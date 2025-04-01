@@ -112,6 +112,11 @@ class WarehouseMaterialResource extends Resource
                     ->label('Ціна')
                     ->money('UAH', true)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('total_cost')
+                    ->label('Загальна вартість')
+                    ->getStateUsing(fn ($record) => $record->quantity * $record->price)
+                    ->money('UAH', true)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
