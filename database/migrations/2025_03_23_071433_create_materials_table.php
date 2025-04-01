@@ -20,6 +20,7 @@ return new class extends Migration
             //додати виробника
             //додати колір такнини
 
+            //asdadad
 //фів
 
             $table->string('description')->nullable();
