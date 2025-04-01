@@ -98,13 +98,20 @@ class MaterialResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Назва')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('barcode')
+                    ->label('Штрихкод')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
+                    ->label('Опис')
                     ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\TextColumn::make('unit'),
-                Tables\Columns\TextColumn::make('category_id')
-                    ->numeric()
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Зображення'),
+                Tables\Columns\TextColumn::make('unit')
+                    ->label('Одиниця виміру'),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Категорія')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
