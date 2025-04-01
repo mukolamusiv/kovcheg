@@ -35,16 +35,61 @@ class MaterialResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Назва')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('description')
+                Forms\Components\TextInput::make('manufacturer_code')
+                    ->label('Код виробника')
+                    ->maxLength(255),
+                Forms\Components\Select::make('supplier_id')
+                    ->label('Постачальник')
+                    ->relationship('supplier', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Назва постачальника')
+                            ->required(),
+                        Forms\Components\TextInput::make('contact')
+                            ->label('Контактна інформація')
+                            ->maxLength(255),
+                    ]),
+                Forms\Components\TextInput::make('fabric_color')
+                    ->label('Колір тканини')
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->label('Опис')
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('image')
+                    ->label('Зображення')
                     ->image(),
-                Forms\Components\TextInput::make('unit')
+                Forms\Components\Select::make('unit')
+                    ->label('Одиниця виміру')
+                    ->options([
+                        'метри погонні' => 'Метри погонні',
+                        'одиниці' => 'Одиниці',
+                        'кг' => 'Кілограми',
+                        'літри' => 'Літри',
+                    ])
                     ->required(),
-                Forms\Components\TextInput::make('category_id')
-                    ->numeric(),
+                Forms\Components\Select::make('category_id')
+                    ->label('Категорія')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Назва категорії')
+                            ->required(),
+                        Forms\Components\Textarea::make('description')
+                            ->label('Опис')
+                            ->maxLength(255),
+                        Forms\Components\Select::make('parent_id')
+                            ->label('Батьківська категорія')
+                            ->relationship('parent', 'name')
+                            ->searchable()
+                            ->preload(),
+                    ]),
             ]);
     }
 

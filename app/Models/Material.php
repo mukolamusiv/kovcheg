@@ -56,6 +56,11 @@ class Material extends Model
                     });
     }
 
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
     /**
      * Генерує унікальний штрихкод для матеріалу.
      *
