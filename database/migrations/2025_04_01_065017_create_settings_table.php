@@ -13,10 +13,15 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
+            // Ідентифікатор користувача, зовнішній ключ
             $table->unsignedBigInteger('user_id');
+            // Фіксована націнка, десяткове число з точністю до 10 цифр, 2 з яких після коми
             $table->decimal('markup_fixed', 10, 2)->nullable();
+            // Відсоткова націнка, десяткове число з точністю до 5 цифр, 2 з яких після коми
             $table->decimal('markup_percentage', 5, 2)->nullable();
+            // Максимальна націнка, десяткове число з точністю до 10 цифр, 2 з яких після коми
             $table->decimal('markup_max', 10, 2)->nullable();
+            // Дозвіл на знижки, булеве значення, за замовчуванням false
             $table->boolean('allow_discounts')->default(false);
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

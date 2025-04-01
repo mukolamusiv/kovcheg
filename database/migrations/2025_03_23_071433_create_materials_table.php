@@ -19,10 +19,10 @@ return new class extends Migration
             //додати код виробника
             //додати виробника
             //додати колір такнини
-
-            //asdasd
-            //asdadad
-//фів
+            $table->string('barcode')->unique(); // унікальний код матеріалу штрихкод
+            $table->string('manufacturer_code')->nullable(); // код виробника можуть бути символи і цифри опційно
+            $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->cascadeOnDelete(); // виробника зв'язок з постачальником опційно
+            $table->string('fabric_color')->nullable(); // колір тканини опційно
 
             $table->string('description')->nullable();
             $table->string('image')->nullable();
