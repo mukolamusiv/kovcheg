@@ -38,12 +38,16 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Назва')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('description')
+                    ->label('Опис')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('parent_id')
-                    ->numeric(),
+                Forms\Components\Select::make('parent_id')
+                    ->label('Батьківська категорія')
+                    ->options(Category::all()->pluck('name', 'id'))
+                    ->searchable(),
             ]);
     }
 
@@ -52,10 +56,13 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Назва категорі')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
+                ->label('Опис')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('parent_id')
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label('Належить до категорі')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
