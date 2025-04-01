@@ -20,6 +20,8 @@ return new class extends Migration
             //додати виробника
             //додати колір такнини
 
+//фів
+
             $table->string('description')->nullable();
             $table->string('image')->nullable();
             $table->enum('unit', ['метри погонні','одиниці','кг','літри'])->default('метри погонні');
