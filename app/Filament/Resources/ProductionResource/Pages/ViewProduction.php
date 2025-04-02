@@ -303,6 +303,10 @@ class ViewProduction extends ViewRecord
                                 ->schema([
                                     TextEntry::make('name')->label('Назва етапу'),
                                     TextEntry::make('status')->label('Статус'),
+                                    TextEntry::make('user.photo')
+                                        ->label('Фото працівника')
+                                        ->formatStateUsing(fn ($state) => $state ? "<img src='{$state}' alt='Фото працівника' style='width: 50px; height: 50px; border-radius: 50%;'>" : 'Немає фото')
+                                        ->html(),
                                     TextEntry::make('user.name')->label('Працівник'),
                                     TextEntry::make('date')->label('Дата завершення'),
 
