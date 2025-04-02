@@ -267,6 +267,34 @@ class ViewProduction extends ViewRecord
 
 
                         Section::make('Етапи виробництва')
+                        ->headerActions([
+                            Action::make('assign_users')
+                                ->label('Призначити відповідальних')
+                                ->icon('heroicon-o-user-group')
+                                ->color('primary')
+                                ->form(function (Production $record) {
+                                    return $record->productionStages->map(function ($stage) {
+                                        return Select::make("stages.{$stage->id}.user_id")
+                                            ->label("Відповідальний для етапу: {$stage->name}")
+                                            ->options(User::all()->pluck('name', 'id'))
+                                            ->searchable()
+                                            ->required();
+                                    })->toArray();
+                                })
+                                ->action(function (array $data, Production $record): void {
+                                    foreach ($data['stages'] as $stageId => $stageData) {
+                                        $stage = $record->productionStages->find($stageId);
+                                        if ($stage) {
+                                            $stage->user_id = $stageData['user_id'];
+                                            $stage->save();
+                                        }
+                                    }
+                                    Notification::make()
+                                        ->title('Відповідальних користувачів оновлено успішно!')
+                                        ->success()
+                                        ->send();
+                                }),
+                        ])
                             ->schema([
                                 RepeatableEntry::make('productionStages')
                                 ->label('Етапи виробництва')
