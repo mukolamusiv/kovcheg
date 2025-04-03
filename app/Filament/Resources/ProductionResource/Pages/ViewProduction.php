@@ -299,16 +299,17 @@ class ViewProduction extends ViewRecord
                                 RepeatableEntry::make('productionStages')
                                 ->label('Етапи виробництва')
                                 ->columnSpan(12)
-                                ->columns(2)
+                                ->columns(3)
                                 ->schema([
                                     TextEntry::make('name')->label('Назва етапу'),
                                     TextEntry::make('status')->label('Статус'),
-                                    ViewEntry::make('user.photo')
-                                        ->label('Фото працівника')
-                                        ->view('components.user-photo'),
-                                    TextEntry::make('user.name')->label('Працівник'),
                                     TextEntry::make('date')->label('Дата завершення'),
-
+                                    TextEntry::make('user.name')->label('Працівник'),
+                                    ViewEntry::make('user')
+                                    ->label('')
+                                    ->view('components.user-photo', [
+                                        'profile_photo_path' => $this->record->user?->profile_photo_path ?? null,
+                                    ]),
                                 ]),
                         ])
                         ->columnSpan(6)

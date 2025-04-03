@@ -96,4 +96,10 @@ class User extends Authenticatable
     }
 
 
+    public function photo()
+    {
+        return $this->profile_photo_path;
+    }
+
+
 }
