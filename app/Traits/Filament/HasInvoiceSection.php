@@ -27,6 +27,7 @@ trait HasInvoiceSection
             //->icon('heroicon-m-shopping-bag')
             //->compact()
             ->visible(fn () => $invoice !== null)
+           // ->getRecord($invoice)
             //->columns(5)
             ->headerActions([
                 // ActionsAction::make('reconcileFinances_' . $invoice->id)
@@ -60,8 +61,8 @@ trait HasInvoiceSection
             ->columns(12)
             ->schema([
                 Section::make('Інформація про накладну')
-                ->description('Загально')
-                ->columns(2)
+                    ->description('Загально')
+                    ->columns(2)
                 //->backgroundColor('gray')
                 //->collapsed(true)
                 //->columnSpan(min(6, 12))
@@ -89,14 +90,24 @@ trait HasInvoiceSection
                 ->footerActionsAlignment(Alignment::Center)
 
                 ->schema([
-                    TextEntry::make('invoice_number')->label('Номер накладної')->default($invoice->invoice_number)->badge()->color('info'),
-                    TextEntry::make('invoice_date')->label('Дата накладної')->default($invoice->invoice_date)->badge()->color('info'),
+                    TextEntry::make('invoice_number')
+                        ->label('Номер накладної')
+                        ->default($invoice->invoice_number)
+                        ->badge()
+                        ->color('info'),
+                    TextEntry::make('invoice_date')
+                        ->label('Дата накладної')
+                        ->default($invoice->invoice_date)
+                        ->badge()
+                        ->color('info'),
                     TextEntry::make('type')->label('Тип')->default($invoice->type)->badge()->color('primary'),
                     TextEntry::make('status')->label('Статус')->default($invoice->status)->badge()->color(fn () => match ($invoice->status) {
                         'створено' => 'info',
                         'проведено' => 'success',
                         'скасовано' => 'danger',
                     }),
+                    TextEntry::make('invoice.notes')
+                        ->label('Примітки'),
                 ]),
 
                 Section::make('Фінанси')
@@ -117,18 +128,30 @@ trait HasInvoiceSection
                             ->color('success')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
                     ])
+                    ->footerActionsAlignment(Alignment::Center)
 
                     ->schema([
                         TextEntry::make('total')->label('Сума')->default($invoice->total)->badge()->color('success'),
                         TextEntry::make('paid')->label('Оплачено')->default($invoice->paid)->badge()->color('warning'),
                         TextEntry::make('due')->label('Заборгованість')->default($invoice->due)->badge()->color('danger'),
                         TextEntry::make('discount')->label('Знижка')->default($invoice->discount)->badge()->color('success'),
+                        TextEntry::make('payment_status')
+                        ->badge()
+                        ->label('Статус оплати')
+                        ->default($invoice->payment_status)
+                        ->color(fn () => match ($invoice->payment_status) {
+                            'завдаток' => 'info',
+                            'частково оплачено' => 'warning',
+                            'оплачено' => 'success',
+                            'не оплачено' => 'danger',
+                        }),
                     ]),
     //                 public function invoiceProductionItems()
     // {
     //     return $this->hasMany(InvoiceProductionItem::class);
     // }
-                    RepeatableEntry::make('invoice.invoiceProductionItems')
+                    RepeatableEntry::make('produc')
+                        ->default(fn () => $invoice->invoiceProductionItems ?? [])
                         ->label('Позиції виробництва')
                         //->label('Позиції замовлення')
                         ->columnSpan(12)
@@ -145,12 +168,16 @@ trait HasInvoiceSection
                             // TextEntry::make('debet.amount'),
                             // TextEntry::make('transaction_date'),
                         ]),
-                    RepeatableEntry::make('invoice.invoiceItems')
+                    RepeatableEntry::make('invoiceItems')
+                        //->default(fn () => $invoice->invoiceItems ?? [])
+                        // ->viewData(
+                        //     ['invoiceItems' => $invoice->invoiceItems],
+                        // )
                         ->label('Позиції накладної')
                         ->columns(4)
                         //->collapsed(true)
-                       // ->columnSpanFull()
-                        ->columnSpan(6)
+                        ->columnSpanFull()
+                        //->columnSpan()
                         //->description('Матеріали накладної')
                         ->schema([
                             TextEntry::make('quantity')->label('Кількість'),
@@ -158,28 +185,37 @@ trait HasInvoiceSection
                             TextEntry::make('total')->label('Сума'),
                         ]),
 
-                TextEntry::make('notes')->label('Примітки')->default($invoice->notes)->badge()->color('secondary'),
-                TextEntry::make('payment_status')
-                    ->badge()
-                    ->label('Статус оплати')
-                    ->default($invoice->payment_status)
-                    ->color(fn () => match ($invoice->payment_status) {
-                        'завдаток' => 'info',
-                        'частково оплачено' => 'warning',
-                        'оплачено' => 'success',
-                        'не оплачено' => 'danger',
-                    }),
+                        Section::make('Транзакції')
+                        ->description('Усі транзакції накладної')
+                        ->collapsed(true)
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->footerActions([
+                            ActionsAction::make('add_discount' . $invoice->id)
+                                ->label('Додати знижку')
+                                ->icon('heroicon-o-printer')
+                                ->color('warning')
+                                ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                            ActionsAction::make('pay' . $invoice->id)
+                                ->label('Оплатити')
+                                ->icon('heroicon-o-printer')
+                                ->color('success')
+                                ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                        ])
 
-                    RepeatableEntry::make('invoice.transactions')
-                        ->label('Транзакції')
-                        ->columnSpan(12)
-                        ->columns(4)
                         ->schema([
-                            TextEntry::make('reference_number'),
-                            TextEntry::make('description'),
-                            TextEntry::make('debet.amount'),
-                            TextEntry::make('transaction_date'),
+                            RepeatableEntry::make('transactions')
+                                ->label('Транзакції')
+                                ->columnSpan(12)
+                                ->columns(4)
+                                ->schema([
+                                    TextEntry::make('reference_number'),
+                                    TextEntry::make('description'),
+                                    TextEntry::make('debet.amount'),
+                                    TextEntry::make('transaction_date'),
+                                ]),
                         ]),
-            ])->columns(5);
+
+            ]);
     }
 }
