@@ -54,7 +54,7 @@ class ProductionResource extends Resource
                                         $set('customer_id', null);
                                     }
                                 }),
-                            Forms\Components\Select::make('custumer_id')
+                            Forms\Components\Select::make('customer_id')
                                 ->label('Клієнт')
                                 ->relationship('customer', 'name')
                                 ->searchable()

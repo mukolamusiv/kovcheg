@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Filament\Notifications\Notification;
+
+use function PHPUnit\Framework\isNull;
 
 // Клас Invoice представляє модель накладної
 class Invoice extends Model
@@ -29,6 +32,12 @@ class Invoice extends Model
         'status', // Загальний статус накладної
         'notes', // Примітки
     ];
+
+    // Відношення до моделі Production (виробництво)
+    public function productions()
+    {
+        return $this->hasMany(Production::class);
+    }
 
     // Відношення до моделі Customer (клієнт)
     public function customer()
@@ -96,6 +105,17 @@ class Invoice extends Model
             $this->due = $this->total - $this->paid;
             $this->save();
         }
+
+        if(!is_null($this->customer_id)){
+            $this->customer()->account();
+        }
+    }
+
+
+    // Метод для отримання суми, що залишилася до оплати
+    public function amount_due()
+    {
+        return $this->total - $this->paid;
     }
 
     // Метод booted для обробки подій моделі
@@ -150,7 +170,7 @@ class Invoice extends Model
     }
 
     // Метод для створення накладних для виробництва
-    public static function createProductionInvoices(\App\Models\Production $production, $customer_id)
+    public static function createProductionInvoices(\App\Models\Production $production, $customer_id = null)
     {
         // Накладна на продаж виробу
         $saleInvoice = new self();
@@ -166,6 +186,7 @@ class Invoice extends Model
         ]);
         $saleInvoice->save();
 
+
         // Додавання виробничих елементів до накладної
         $saleInvoice->invoiceProductionItems()->create([
             'production_id' => $production->id,
@@ -173,6 +194,27 @@ class Invoice extends Model
             'price' => $production->price,
             'total' => $production->quantity * $production->price,
         ]);
+
+            Notification::make()
+                ->title('Створено накладну для продажу №'.$saleInvoice->invoice_number)
+                ->success()
+                ->send();
+
+        // Якщо ідентифікатор клієнта не є null
+        if (!isNull($customer_id)) {
+            // Знаходимо клієнта за ідентифікатором
+            $customer = Customer::find($customer_id);
+            $customer->updateAccount();
+            // Додаємо суму накладної до балансу клієнта
+          //  $customer->add_money($saleInvoice->total);
+            // Зберігаємо оновлену інформацію про клієнта
+            $customer->save();
+
+            Notification::make()
+                ->title('Оновлюємо зовбовязання клієнта!')
+                ->warning()
+                ->send();
+        }
 
         $saleInvoice->save();
 
@@ -247,6 +289,11 @@ class Invoice extends Model
             'price' => $production->price,
             'total' => $production->price * $production->quantity,
         ]);
+
+        Notification::make()
+                ->title('Створено накладну для списання матеріалів для виробництва №'.$writeOffInvoice->invoice_number)
+                ->success()
+                ->send();
 
         // // Додавання матеріалів до накладної
         // foreach ($materials as $material) {

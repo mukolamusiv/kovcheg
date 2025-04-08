@@ -79,6 +79,12 @@ class Production extends Model
             //Invoice::createProductionInvoices($production);
         });
 
+        // static::update(function(){
+        //     $this->custumer_id;
+        //     // Якщо ідентифікатор клієнта не є null
+
+        // });
+
     }
 
 

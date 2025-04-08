@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProductionResource\Pages;
 
 use App\Filament\Resources\ProductionResource;
+use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Production;
 use Filament\Actions;
@@ -18,6 +19,9 @@ class CreateProduction extends CreateRecord
         // Перевірка валідності даних та розрахунок ціни продукту
         $this->validate();
 
+        // $custumer = Customer::find(1);// calculateObligations
+        // dd($custumer->calculateObligations());
+        //dd($this->data);
         $production = Production::createProductionWithDetails($this->data);
 
         Invoice::createProductionInvoices($production, $this->data['customer_id']);

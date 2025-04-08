@@ -34,4 +34,24 @@ class Account extends Model
         return $this->transactionEntries()->where('entry_type', 'кредит');
     }
 
+
+    public function syncBalance()
+    {
+        $debitSum = $this->debitEntries()->sum('amount');
+        $creditSum = $this->creditEntries()->sum('amount');
+        $this->balance = $debitSum - $creditSum;
+        $this->save();
+    }
+
+
+    // public function calculateOutstandingInvoices()
+    // {
+    //     if ($this->owner_type === 'App\Models\Client') {
+    //         return $this->owner->invoices()
+    //             ->where('is_paid', false)
+    //             ->sum('amount');
+    //     }
+    //     return 0;
+    // }
+
 }

@@ -5,9 +5,11 @@ namespace App\Filament\Resources\ProductionResource\Pages;
 use App\Filament\Resources\ProductionResource;
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\Invoice;
 use App\Models\Production;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Traits\Filament\HasInvoiceSection;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Infolist;
@@ -34,6 +36,7 @@ use Pest\ArchPresets\Custom;
 
 class ViewProduction extends ViewRecord
 {
+    use HasInvoiceSection;
     protected static string $resource = ProductionResource::class;
 
     protected function getHeaderActions(): array
@@ -47,9 +50,12 @@ class ViewProduction extends ViewRecord
     public function infolist(Infolist $infolist): Infolist
     {
 
+        $record = $this->getRecord(); // поточний Production
+
        return $infolist
                 ->columns(12)
                 ->schema([
+                    self::getInvoiceSection($record->invoice), // Передаємо іншу накладну
                         Section::make('Інформація про продукт')
                         ->columns(2)
                         ->columnSpan(8)
@@ -299,17 +305,17 @@ class ViewProduction extends ViewRecord
                                 RepeatableEntry::make('productionStages')
                                 ->label('Етапи виробництва')
                                 ->columnSpan(12)
-                                ->columns(3)
+                                ->columns(2)
                                 ->schema([
                                     TextEntry::make('name')->label('Назва етапу'),
                                     TextEntry::make('status')->label('Статус'),
                                     TextEntry::make('date')->label('Дата завершення'),
                                     TextEntry::make('user.name')->label('Працівник'),
-                                    ViewEntry::make('user')
-                                    ->label('')
-                                    ->view('components.user-photo', [
-                                        'profile_photo_path' => $this->record->user?->profile_photo_path ?? null,
-                                    ]),
+                                //     ViewEntry::make('user')
+                                //     ->label('')
+                                //     ->view('components.user-photo', [
+                                //         'profile_photo_path' => $this->record->productionStage?->user?->profile_photo_path ?? null,
+                                //     ]),
                                 ]),
                         ])
                         ->columnSpan(6)

@@ -48,6 +48,16 @@ class TransactionEntry extends Model
             } elseif ($model->entry_type == 'дебет') {
                 $account->balance += $model->amount;
             }
+
+            if(!is_null($account->owner)){
+                dd($account->owner_type == 'App\Models\Customer' , $account->owner);
+            }
+
+            // if($model->account->owner == Customer::class){
+            //     // $account->balance = $account->balance - $model->amount;
+            //     // $account->balance = 0;
+
+            // }
             //dd($account->balance);
             $account->save();
         });

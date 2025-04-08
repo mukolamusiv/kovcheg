@@ -30,11 +30,29 @@ class Customer extends Model
                 'balance' => 0.00,
             ]);
         });
+
+        // Слухаємо подію "updated" для моделі Customer
+        static::updated(function ($customer) {
+            // Перераховуємо баланс рахунку клієнта на основі його зобов'язань
+            $customer->account->balance = $customer->calculateObligations();
+            // Зберігаємо оновлений баланс у базі даних
+            $customer->account->save();
+        });
+        //     $customer->account->balance = $customer->calculateObligations();
+        //     $customer->account->save();
+        // });
     }
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class, 'owner_id')->where('owner_type', 'App\Models\Customer');
+        return $this->hasManyThrough(
+            Transaction::class,
+            TransactionEntry::class,
+            'account_id', // Foreign key on TransactionEntry table
+            'id',         // Foreign key on Transaction table
+            'account_id', // Local key on Account table
+            'transaction_id' // Local key on TransactionEntry table
+        );
     }
 
     public function getBalanceAttribute()
@@ -47,4 +65,35 @@ class Customer extends Model
         return $this->hasMany(CustomerSize::class);
     }
 
+    public function add_money($amount)
+    {
+        $this->account->balance += $amount;
+        $this->account->save();
+    }
+
+
+
+    public function calculateObligations()
+    {
+        $invoicesTotal = $this->invoices()->sum('due');
+        $transactionsTotal = $this->transactions()
+            ->with('entries')
+            ->get()
+            ->flatMap(function ($transaction) {
+            return $transaction->entries;
+            })
+            ->sum('amount');
+        return $invoicesTotal - $transactionsTotal;
+    }
+
+
+    public function updateAccount()
+    {
+        $this->account->balance = $this->calculateObligations();
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'customer_id');
+    }
 }
