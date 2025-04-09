@@ -976,6 +976,15 @@ class ViewProduction extends ViewRecord
     private function getInvoicesMaterials(Production $record): array
     {
         $invoices_off = $record->invoice_off; // отримуємо накладні
+
+        if(is_null($invoices_off)) {
+            $productionItems = []; // отримуємо позиції виробництва
+            $invoiceItems = []; // отримуємо позиції товарів
+        }else{
+            $productionItems = $invoices_off->invoiceProductionItems; // отримуємо позиції виробництва
+            $invoiceItems = $invoices_off->invoiceItems; // отримуємо позиції товарів
+        }
+
         $materials = [];
         if (is_null($invoices_off)) {
             $materials[] = Section::make('Накладна на списання матеріалів')
@@ -1081,40 +1090,26 @@ class ViewProduction extends ViewRecord
                         'не оплачено' => 'danger',
                     }),
                 ]),
-            ]);
-            foreach ($invoiceMaterials as $item) {
-                $materials[] = Section::make('Матеріал - ' . $item->material->name)
+
+
+                Section::make('Усі замовлення накладної')
+                    //->description('Усі транзакції накладної')
+                    ->collapsed(true)
+                    ->columns(2)
                     ->columnSpanFull()
-                    ->schema([
-                        TextEntry::make('name')
-                            ->label('Назва матеріалу')
-                            ->default($item->material->name)
-                            ->weight('bold'),
+                    ->schema(
+                        $this->getProductionInvoice($productionItems)
+                ),
 
-                        TextEntry::make('quantity')
-                            ->label('Кількість')
-                            ->default($item->quantity)
-                            ->numeric(),
-
-                        TextEntry::make('price')
-                            ->label('Ціна')
-                            ->default($item->price)
-                            ->prefix('₴'),
-
-                        TextEntry::make('total')
-                            ->label('Сума')
-                            ->default($item->total)
-                            ->prefix('₴'),
-
-                        TextEntry::make('description')
-                            ->label('Опис')
-                            ->default($item->description ?? '-'),
-                    ])
-                    ->columns([
-                        'sm' => 2,
-                        'lg' => 3,
-                    ]);
-            }
+                Section::make('Усі товари у накладній')
+                    //->description('Усі транзакції накладної')
+                    ->collapsed(true)
+                    ->columns(2)
+                    ->columnSpanFull()
+                    ->schema(
+                        $this->getItemsInvoice($invoiceItems)
+                    ),
+            ]);
         }
 
         return $materials;
