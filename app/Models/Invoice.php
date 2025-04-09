@@ -66,7 +66,7 @@ class Invoice extends Model
     // Відношення до моделі InvoiceProductionItem (виробничі елементи накладної)
     public function invoiceProductionItems()
     {
-        return $this->hasMany(InvoiceProductionItem::class);
+        return $this->hasMany(InvoiceProductionItem::class, 'invoice_id', 'id', 'id');
     }
 
     // Відношення до моделі Transaction (транзакції)
