@@ -6,7 +6,9 @@ use App\Filament\Resources\ProductionResource;
 use App\Models\Account;
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Models\InvoiceProductionItem;
 use App\Models\Production;
+use App\Models\ProductionSize;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Traits\Filament\HasInvoiceSection;
@@ -22,7 +24,7 @@ use Filament\Infolists\Components\Fieldset;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Closure;
-
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\ViewEntry;
@@ -43,25 +45,22 @@ class ViewProduction extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+           // Actions\EditAction::make(),
         ];
     }
 
 
     public function infolist(Infolist $infolist): Infolist
     {
-
         $record = $this->getRecord(); // поточний Production
-        $customer = Customer::find($record->customer_id); // отримуємо клієнта
-        $user = User::find($record->user_id); // отримуємо відповідального
-        $invoice = Invoice::find($record->invoice_id); // отримуємо рахунок
-        $transactions = Transaction::where('invoice_id', $record->invoice_id)->get(); // отримуємо транзакції
-        $totalPaid = $transactions->sum('amount'); // сума всіх транзакцій
-        $totalPaid = $totalPaid ? $totalPaid : 0; // якщо сума транзакцій не визначена, то 0
-        $total = $record->price; // загальна сума замовлення
-        $productionStages = $record->productionStages; // етапи виробництва
-
-
+        // $customer = Customer::find($record->customer_id); // отримуємо клієнта
+        // $user = User::find($record->user_id); // отримуємо відповідального
+        // $invoice = Invoice::find($record->invoice_id); // отримуємо рахунок
+        // $transactions = Transaction::where('invoice_id', $record->invoice_id)->get(); // отримуємо транзакції
+        // $totalPaid = $transactions->sum('amount'); // сума всіх транзакцій
+        // $totalPaid = $totalPaid ? $totalPaid : 0; // якщо сума транзакцій не визначена, то 0
+        // $total = $record->price; // загальна сума замовлення
+        // $productionStages = $record->productionStages; // етапи виробництва
 
         return $infolist
                 ->columns(12)
@@ -72,30 +71,78 @@ class ViewProduction extends ViewRecord
                         ->columns(12)
                         ->columnSpan(12)
                         ->headerActions([
-                            Action::make('Star')
-                                ->label('Оплатити')
-                                ->icon('heroicon-s-currency-euro')
-                                ->color('danger')
+
+                            Action::make('startProduction')
+                                ->label('Розпочати виробництво')
+                                ->icon('heroicon-o-play')
+                                ->color('success')
+                                ->hidden(fn () => $record->status !== 'створено')
+                                ->requiresConfirmation()
+                                ->action(function (Production $record): void {
+                                    $record->status = 'в роботі';
+                                    try {
+                                        if ($record->save()) {
+                                            Notification::make()
+                                                ->title('Виробництво успішно запущено!')
+                                                ->success()
+                                                ->send();
+                                        } else {
+                                            Notification::make()
+                                                ->title('Не вдалося запустити виробництво!')
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    } catch (\Exception $e) {
+                                        Notification::make()
+                                            ->title('Помилка збереження: ' . $e->getMessage())
+                                            ->danger()
+                                            ->send();
+                                    }
+                                }),
+
+                            Action::make('editProduction')
+                                ->label('Редагувати')
+                                ->icon('heroicon-o-pencil')
+                                ->color('info')
                                 ->requiresConfirmation()
                                 ->form([
-                                    Select::make('account')
-                                        ->label('Гроші на рахунок')
-                                        ->options(Account::query()->where(['owner_id' => null])->pluck('name', 'id'))
-                                        ->required(),
-                                    TextInput::make('price')
-                                        ->label('Сума оплати')
+                                    TextInput::make('name')
+                                        ->label('Назва')
+                                        ->required()
+                                        ->default($record->name),
+                                    Textarea::make('description')
+                                        ->label('Опис')
+                                        ->default($record->description),
+                                    TextInput::make('quantity')
+                                        ->label('Кількість')
                                         ->required()
                                         ->numeric()
-                                        ->minValue(0)
-                                        ->maxValue($record->price)
-                                        ->default($record->price)
+                                        ->minValue(1)
+                                        ->default($record->quantity),
                                 ])
                                 ->action(function (array $data, Production $record): void {
+                                    $record->name = $data['name'];
+                                    $record->description = $data['description'];
+                                    $record->quantity = $data['quantity'];
 
-                                    // dd($data,$record->invoice());
-
-                                    // $record->author()->associate($data['authorId']);
-                                    // $record->save();
+                                    try {
+                                        if ($record->save()) {
+                                            Notification::make()
+                                                ->title('Виробництво успішно змінено!')
+                                                ->success()
+                                                ->send();
+                                        } else {
+                                            Notification::make()
+                                                ->title('Не вдалося змінити виробництво!')
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    } catch (\Exception $e) {
+                                        Notification::make()
+                                            ->title('Помилка збереження: ' . $e->getMessage())
+                                            ->danger()
+                                            ->send();
+                                    }
                                 })
                         ])
                         ->schema([
@@ -115,7 +162,7 @@ class ViewProduction extends ViewRecord
                                         ->badge()
                                         ->color(fn ($state) => match ($state) {
                                             'створено' => 'info',
-                                            'в роботі' => 'warring',
+                                            'в роботі' => 'warning',
                                             'виготовлено' => 'success',
                                             'скасовано' => 'danger',
                                             default => 'gray',
@@ -147,7 +194,7 @@ class ViewProduction extends ViewRecord
                                         ->label('Кількість'),
 
                                     TextEntry::make('price')
-                                        ->label('Ціна')
+                                        ->label('Вартість виробу')
                                         ->prefix('₴'),
 
                                     TextEntry::make('production_date')
@@ -161,7 +208,13 @@ class ViewProduction extends ViewRecord
                             Fieldset::make('customer')
                                 ->label('Клієнт')
                                 ->columns(12)
-                                ->schema($this->getCustomer($record),),
+                                ->schema(
+                                    array_merge(
+                                        $this->getCustomer($record),
+                                        $this->getSizeProduction($record)
+                                    ),
+                                ),
+
                         ])
                         ->columns([
                             'sm' => 2,
@@ -308,7 +361,9 @@ class ViewProduction extends ViewRecord
                         ->columnSpan(12)
                         ->headerActions([
                         ])
-                        ->schema($this->getInvoices($record))
+                        ->schema(
+                            array_merge($this->getInvoices($record),$this->getInvoicesMaterials($record))
+                            )
                         ->columns([
                            'sm' => 2,
                            'lg' => 4,
@@ -326,6 +381,180 @@ class ViewProduction extends ViewRecord
 
 
 
+    private function getSizeProduction(Production $record): array
+    {
+
+        //dd($record->customer->size);
+        $data[] = Section::make('Розміри виробу')
+                ->description('Розміри виробу')
+                ->columnSpan(8)
+                ->headerActions([
+                    Action::make('applyCustomerSize')
+                        ->label('Застосувати розміри клієнта')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->visible(fn () => $record->customer->size->last() !== null)
+                        ->requiresConfirmation()
+                        ->action(function (Production $record): void {
+                           // dd($record->customer->size->last());
+                            $customerSize = $record->customer->size->last();
+                           // $size = $record->productionSizes;
+                            if ($customerSize) {
+                                $size = $record->productionSizes ?? $record->productionSizes()->create();
+                                $size->throat = $customerSize->throat;
+                                $size->redistribution = $customerSize->redistribution;
+                                $size->behind = $customerSize->behind;
+                                $size->hips = $customerSize->hips;
+                                $size->length = $customerSize->length;
+                                $size->sleeve = $customerSize->sleeve;
+                                $size->shoulder = $customerSize->shoulder;
+                                $size->comment = $customerSize->comment;
+
+                                try {
+                                    if ($size->save()) {
+                                        Notification::make()
+                                            ->title('Розміри клієнта успішно застосовано до виробу!')
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        Notification::make()
+                                            ->title('Не вдалося застосувати розміри клієнта до виробу!')
+                                            ->danger()
+                                            ->send();
+                                    }
+                                } catch (\Exception $e) {
+                                    Notification::make()
+                                        ->title('Помилка збереження: ' . $e->getMessage())
+                                        ->danger()
+                                        ->send();
+                                }
+                            }
+                        }),
+
+                    Action::make('editCustomerSize')
+                        ->label('Редагувати розміри')
+                        ->icon('heroicon-o-pencil')
+                        ->color('info')
+                        ->form([
+                            TextInput::make('throat')
+                                ->label('Обхват горла')
+                                ->numeric()
+                                ->default($record->productionSizes->throat ?? null),
+                            TextInput::make('redistribution')
+                                ->label('Обхват грудей')
+                                ->numeric()
+                                ->default($record->productionSizes->redistribution ?? null),
+                            TextInput::make('behind')
+                                ->label('Обхват талії')
+                                ->numeric()
+                                ->default($record->productionSizes->behind ?? null),
+                            TextInput::make('hips')
+                                ->label('Обхват стегон')
+                                ->numeric()
+                                ->default($record->productionSizes->hips ?? null),
+                            TextInput::make('length')
+                                ->label('Довжина виробу')
+                                ->numeric()
+                                ->default($record->productionSizes->length ?? null),
+                            TextInput::make('sleeve')
+                                ->label('Довжина рукава')
+                                ->numeric()
+                                ->default($record->productionSizes->sleeve ?? null),
+                            TextInput::make('shoulder')
+                                ->label('Ширина плечей')
+                                ->numeric()
+                                ->default($record->productionSizes->shoulder ?? null),
+                            Textarea::make('comment')
+                                ->label('Коментар')
+                                ->default($record->productionSizes->comment ?? null),
+                        ])
+                        ->action(function (array $data, Production $record): void {
+                            $productionSize = $record->productionSizes;
+
+                            if (!$productionSize) {
+                                $productionSize = new ProductionSize();
+                                $productionSize->customer_id = $record->customer_id;
+                            }
+
+                            $productionSize->throat = $data['throat'];
+                            $productionSize->redistribution = $data['redistribution'];
+                            $productionSize->behind = $data['behind'];
+                            $productionSize->hips = $data['hips'];
+                            $productionSize->length = $data['length'];
+                            $productionSize->sleeve = $data['sleeve'];
+                            $productionSize->shoulder = $data['shoulder'];
+                            $productionSize->comment = $data['comment'];
+
+                            try {
+                                if ($productionSize->save()) {
+                                    $record->save();
+
+                                    Notification::make()
+                                        ->title('Розміри клієнта успішно оновлено!')
+                                        ->success()
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->title('Не вдалося оновити розміри клієнта!')
+                                        ->danger()
+                                        ->send();
+                                }
+                            } catch (\Exception $e) {
+                                Notification::make()
+                                    ->title('Помилка збереження: ' . $e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        })
+                ])
+                ->schema([
+                    TextEntry::make('throat')
+                        ->label('Обхват горла')
+                        ->default($record->productionSizes->throat ?? '-'),
+
+                    TextEntry::make('redistribution')
+                        ->label('Обхват грудей')
+                        ->default($record->productionSizes->redistribution ?? '-'),
+
+                    TextEntry::make('behind')
+                        ->label('Обхват талії')
+                        ->default($record->productionSizes->behind ?? '-'),
+
+                    TextEntry::make('hips')
+                        ->label('Обхват стегон')
+                        ->default($record->productionSizes->hips ?? '-'),
+
+                    TextEntry::make('length')
+                        ->label('Довжина виробу')
+                        ->default($record->productionSizes->length ?? '-'),
+
+                    TextEntry::make('sleeve')
+                        ->label('Довжина рукава')
+                        ->default($record->productionSizes->sleeve ?? '-'),
+
+                    TextEntry::make('shoulder')
+                        ->label('Ширина плечей')
+                        ->default($record->productionSizes->shoulder ?? '-'),
+
+                    TextEntry::make('comment')
+                        ->label('Коментар')
+                        ->default($record->productionSizes->comment ?? '-'),
+                ])
+                ->columns([
+                   'sm' => 2,
+                   'lg' => 4,
+                ]);
+            return $data;
+    }
+
+
+
+    /**
+     * Отримуємо Дані про клієнта
+     *
+     * @param Production $record
+     * @return array
+     */
     private function getCustomer(Production $record): array
     {
         $customer = $record->customer; // отримуємо клієнта
@@ -381,85 +610,104 @@ class ViewProduction extends ViewRecord
                     TextEntry::make($customer->email ?? '')
                         ->label('Email клієнта')
                         ->default($customer->email),
-                ]);
 
-
-            $data[] = Section::make('Розміри клієнта')
-                ->description('Розміри клієнта')
-                ->columnSpan(8)
-                ->headerActions([
-                    Action::make('selectCustomerSize')
-                        ->label('Вибрати розміри')
-                        ->icon('heroicon-o-user')
-                        ->color('success')
-                        ->form([
-                            Select::make('customer_size_id')
-                                ->label('Розміри клієнта')
-                                ->options(\App\Models\CustomerSize::where('customer_id', $customer->id)->pluck('id', 'id'))
-                                ->required(),
-                        ])
-                        ->action(function (array $data, Production $record): void {
-                            $record->customer_size_id = $data['customer_size_id'];
-
-                            try {
-                                if ($record->save()) {
-                                    Notification::make()
-                                        ->title('Розміри клієнта успішно змінено!')
-                                        ->success()
-                                        ->send();
-                                } else {
-                                    Notification::make()
-                                        ->title('Не вдалося змінити розміри клієнта!')
-                                        ->danger()
-                                        ->send();
-                                }
-                            } catch (\Exception $e) {
-                                Notification::make()
-                                    ->title('Помилка збереження: ' . $e->getMessage())
-                                    ->danger()
-                                    ->send();
-                            }
-                        })
-                ])
-                ->schema([
-                    TextEntry::make('throat')
-                        ->label('Обхват горла')
-                        ->default($record->customerSize->throat ?? '-'),
-
-                    TextEntry::make('redistribution')
-                        ->label('Обхват грудей')
-                        ->default($record->customerSize->redistribution ?? '-'),
-
-                    TextEntry::make('behind')
-                        ->label('Обхват талії')
-                        ->default($record->customerSize->behind ?? '-'),
-
-                    TextEntry::make('hips')
-                        ->label('Обхват стегон')
-                        ->default($record->customerSize->hips ?? '-'),
-
-                    TextEntry::make('length')
-                        ->label('Довжина виробу')
-                        ->default($record->customerSize->length ?? '-'),
-
-                    TextEntry::make('sleeve')
-                        ->label('Довжина рукава')
-                        ->default($record->customerSize->sleeve ?? '-'),
-
-                    TextEntry::make('shoulder')
-                        ->label('Ширина плечей')
-                        ->default($record->customerSize->shoulder ?? '-'),
-
-                    TextEntry::make('comment')
-                        ->label('Коментар')
-                        ->default($record->customerSize->comment ?? '-'),
-                ])
-                ->columns([
-                   'sm' => 2,
-                   'lg' => 4,
                 ]);
         }
         return $data;
+    }
+
+
+
+    /**
+     * Отримуємо список виробництв у накладній
+     *
+     * @param Production $record
+     * @return array
+     */
+    private function getProductionInvoice($invoiceProductionItems): array
+    {
+        $invoice = [];
+        if(is_null($invoiceProductionItems)) {
+            $invoice[] = Fieldset::make('invoiceProductionItems')
+                            //->default(fn () => $invoiceProductionItems ?? [])
+                            ->label('Позиції виробництва')
+                            ->columnSpan(12)
+                            ->columns(4)
+                            ->schema([
+                                TextEntry::make('quantity')->label('Кількість'),
+                                TextEntry::make('price')->label('Ціна'),
+                                TextEntry::make('total')->label('Сума'),
+                                TextEntry::make('production.name')->label('Виробництво'),
+                                TextEntry::make('production.description')->label('Опис'),
+                                TextEntry::make('production.status')->label('Статус'),
+                                TextEntry::make('production.type')->label('Тип'),
+                            ]);
+        }else {
+           foreach ($invoiceProductionItems as $productionItems){
+            $invoice[] = Fieldset::make('invoiceProductionItems'.$productionItems->id)
+                            //->default(fn () => $production ?? [])
+                            ->label('Виробництво - '.$productionItems->production->name)
+                            ->columnSpan(12)
+                            ->columns(4)
+                            ->schema([
+                                TextEntry::make('quantity'.$productionItems->id)
+                                    ->default($productionItems->quantity)->label('Кількість'),
+                                TextEntry::make('price'.$productionItems->id)
+                                    ->default($productionItems->price)->label('Ціна'),
+                                TextEntry::make('total'.$productionItems->id)
+                                    ->default($productionItems->price)->label('Сума'),
+                                TextEntry::make('productionname'.$productionItems->id)
+                                    ->default($productionItems->production->name)->label('Виробництво'),
+                                TextEntry::make('productiondescription'.$productionItems->id)
+                                    ->default($productionItems->production->description)->label('Опис'),
+                                TextEntry::make('productionstatus'.$productionItems->id)
+                                    ->default($productionItems->production->status)->label('Статус'),
+                                TextEntry::make('productiontype'.$productionItems->id)
+                                    ->default($productionItems->production->type)->label('Тип'),
+                            ]);
+           }
+        }
+        return $invoice;
+    }
+
+
+    private function getItemsInvoice($invoiceItemsItems): array
+    {
+        $invoice = [];
+        if(is_null($invoiceItemsItems)) {
+            $invoice[] = Fieldset::make('invoiceProductionItems')
+                            //->default(fn () => $invoiceProductionItems ?? [])
+                            ->label('Товари у накладній відсутні')
+                            ->columnSpan(12)
+                            ->columns(4)
+                            ->schema([
+                                // TextEntry::make('quantity')->label('Кількість'),
+                                // TextEntry::make('price')->label('Ціна'),
+                                // TextEntry::make('total')->label('Сума'),
+                                // TextEntry::make('production.name')->label('Виробництво'),
+                                // TextEntry::make('production.description')->label('Опис'),
+                                // TextEntry::make('production.status')->label('Статус'),
+                                // TextEntry::make('production.type')->label('Тип'),
+                            ]);
+        }else {
+           foreach ($invoiceItemsItems as $items){
+            $invoice[] = Fieldset::make('invoiceItemsItems'.$items->id)
+                            ->label('Товар - '.$items->material->name)
+                            ->columnSpan(12)
+                            ->columns(4)
+                            ->schema([
+                                TextEntry::make('quantity'.$items->id)
+                                    ->default($items->quantity)->label('Кількість'),
+                                TextEntry::make('price'.$items->id)
+                                    ->default($items->price)->label('Ціна'),
+                                TextEntry::make('total'.$items->id)
+                                    ->default($items->total)->label('Сума'),
+                                TextEntry::make('materialname'.$items->id)
+                                    ->default($items->material->name)->label('Матеріал'),
+                            ]);
+           }
+        }
+        return $invoice;
     }
 
 
@@ -473,22 +721,81 @@ class ViewProduction extends ViewRecord
     private function getInvoices(Production $record): array
     {
         $invoices = $record->invoice; // отримуємо накладні
+        if(is_null($invoices)) {
+            $productionItems = []; // отримуємо позиції виробництва
+            $invoiceItems = []; // отримуємо позиції товарів
+        }else{
+            $productionItems = $invoices->invoiceProductionItems; // отримуємо позиції виробництва
+            $invoiceItems = $invoices->invoiceItems; // отримуємо позиції товарів
+        }
+
+       // dd($invoices,$productionItems);
         $invoice = [];
         //dd($invoices);
         if(is_null($invoices)) {
-            $invoice[] = Section::make('Накладна - ')
+            $invoice[] = Section::make('Немає накладної на продаж')
                 ->description('Немає накладних')
+                ->headerActions([
+                    Action::make('addInvoice')
+                        ->label('Додати накладну')
+                        ->icon('heroicon-o-plus')
+                        ->requiresConfirmation()
+                        ->color('success')
+                        ->form([
+                            Select::make('invoice_id')
+                                ->label('Виберіть накладну')
+                                ->options(Invoice::pluck('invoice_number', 'id'))
+                                ->searchable()
+                                ->placeholder('Створити нову накладну')
+                        ])
+                        ->action(function (array $data, Production $record): void {
+                            if (!empty($data['invoice_id'])) {
+                                $invoice = Invoice::find($data['invoice_id']);
+                                if ($invoice) {
+                                    $invoice->addProduction($record);
+                                    Notification::make()
+                                        ->title('Виробництво успішно додано до існуючої накладної!')
+                                        ->success()
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->title('Обрана накладна не знайдена!')
+                                        ->danger()
+                                        ->send();
+                                }
+                            } else {
+                                try {
+                                    $invoice = Invoice::createInvoiceForProduction($record);
+                                    if ($invoice) {
+                                        Notification::make()
+                                            ->title('Нова накладна успішно створена та виробництво додано!')
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        Notification::make()
+                                            ->title('Не вдалося створити нову накладну!')
+                                            ->danger()
+                                            ->send();
+                                    }
+                                } catch (\Exception $e) {
+                                    Notification::make()
+                                        ->title('Помилка збереження: ' . $e->getMessage())
+                                        ->danger()
+                                        ->send();
+                                }
+                            }
+                        })
+                ])
                 ->columnSpanFull();
         }else {
-
-                $invoice[] = Section::make('Накладна та фінанси')
+                $invoice[] = Section::make('Накладна на продаж виробу')
                     ->visible(fn () => $invoices !== null)
                     ->collapsed(false)
                     ->columnSpanFull()
                     ->columns(12)
                     ->schema([
                     Section::make('Інформація про накладну')
-                        ->description('Загально')
+                       // ->description('Загально')
                         ->columns(2)
                         ->columnSpan(6, 12)
                         ->footerActions([
@@ -506,6 +813,7 @@ class ViewProduction extends ViewRecord
                             ->action(fn () => $invoices->cancelInvoice()),
                         Action::make('printInvoice_' . $invoices->id)
                             ->label('Надрукувати накладну')
+                            ->visible(fn () => $invoices->status === 'проведено')
                             ->icon('heroicon-o-printer')
                             ->color('info')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
@@ -532,61 +840,70 @@ class ViewProduction extends ViewRecord
                             ->label('Примітки'),
                         ]),
                     Section::make('Фінанси')
-                        ->description('Базова інформація про накладну')
+                        //->description('Базова інформація про накладну')
                         ->columns(2)
                         ->columnSpan(6, 12)
                         ->footerActions([
                         Action::make('add_discount' . $invoices->id)
                             ->label('Додати знижку')
+                            ->visible(fn () => $invoices->status === 'створено')
                             ->icon('heroicon-o-printer')
                             ->color('warning')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
                         Action::make('pay' . $invoices->id)
                             ->label('Оплатити')
+                            ->visible(fn () => $invoices->status === 'проведено')
                             ->icon('heroicon-o-printer')
                             ->color('success')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
                         ])
                         ->footerActionsAlignment(Alignment::Center)
                         ->schema([
-                        TextEntry::make('total')->label('Сума')->default($invoices->total)->badge()->color('success'),
-                        TextEntry::make('paid')->label('Оплачено')->default($invoices->paid)->badge()->color('warning'),
-                        TextEntry::make('due')->label('Заборгованість')->default($invoices->due)->badge()->color('danger'),
-                        TextEntry::make('discount')->label('Знижка')->default($invoices->discount)->badge()->color('success'),
-                        TextEntry::make('payment_status')
-                            ->badge()
-                            ->label('Статус оплати')
-                            ->default($invoices->payment_status)
-                            ->color(fn () => match ($invoices->payment_status) {
-                            'завдаток' => 'info',
-                            'частково оплачено' => 'warning',
-                            'оплачено' => 'success',
-                            'не оплачено' => 'danger',
-                            }),
+                            TextEntry::make('total')->label('Сума')->default($invoices->total)->badge()->color('success'),
+                            TextEntry::make('paid')->label('Оплачено')->default($invoices->paid)->badge()->color('warning'),
+                            TextEntry::make('due')->label('Заборгованість')->default($invoices->due)->badge()->color('danger'),
+                            TextEntry::make('discount')->label('Знижка')->default($invoices->discount)->badge()->color('success'),
+                            TextEntry::make('payment_status')
+                                ->badge()
+                                ->label('Статус оплати')
+                                ->default($invoices->payment_status)
+                                ->color(fn () => match ($invoices->payment_status) {
+                                'завдаток' => 'info',
+                                'частково оплачено' => 'warning',
+                                'оплачено' => 'success',
+                                'не оплачено' => 'danger',
+                                }),
                         ]),
-                    RepeatableEntry::make('produc')
-                        ->default(fn () => $invoices->invoiceProductionItems ?? [])
-                        ->label('Позиції виробництва')
-                        ->columnSpan(12)
-                        ->columns(4)
-                        ->schema([
-                        TextEntry::make('quantity')->label('Кількість'),
-                        TextEntry::make('price')->label('Ціна'),
-                        TextEntry::make('total')->label('Сума'),
-                        TextEntry::make('production.name')->label('Виробництво'),
-                        TextEntry::make('production.description')->label('Опис'),
-                        TextEntry::make('production.status')->label('Статус'),
-                        TextEntry::make('production.type')->label('Тип'),
-                        ]),
-                    RepeatableEntry::make('invoiceItems')
-                        ->label('Позиції накладної')
-                        ->columns(4)
-                        ->columnSpanFull()
-                        ->schema([
-                        TextEntry::make('quantity')->label('Кількість'),
-                        TextEntry::make('price')->label('Ціна'),
-                        TextEntry::make('total')->label('Сума'),
-                        ]),
+
+                        Section::make('Усі замовлення накладної')
+                            //->description('Усі транзакції накладної')
+                            ->collapsed(true)
+                            ->columns(2)
+                            ->columnSpanFull()
+                            ->schema(
+                                $this->getProductionInvoice($productionItems)
+                            ),
+
+                        Section::make('Усі товари у накладній')
+                            //->description('Усі транзакції накладної')
+                            ->collapsed(true)
+                            ->columns(2)
+                            ->columnSpanFull()
+                            ->schema(
+                                $this->getItemsInvoice($invoiceItems)
+                            ),
+
+                    //,
+
+                    // RepeatableEntry::make('invoiceItems')
+                    //     ->label('Позиції накладної')
+                    //     ->columns(4)
+                    //     ->columnSpanFull()
+                    //     ->schema([
+                    //     TextEntry::make('quantity')->label('Кількість'),
+                    //     TextEntry::make('price')->label('Ціна'),
+                    //     TextEntry::make('total')->label('Сума'),
+                    //     ]),
                     Section::make('Транзакції')
                         ->description('Усі транзакції накладної')
                         ->collapsed(true)
@@ -647,6 +964,160 @@ class ViewProduction extends ViewRecord
                     ]);
                 }
         return $invoice;
+    }
+
+
+    /**
+     * Отримуємо матеріали накладних
+     *
+     * @param Production $record
+     * @return array
+     */
+    private function getInvoicesMaterials(Production $record): array
+    {
+        $invoices_off = $record->invoice_off; // отримуємо накладні
+        $materials = [];
+        if (is_null($invoices_off)) {
+            $materials[] = Section::make('Накладна на списання матеріалів')
+            ->description('Немає матеріалів у накладній')
+            ->columnSpanFull();
+        } else {
+            $invoiceMaterials = $invoices_off->invoiceItems; // отримуємо матеріали накладної
+
+            $materials[] = Section::make('Накладна на списання матеріалів')
+            ->visible(fn () => $invoices_off !== null)
+            ->collapsed(false)
+            ->columnSpanFull()
+            ->columns(12)
+            ->schema([
+                Section::make('Інформація про накладну')
+                ->columns(2)
+                ->columnSpan(6, 12)
+                ->footerActions([
+                    Action::make('move_invoice' . $invoices_off->id)
+                        ->label('Провести накладну')
+                        ->icon('heroicon-o-check')
+                        ->visible(fn () => $invoices_off->status === 'створено')
+                        ->color('success')
+                        ->action(fn () => $invoices_off->moveInvoice()),
+                    Action::make('cancel_invoice' . $invoices_off->id)
+                        ->label('Скасувати проведення')
+                        ->visible(fn () => $invoices_off->status === 'проведено')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('danger')
+                        ->action(fn () => $invoices_off->cancelInvoice()),
+                    Action::make('printInvoice_' . $invoices_off->id)
+                        ->label('Надрукувати накладну')
+                        ->visible(fn () => $invoices_off->status === 'проведено')
+                        ->icon('heroicon-o-printer')
+                        ->color('info')
+                        ->url(fn () => route('invoice.pdf', ['invoice' => $invoices_off->id])),
+                ])
+                ->footerActionsAlignment(Alignment::Center)
+                ->schema([
+                    TextEntry::make('invoice_number'.$invoices_off->id)
+                    ->label('Номер накладної')
+                    ->default($invoices_off->invoice_number)
+                    ->badge()
+                    ->color('info'),
+                    TextEntry::make('invoice_date'.$invoices_off->id)
+                    ->label('Дата накладної')
+                    ->default($invoices_off->invoice_date)
+                    ->badge()
+                    ->color('info'),
+                    TextEntry::make('type'.$invoices_off->id)
+                    ->label('Тип')
+                    ->default($invoices_off->type)
+                    ->badge()
+                    ->color('primary'),
+                    TextEntry::make('status'.$invoices_off->id)
+                    ->label('Статус')
+                    ->default($invoices_off->status)
+                    ->badge()
+                    ->color(fn () => match ($invoices_off->status) {
+                        'створено' => 'info',
+                        'проведено' => 'success',
+                        'скасовано' => 'danger',
+                    }),
+                    TextEntry::make('invoice.notes'.$invoices_off->id)
+                    ->label('Примітки'),
+                ]),
+                Section::make('Фінанси')
+                ->columns(2)
+                ->columnSpan(6, 12)
+                ->footerActions([
+
+                ])
+                ->footerActionsAlignment(Alignment::Center)
+                ->schema([
+                    TextEntry::make('total')
+                    ->label('Сума')
+                    ->default($invoices_off->total)
+                    ->badge()
+                    ->color('success'),
+                    TextEntry::make('paid')
+                    ->label('Оплачено')
+                    ->default($invoices_off->paid)
+                    ->badge()
+                    ->color('warning'),
+                    TextEntry::make('due')
+                    ->label('Заборгованість')
+                    ->default($invoices_off->due)
+                    ->badge()
+                    ->color('danger'),
+                    TextEntry::make('discount')
+                    ->label('Знижка')
+                    ->default($invoices_off->discount)
+                    ->badge()
+                    ->color('success'),
+                    TextEntry::make('payment_status')
+                    ->badge()
+                    ->label('Статус оплати')
+                    ->default($invoices_off->payment_status)
+                    ->color(fn () => match ($invoices_off->payment_status) {
+                        'завдаток' => 'info',
+                        'частково оплачено' => 'warning',
+                        'оплачено' => 'success',
+                        'не оплачено' => 'danger',
+                    }),
+                ]),
+            ]);
+            foreach ($invoiceMaterials as $item) {
+                $materials[] = Section::make('Матеріал - ' . $item->material->name)
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('name')
+                            ->label('Назва матеріалу')
+                            ->default($item->material->name)
+                            ->weight('bold'),
+
+                        TextEntry::make('quantity')
+                            ->label('Кількість')
+                            ->default($item->quantity)
+                            ->numeric(),
+
+                        TextEntry::make('price')
+                            ->label('Ціна')
+                            ->default($item->price)
+                            ->prefix('₴'),
+
+                        TextEntry::make('total')
+                            ->label('Сума')
+                            ->default($item->total)
+                            ->prefix('₴'),
+
+                        TextEntry::make('description')
+                            ->label('Опис')
+                            ->default($item->description ?? '-'),
+                    ])
+                    ->columns([
+                        'sm' => 2,
+                        'lg' => 3,
+                    ]);
+            }
+        }
+
+        return $materials;
     }
 
 
