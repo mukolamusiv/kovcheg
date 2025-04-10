@@ -3,12 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
+use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
@@ -27,6 +32,14 @@ class User extends Authenticatable
         'phone',
         'address',
     ];
+
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role === 'admin' || $this->role === 'manager';
+    }
+
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -97,6 +110,11 @@ class User extends Authenticatable
 
 
     public function photo()
+    {
+        return $this->profile_photo_path;
+    }
+
+    public function getFilamentAvatarUrl(): ?string
     {
         return $this->profile_photo_path;
     }
