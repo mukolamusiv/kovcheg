@@ -17,7 +17,8 @@ class ProductionMaterial extends Model
         'price',
         'description',
         'date_writing_off',
-        'invoice_id'
+        'invoice_id',
+        'warehouse_id',
     ];
 
     public function production()

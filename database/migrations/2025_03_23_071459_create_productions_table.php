@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->enum('status', ['очікує','в роботі','виготовлено', 'скасовано'])->default('очікує');
-            $table->decimal('paid_worker', 15, 2); // Оплачено
+            $table->decimal('paid_worker', 15, 2); // Оплата парацівника
             $table->date('date')->nullable(); // Дата виготовлення
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
@@ -54,6 +54,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->default(0);    // ціна за одиницю
             $table->string('description')->nullable();
             $table->date('date_writing_off')->nullable(); // Дата списання
+            $table->foreignId('warehouse_id')->nullable()->constrained()->cascadeOnDelete(); // Склад
             $table->timestamps();
             $table->softDeletes();
         });

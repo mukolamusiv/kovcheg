@@ -110,16 +110,14 @@ class ProductionResource extends Resource
                                         ->label('Оплата працівника')
                                         ->required(),
 
+                                    Forms\Components\Select::make('user_id')
+                                        ->label('Працівник')
+                                        ->relationship('user', 'name')
+                                        ->searchable()
+                                        ->preload(),
 
-                                    Forms\Components\Select::make('paid_type')
-                                        ->label('Тип оплати')
-                                        ->default('за одиницю')
-                                        ->options([
-                                            'за одиницю' => 'за одиницю',
-                                            'за метри' => 'за метри',
-                                            'за час' => 'за час',
-                                            //'скасовано' => 'скасовано',
-                                        ]),
+
+
                                     Forms\Components\Textarea::make('description')
                                         ->label('Опис')
                                         ->maxLength(65535),
@@ -265,8 +263,8 @@ class ProductionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ProductionMaterialRelationManager::class,
-            ProductionStagesRelationManager::class,
+            // ProductionMaterialRelationManager::class,
+            // ProductionStagesRelationManager::class,
         ];
     }
 

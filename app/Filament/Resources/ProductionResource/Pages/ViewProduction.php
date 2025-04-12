@@ -3,14 +3,18 @@
 namespace App\Filament\Resources\ProductionResource\Pages;
 
 use App\Filament\Resources\ProductionResource;
+use App\Helpers\InvoiceSectionBuilder;
+use App\Helpers\ProductionViewBuilder;
 use App\Models\Account;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoiceProductionItem;
+use App\Models\Material;
 use App\Models\Production;
 use App\Models\ProductionSize;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Warehouse;
 use App\Traits\Filament\HasInvoiceSection;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
@@ -65,12 +69,44 @@ class ViewProduction extends ViewRecord
         return $infolist
                 ->columns(12)
                 ->schema([
-                   // $stages,
+                    ProductionViewBuilder::configureView($record),
+                    InvoiceSectionBuilder::buildSection($record->invoice,' ПРОДАЖ'),
+               // ]);
+                  ///* // $stages,
                     Section::make('Замовлення на виробництво')
                         ->collapsed(false)
                         ->columns(12)
                         ->columnSpan(12)
                         ->headerActions([
+
+
+                            Action::make('recalculatePrice')
+                                ->label('Перерахувати вартість')
+                                ->icon('heroicon-o-calculator')
+                                ->color('warning')
+                                ->hidden(fn () => $record->status !== 'створено')
+                                ->requiresConfirmation()
+                                ->action(function (Production $record): void {
+                                    try {
+                                        $record->price = $record->getTotalCostWithStagesAndMarkup(); // перерахунок вартості
+                                        if ($record->save()) {
+                                            Notification::make()
+                                                ->title('Вартість успішно перераховано!')
+                                                ->success()
+                                                ->send();
+                                        } else {
+                                            Notification::make()
+                                                ->title('Не вдалося перерахувати вартість!')
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    } catch (\Exception $e) {
+                                        Notification::make()
+                                            ->title('Помилка перерахунку: ' . $e->getMessage())
+                                            ->danger()
+                                            ->send();
+                                    }
+                                }),
 
                             Action::make('startProduction')
                                 ->label('Розпочати виробництво')
@@ -112,6 +148,7 @@ class ViewProduction extends ViewRecord
                                         ->default($record->name),
                                     Textarea::make('description')
                                         ->label('Опис')
+                                        ->maxLength(255)
                                         ->default($record->description),
                                     TextInput::make('quantity')
                                         ->label('Кількість')
@@ -308,9 +345,18 @@ class ViewProduction extends ViewRecord
                                 ->icon('heroicon-o-plus')
                                 ->color('success')
                                 ->form([
+                                    Select::make('warehouse_id')
+                                        ->label('Склад')
+                                        ->options(\App\Models\Warehouse::pluck('name', 'id'))
+                                        ->searchable()
+                                        ->preload()
+                                        ->required(),
+
                                     Select::make('material_id')
                                         ->label('Матеріал')
                                         ->options(\App\Models\Material::pluck('name', 'id'))
+                                        ->searchable()
+                                        ->preload()
                                         ->required(),
                                     TextInput::make('quantity')
                                         ->label('Кількість')
@@ -322,34 +368,13 @@ class ViewProduction extends ViewRecord
                                         ->nullable(),
                                 ])
                                 ->action(function (array $data, Production $record): void {
-                                    $material = new \App\Models\ProductionMaterial();
-                                    $material->production_id = $record->id;
-                                    $material->material_id = $data['material_id'];
-                                    $material->quantity = $data['quantity'];
-                                    //$material->price = $data['price'];
-                                    $material->description = $data['description'];
-
-                                    try {
-                                        if ($material->save()) {
-                                            Notification::make()
-                                                ->title('Матеріал успішно додано до виробництва!')
-                                                ->success()
-                                                ->send();
-                                        } else {
-                                            Notification::make()
-                                                ->title('Не вдалося додати матеріал до виробництва!')
-                                                ->danger()
-                                                ->send();
-                                        }
-                                    } catch (\Exception $e) {
-                                        Notification::make()
-                                            ->title('Помилка збереження: ' . $e->getMessage())
-                                            ->danger()
-                                            ->send();
-                                    }
+                                    $record->addProductionMaterial(Material::find($data['material_id']),Warehouse::find( $data['warehouse_id']), $data['quantity'], $data['description']);
                                 })
                         ])
-                        ->schema($this->getMaterials($record))
+                        ->schema(
+                            ProductionViewBuilder::buildProductionMaterialView($record)
+                            //$this->getMaterials($record)
+                            )
                         ->columns([
                             'sm' => 2,
                             'lg' => 4,
@@ -371,7 +396,7 @@ class ViewProduction extends ViewRecord
 
 
 
-                ]);
+                ]);//*/
 
        // return //$infolist
 
@@ -393,7 +418,7 @@ class ViewProduction extends ViewRecord
                         ->label('Застосувати розміри клієнта')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn () => $record->customer->size->last() !== null)
+                        //->visible(fn () => $record->customer->size->last() !== null)
                         ->requiresConfirmation()
                         ->action(function (Production $record): void {
                            // dd($record->customer->size->last());
@@ -563,7 +588,41 @@ class ViewProduction extends ViewRecord
         if(is_null($customer)) {
             $data[] = Section::make('Клієнт - ')
                 ->description('Немає клієнта')
-                ->columnSpanFull();
+                ->headerActions([
+                    Action::make('selectCustomer')
+                        ->label('Вибрати клієнта')
+                        ->icon('heroicon-o-user')
+                        ->color('success')
+                        ->form([
+                            Select::make('customer_id')
+                                ->label('Клієнт')
+                                ->options(Customer::pluck('name', 'id'))
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Production $record): void {
+                            $record->customer_id = $data['customer_id'];
+
+                            try {
+                                if ($record->save()) {
+                                    Notification::make()
+                                        ->title('Клієнта успішно змінено!')
+                                        ->success()
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->title('Не вдалося змінити клієнта!')
+                                        ->danger()
+                                        ->send();
+                                }
+                            } catch (\Exception $e) {
+                                Notification::make()
+                                    ->title('Помилка збереження: ' . $e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
+                        })
+                ])
+                ->columnSpan(4);
         }else {
             $data[] = Section::make('Клієнт - ' . $customer->name)
                 ->description($customer->email ?? 'Немає email')
@@ -749,41 +808,7 @@ class ViewProduction extends ViewRecord
                                 ->placeholder('Створити нову накладну')
                         ])
                         ->action(function (array $data, Production $record): void {
-                            if (!empty($data['invoice_id'])) {
-                                $invoice = Invoice::find($data['invoice_id']);
-                                if ($invoice) {
-                                    $invoice->addProduction($record);
-                                    Notification::make()
-                                        ->title('Виробництво успішно додано до існуючої накладної!')
-                                        ->success()
-                                        ->send();
-                                } else {
-                                    Notification::make()
-                                        ->title('Обрана накладна не знайдена!')
-                                        ->danger()
-                                        ->send();
-                                }
-                            } else {
-                                try {
-                                    $invoice = Invoice::createInvoiceForProduction($record);
-                                    if ($invoice) {
-                                        Notification::make()
-                                            ->title('Нова накладна успішно створена та виробництво додано!')
-                                            ->success()
-                                            ->send();
-                                    } else {
-                                        Notification::make()
-                                            ->title('Не вдалося створити нову накладну!')
-                                            ->danger()
-                                            ->send();
-                                    }
-                                } catch (\Exception $e) {
-                                    Notification::make()
-                                        ->title('Помилка збереження: ' . $e->getMessage())
-                                        ->danger()
-                                        ->send();
-                                }
-                            }
+                            $record->makeInvoice($data['invoice_id'], $data);
                         })
                 ])
                 ->columnSpanFull();
@@ -965,8 +990,6 @@ class ViewProduction extends ViewRecord
                 }
         return $invoice;
     }
-
-
     /**
      * Отримуємо матеріали накладних
      *
@@ -977,6 +1000,7 @@ class ViewProduction extends ViewRecord
     {
         $invoices_off = $record->invoice_off; // отримуємо накладні
 
+        //dd($invoices_off,$record->invoice);
         if(is_null($invoices_off)) {
             $productionItems = []; // отримуємо позиції виробництва
             $invoiceItems = []; // отримуємо позиції товарів
@@ -989,6 +1013,23 @@ class ViewProduction extends ViewRecord
         if (is_null($invoices_off)) {
             $materials[] = Section::make('Накладна на списання матеріалів')
             ->description('Немає матеріалів у накладній')
+            ->headerActions([
+                Action::make('addInvoice')
+                    ->label('Згенерувати накладну')
+                    ->icon('heroicon-o-plus')
+                    ->requiresConfirmation()
+                    ->color('success')
+                    ->form([
+                        Select::make('invoice_id')
+                            ->label('Виберіть накладну')
+                            ->options(Invoice::pluck('invoice_number', 'id'))
+                            ->searchable()
+                            ->placeholder('Створити нову накладну')
+                    ])
+                    ->action(function (array $data, Production $record): void {
+                        $record->makeInvoiceOff();
+                    })
+            ])
             ->columnSpanFull();
         } else {
             $invoiceMaterials = $invoices_off->invoiceItems; // отримуємо матеріали накладної
@@ -1267,6 +1308,33 @@ class ViewProduction extends ViewRecord
                     ->collapsed($material->date_writing_off !== null)
                     ->description($material->date_writing_off ? 'Списано ' . $material->quantity . ' одиниць' : 'Не списано')
                     ->columnSpanFull()
+                    ->footerActions([
+                        Action::make('deleteMaterial')
+                            ->label('Видалити матеріал')
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->requiresConfirmation()
+                            ->action(function (Production $record) use ($material): void {
+                                try {
+                                    if ($material->delete()) {
+                                        Notification::make()
+                                            ->title('Матеріал успішно видалено!')
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        Notification::make()
+                                            ->title('Не вдалося видалити матеріал!')
+                                            ->danger()
+                                            ->send();
+                                    }
+                                } catch (\Exception $e) {
+                                    Notification::make()
+                                        ->title('Помилка видалення: ' . $e->getMessage())
+                                        ->danger()
+                                        ->send();
+                                }
+                            })
+                    ])
                     ->headerActions([
                     Action::make('edit'.$material->id)
                         ->label('Редагувати')
@@ -1279,6 +1347,14 @@ class ViewProduction extends ViewRecord
                             ->required()
                             ->default($material->quantity)
                             ->numeric(),
+                        Select::make('material_id')
+                            ->label('Матеріал')
+                            ->options(Material::pluck('name', 'id'))
+                            ->default($material->material_id)
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+
                         // TextInput::make('price')
                         //     ->label('Ціна')
                         //     ->required()
@@ -1295,6 +1371,7 @@ class ViewProduction extends ViewRecord
                             $material->quantity = $data['quantity'];
                             //$material->price = $data['price'];
                             $material->description = $data['description'];
+                            $material->material_id = $data['material_id'];
                             //$material->date_writing_off = $data['date_writing_off'];
 
                         try {

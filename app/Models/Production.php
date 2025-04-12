@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Filament\Notifications\Notification;
 
 use function PHPUnit\Framework\isNull;
 
@@ -32,7 +33,7 @@ class Production extends Model
     {
         static::creating(function ($production) {
             $production->user_id = auth()->id();
-            $production->price = 0;
+            //$production->price = 0;
 
             // if(!empty($production->customer_id)){
             //     $invoice = new Invoice();
@@ -77,13 +78,19 @@ class Production extends Model
 
         static::created(function ($production) {
             //Invoice::createProductionInvoices($production);
+            $production->price = $production->getTotalCostWithStagesAndMarkup();
         });
 
-        // static::update(function(){
-        //     $this->custumer_id;
-        //     // Якщо ідентифікатор клієнта не є null
-
-        // });
+        static::updated(function($production){
+            if($production->price == 0.00){
+                $production->price =  $production->getTotalCostWithStagesAndMarkup();
+                $production->save();
+            Notification::make()
+                ->title('Встановлено вартість продукту!')
+                ->warning()
+                ->send();
+            }
+        });
 
     }
 
@@ -127,14 +134,6 @@ class Production extends Model
 
     public function invoiceItems()
     {
-        // dd ($this->hasManyThrough(
-        //     InvoiceItem::class,
-        //     InvoiceProductionItem::class,
-        //     'production_id', // Зовнішній ключ у таблиці InvoiceProductionItem
-        //     'invoice_id',    // Зовнішній ключ у таблиці InvoiceItem
-        //     'id',            // Локальний ключ у таблиці Production
-        //     'invoice_id'     // Локальний ключ у таблиці InvoiceProductionItem
-        // ));
         return $this->hasManyThrough(
             InvoiceItem::class,
             InvoiceProductionItem::class,
@@ -159,21 +158,11 @@ class Production extends Model
         )->whereIn('type', ['продаж']);
     }
 
-    // public function invoice_off()
-    // {
-    //     return $this->hasOneThrough(
-    //         Invoice::class,
-    //         InvoiceProductionItem::class,
-    //         'production_id', // Foreign key on InvoiceProductionItem table
-    //         'id',            // Foreign key on Invoice table
-    //         'id',            // Local key on Production table
-    //         'invoice_id'     // Local key on InvoiceProductionItem table
-    //     )->whereIn('type', ['переміщення', 'списання']);
-   // }
 
     public function invoice_off()
     {
-        return $this->hasOneThrough(
+
+       return $this->hasOneThrough(
             Invoice::class,
             ProductionMaterial::class,
             'production_id', // Foreign key on ProductionMaterial table
@@ -264,7 +253,7 @@ class Production extends Model
         // Використовуємо транзакцію для забезпечення цілісності даних
         return (new static)->getConnection()->transaction(function () use ($data) {
 
-             // Розрахунок загальної вартості виробництва
+            // Розрахунок загальної вартості виробництва
              $totalCost = 0;
              $materialArray = array();
              // Додаємо вартість матеріалів
@@ -380,5 +369,260 @@ class Production extends Model
             // Повертаємо створене виробництво разом із пов'язаними даними
             return $production->load(['productionStages', 'productionMaterials', 'productionSizes']);
         });
+    }
+
+
+
+     /**
+     * Створює нове виробництво з переданими даними.
+     *
+     * @param array $data Дані для створення виробництва.
+     * @return Production Створене виробництво.
+     */
+    public static function createProduction($data)
+    {
+        // Використовуємо транзакцію для забезпечення цілісності даних
+        return (new static)->getConnection()->transaction(function () use ($data) {
+            // Створення виробництва
+            $production = self::create([
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'status' => 'створено',
+                'type' => $data['type'] ?? 'замовлення',
+                'pay' => $data['pay'] ?? 'не оплачено',
+                'customer_id' => $data['customer_id'] ?? null,
+                'user_id' => auth()->id(),
+                'quantity' => $data['quantity'] ?? 1,
+                'price' => 0,
+                'production_date' =>  null,
+                'image' => null,
+            ]);
+
+            $warehouse = Warehouse::findOrFail($data['warehouse_id']); // ID складу
+            // Додавання матеріалів до виробництва
+            foreach ($data['productionMaterials'] as $material) {
+                $materialModel = Material::findOrFail($material['material_id']);
+                $production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
+            }
+
+            // Додавання етапів виробництва
+            foreach ($data['productionStages'] as $stage) {
+                $production->addStage($stage);
+            }
+            // Додавання розмірів до виробництва
+            if (!empty($data['productionSizes'])) {
+                $production->addProductionSize($data['productionSizes']);
+            }
+            Notification::make()
+                ->title('Проведено транзакцію записів!')
+                ->warning()
+                ->send();
+            // Повертаємо створене виробництво
+            return $production;
+        });
+    }
+
+    /**
+     * Додає матеріал до виробництва.
+     *
+     * @param Material $material Модель матеріалу.
+     * @param Warehouse $warehouse Модель складу.
+     * @param int $quantity Кількість матеріалу (за замовчуванням 1).
+     * @param string|null $description Опис матеріалу (за замовчуванням null).
+     * @return ProductionMaterial Доданий матеріал.
+     */
+    public function addProductionMaterial(Material $material, Warehouse $warehouse, $quantity = 1, $description = null)
+    {
+        // Перевірка, чи матеріал вже існує у виробництві
+        $existingMaterial = $this->productionMaterials()->where('material_id', $material->id)->first();
+        if ($existingMaterial) {
+            // Якщо матеріал вже існує, оновлюємо його кількість
+            $existingMaterial->quantity = $quantity;
+            $existingMaterial->warehouse_id = $warehouse->id; // ID складу
+            //оновлюємо ціну
+            $existingMaterial->price = $material->getTotalValueInWarehouse($warehouse->id);
+            $existingMaterial->save();
+            return $existingMaterial;
+        }else{
+            if (!isset($material)) {
+                throw new \Exception('Не передано material_id для одного з матеріалів.');
+            }
+            // Якщо матеріал не існує, створюємо новий запис
+            $this->productionMaterials()->create([
+                'material_id' => $material->id, // ID матеріалу
+                'warehouse_id' => $warehouse->id, // ID складу
+                'quantity' => $quantity, // Кількість матеріалу
+                'price' => $material->getTotalValueInWarehouse($warehouse->id), // Ціна матеріалу
+                'warehouse_id' => $warehouse->id, // ID складу
+                'description' => $description ?? null, // Опис матеріалу
+            ]);
+            Notification::make()
+                ->title('Матеріал успішно додано до виробництва!')
+                ->success()
+                ->send();
+            return $this->productionMaterials()->where('material_id', $material['material_id'])->first();
+        }
+    }
+
+    /**
+     * Додає етап до виробництва.
+     *
+     * @param array $stage Дані етапу.
+     * @return ProductionStage Доданий етап.
+     */
+    public function addStage($stage)
+    {
+        if($stage['user_id'] == null){
+            $stage['user_id'] = auth()->id();
+        }
+        //$stage = $stage['productionStages'];
+        // Додаємо етап до виробництва
+        return $this->productionStages()->create([
+            'name' => $stage['name'],
+            'description' => $stage['description'],
+            'status' => $stage['status'],
+            'paid_worker' => $stage['paid_worker'],
+            'date' => $stage['date'],
+            'user_id' => $stage['user_id'],
+        ]);
+    }
+
+    /**
+     * Додає розмір до виробництва.
+     *
+     * @param object $size Дані розміру.
+     * @return ProductionSize Доданий розмір.
+     */
+    public function addProductionSize($size)
+    {
+        // Додаємо розмір до виробництва
+        return $this->productionSizes()->create([
+            'throat' => $size->throat,
+            'redistribution' => $size->redistribution,
+            'behind' => $size->behind,
+            'hips' => $size->hips,
+            'length' => $size->length,
+            'sleeve' => $size->sleeve,
+            'shoulder' => $size->shoulder,
+            'comment' => $size->comment,
+        ]);
+    }
+
+    public function getTotalCost()
+    {
+        return $this->productionMaterials->sum(function ($material) {
+            return $material->price * $material->quantity;
+        });
+    }
+    public function getTotalCostWithStages()
+    {
+        $totalCost = $this->getTotalCost();
+        $totalStagesCost = $this->productionStages->sum('paid_worker');
+        return $totalCost + $totalStagesCost;
+    }
+    /**
+     * Отримує загальну вартість виробництва з урахуванням етапів та націнки.
+     *
+     * @return float Загальна вартість виробництва з урахуванням етапів та націнки.
+     */
+    public function getTotalCostWithStagesAndMarkup()
+    {
+        $totalCost = $this->getTotalCostWithStages();
+        return $totalCost * 1.4; // Додаємо 40% до загальної вартості
+    }
+
+
+    // НАКЛАДНІ
+    public function makeInvoice($invoiceId = null, $data)
+    {
+        if(!empty($invoiceId)){
+            $this->invoice = Invoice::find($invoiceId);
+        }else{
+            $invoice = $this->invoice;
+        }
+
+        if (!$invoice) {
+            $invoice = Invoice::create([
+                'customer_id' => $this->customer_id,
+                'user_id' => $this->user_id,
+                'total' => $this->getTotalCostWithStagesAndMarkup(),
+                'paid' => 0,
+                'due' => $this->getTotalCostWithStagesAndMarkup(),
+                'type' => 'продаж',
+                'payment_status' => 'не оплачено',
+                'status' => 'створено',
+                'notes' => 'Накладна створена для виробництва: ' . $this->name,
+            ]);
+
+            $invoice->invoiceProductionItems()->create([
+                'production_id' => $this->id,
+                'quantity' => $this->quantity,
+                'price' => $this->price,
+                'total' => $this->quantity * $this->price,
+            ]);
+            Notification::make()
+                ->title('Створено накладу для продажу!')
+                ->success()
+                ->send();
+        }
+
+
+        return $invoice;
+    }
+
+
+    public function makeInvoiceOff()
+    {
+        $invoice = $this->invoice_off;
+
+        if (!$invoice) {
+            $invoice = Invoice::create([
+                'customer_id' => $this->customer_id,
+                'user_id' => $this->user_id,
+                'total' => $this->getTotalCostWithStagesAndMarkup(),
+                'paid' =>  $this->getTotalCostWithStagesAndMarkup(),
+                'due' => 0,
+                'type' => 'списання',
+                'payment_status' => 'оплачено',
+                'status' => 'створено',
+                'notes' => 'Накладна створена для списання матеріалів виробництва: ' . $this->name,
+            ]);
+
+            $invoice->invoiceProductionItems()->create([
+                'production_id' => $this->id,
+                'quantity' => $this->quantity,
+                'price' => $this->price,
+                'total' => $this->quantity * $this->price,
+            ]);
+
+           // protected $fillable = ['invoice_id', 'material_id', 'quantity', 'price', 'total'];
+
+            // Додавання матеріалів до накладної
+            foreach ($this->productionMaterials as $material) {
+                $material->invoice_id = $invoice->id;
+                $material->save();
+                $invoice->invoiceItems()->create([
+                    'material_id' => $material->material_id,
+                    'invoice_id' => $invoice->id,
+                    'quantity' => $material->quantity,
+                    'price' => $material->price,
+                    'total' => $material->quantity * $material->price,
+                ]);
+            }
+        //     // Додавання одного матеріалу до накладної
+
+        //    $invoice->invoiceItems()->create([
+        //         'material_id' => $this->productionMaterials->first()->material_id,
+        //         'quantity' => $this->productionMaterials->first()->quantity,
+        //         'price' => $this->productionMaterials->first()->price,
+        //         'total' => $this->productionMaterials->first()->quantity * $this->productionMaterials->first()->price,
+        //     ]);
+            Notification::make()
+                ->title('Створено накладу для списання!')
+                ->success()
+                ->send();
+        }
+
+        return $invoice;
     }
 }

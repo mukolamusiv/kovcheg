@@ -22,14 +22,15 @@ class CreateProduction extends CreateRecord
         // $custumer = Customer::find(1);// calculateObligations
         // dd($custumer->calculateObligations());
         //dd($this->data);
-        $production = Production::createProductionWithDetails($this->data);
+       // $production = Production::createProductionWithDetails($this->data);
+        $production = Production::createProduction($this->data);
 
-        Invoice::createProductionInvoices($production, $this->data['customer_id']);
-         // Сповіщення про успішне створення
-            Notification::make()
-            ->title('Створено нове виробництво додані накладні та складено список метеріалів!')
-            ->success()
-            ->send();
+        // Invoice::createProductionInvoices($production, $this->data['customer_id']);
+        //  // Сповіщення про успішне створення
+        //     Notification::make()
+        //         ->title('Створено нове виробництво додані накладні та складено список метеріалів!')
+        //         ->success()
+        //         ->send();
 
         // Перенаправлення на сторінку перегляду або список записів
        // $this->redirect(ProductionResource::getUrl('index'));
