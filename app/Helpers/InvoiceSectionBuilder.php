@@ -74,7 +74,13 @@ class InvoiceSectionBuilder
                         Action::make('add_discount' . $invoice->id)
                             ->label('Додати знижку')
                             //->visible(fn () => $invoice->status === 'створено')
-                            ->icon('heroicon-o-printer')
+                            ->icon('heroicon-o-percent-badge')
+                            ->color('warning')
+                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                        Action::make('add_discount' . $invoice->id)
+                            ->label('Додати доставку')
+                            //->visible(fn () => $invoice->status === 'створено')
+                            ->icon('heroicon-o-truck')
                             ->color('warning')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
                         Action::make('pay' . $invoice->id)
@@ -83,6 +89,8 @@ class InvoiceSectionBuilder
                             ->icon('heroicon-o-printer')
                             ->color('success')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+
+
                 ])->columnSpanFull(),
 
                 Fieldset::make('Інформація про накладну')
@@ -109,7 +117,7 @@ class InvoiceSectionBuilder
                         TextEntry::make('invoice.notes')
                             ->label('Примітки'),
                         ]),
-                    Fieldset::make('Фінанси')
+                Fieldset::make('Фінанси')
                         //->description('Базова інформація про накладну')
                         ->columns(2)
                         ->columnSpan(6, 12)
@@ -130,6 +138,99 @@ class InvoiceSectionBuilder
                                 'не оплачено' => 'danger',
                                 }),
                         ]),
-            ]);
+
+                Fieldset::make('Інформація про замовлення')
+                        //->description('Базова інформація про накладну')
+                        ->columns(2)
+                        //->columnSpan(6, 12)
+                        ->schema([
+                            TextEntry::make('customer.name')
+                                ->label('Замовник')
+                                ->default($invoice->customer->name)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('customer.phone')
+                                ->label('Телефон замовника')
+                                ->default($invoice->customer->phone)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('customer.email')
+                                ->label('Email замовника')
+                                ->default($invoice->customer->email)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('customer.address')
+                                ->label('Адреса замовника')
+                                ->default($invoice->customer->address)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('user.name')
+                                ->label('Менеджер')
+                                ->default($invoice->user->name)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('warehouse.name')
+                                ->label('Склад')
+                                //->default($invoice->warehouse->name)
+                                ->badge()
+                                ->color('primary'),
+                    ]),
+                    self::buildSectionInvoiceProductionItems($invoice),
+                ]);
+    }
+
+
+
+    public static function buildSectionInvoiceProductionItems(Invoice $invoice)
+    {
+
+        $data  = [];
+
+        foreach ($invoice->invoiceProductionItems as $item) {
+            $data[] = Fieldset::make('Матеріал')
+                ->columns(2)
+                //->columnSpan(6, 12)
+                ->schema([
+                    TextEntry::make('material.name')
+                        ->label('Назва матеріалу')
+                        //->default($invoice->material->name)
+                        ->badge()
+                        ->color('primary'),
+                    TextEntry::make('material.price')
+                        ->label('Ціна матеріалу')
+                        //->default($invoice->material->price)
+                        ->badge()
+                        ->color('primary'),
+                    TextEntry::make('quantity')
+                        ->label('Кількість')
+                        ->default($invoice->quantity)
+                        ->badge()
+                        ->color('primary'),
+                    TextEntry::make('total_price')
+                        ->label('Сума')
+                        ->default($invoice->total_price)
+                        ->badge()
+                        ->color('primary'),
+                ]);
+
+        }
+
+
+        return Section::make('Матеріали')
+            ->description('Матеріали в накладній')
+            ->columns(2)
+            ->columnSpanFull()
+            ->headerActions([
+                Action::make('pay' . $invoice->id)
+                    ->label('Додати матеріали')
+                    //->visible(fn () => $invoice->status === 'проведено')
+                    ->icon('heroicon-o-document-plus')
+                    ->color('success')
+                    ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                ])
+                ->schema(
+                    $data
+               );
     }
 }
+
