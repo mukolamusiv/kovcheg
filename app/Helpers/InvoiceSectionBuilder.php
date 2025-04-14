@@ -138,10 +138,18 @@ class InvoiceSectionBuilder
                                 'не оплачено' => 'danger',
                                 }),
                         ]),
+                    self::buildCustumerInvoice($invoice),
+                    self::buildSectionInvoiceProductionItems($invoice),
+                    self::buildSectionInvoiceMaterialItems($invoice),
+                ]);
+    }
 
-                Fieldset::make('Інформація про замовлення')
+
+    public static function buildCustumerInvoice($invoice){
+        return  Fieldset::make('Інформація про отримувача')
                         //->description('Базова інформація про накладну')
                         ->columns(2)
+                        ->hidden(!isset($invoice->customer))
                         //->columnSpan(6, 12)
                         ->schema([
                             TextEntry::make('customer.name')
@@ -164,55 +172,121 @@ class InvoiceSectionBuilder
                                 ->default($invoice->customer->address)
                                 ->badge()
                                 ->color('primary'),
-                            TextEntry::make('user.name')
-                                ->label('Менеджер')
-                                ->default($invoice->user->name)
-                                ->badge()
-                                ->color('primary'),
-                            TextEntry::make('warehouse.name')
-                                ->label('Склад')
-                                //->default($invoice->warehouse->name)
-                                ->badge()
-                                ->color('primary'),
-                    ]),
-                    self::buildSectionInvoiceProductionItems($invoice),
-                ]);
+                            // TextEntry::make('user.name')
+                            //     ->label('Менеджер')
+                            //     ->default($invoice->user->name)
+                            //     ->badge()
+                            //     ->color('primary'),
+                            // TextEntry::make('warehouse.name')
+                            //     ->label('Склад')
+                            //     //->default($invoice->warehouse->name)
+                            //     ->badge()
+                            //     ->color('primary'),
+                        ]);
     }
-
 
 
     public static function buildSectionInvoiceProductionItems(Invoice $invoice)
     {
 
         $data  = [];
-
         foreach ($invoice->invoiceProductionItems as $item) {
-            $data[] = Fieldset::make('Матеріал')
-                ->columns(2)
-                //->columnSpan(6, 12)
-                ->schema([
-                    TextEntry::make('material.name')
-                        ->label('Назва матеріалу')
-                        //->default($invoice->material->name)
-                        ->badge()
-                        ->color('primary'),
-                    TextEntry::make('material.price')
-                        ->label('Ціна матеріалу')
-                        //->default($invoice->material->price)
-                        ->badge()
-                        ->color('primary'),
-                    TextEntry::make('quantity')
-                        ->label('Кількість')
-                        ->default($invoice->quantity)
-                        ->badge()
-                        ->color('primary'),
-                    TextEntry::make('total_price')
-                        ->label('Сума')
-                        ->default($invoice->total_price)
-                        ->badge()
-                        ->color('primary'),
-                ]);
+            $data[] = Fieldset::make('Замовлення '. $item->id)
+            ->columns(2)
+            //->columnSpan(6, 12)
+            ->schema([
+                BAction::make([
+                    Action::make('pay' . $invoice->id)
+                        ->label('Змінити')
+                        //->visible(fn () => $invoice->status === 'проведено')
+                        ->icon('heroicon-o-document-plus')
+                        ->color('info')
+                        ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                    Action::make('pay' . $invoice->id)
+                        ->label('Оновити')
+                        //->visible(fn () => $invoice->status === 'проведено')
+                        ->icon('heroicon-o-document-plus')
+                        ->color('warning')
+                        ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                    Action::make('pay' . $invoice->id)
+                        ->label('Видалити')
+                        //->visible(fn () => $invoice->status === 'проведено')
+                        ->icon('heroicon-o-document-plus')
+                        ->color('danger')
+                        ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                ]),
+                TextEntry::make('production.name')
+                    ->label('Назва замовлення')
+                    ->default($item->production->name)
+                    ->badge()
+                    ->color('primary'),
+                TextEntry::make('price')
+                    ->label('Вартість замовлення')
+                    ->default($invoice->price)
+                    ->badge()
+                    ->color('primary'),
+                TextEntry::make('quantity')
+                    ->label('Кількість')
+                    ->default($item->quantity)
+                    ->badge()
+                    ->color('primary'),
+                TextEntry::make('total')
+                    ->label('Сума')
+                    ->default($item->total)
+                    ->badge()
+                    ->color('primary'),
+            ]);
+        }
 
+
+        return Section::make('Замовлення')
+            ->description('Замовлення в накладній')
+            ->columns(2)
+            ->columnSpanFull()
+            ->headerActions([
+                Action::make('pay' . $invoice->id)
+                    ->label('Додати замовлення')
+                    //->visible(fn () => $invoice->status === 'проведено')
+                    ->icon('heroicon-o-document-plus')
+                    ->color('success')
+                    ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                ])
+                ->schema(
+                    $data
+               );
+    }
+
+
+    public static function buildSectionInvoiceMaterialItems(Invoice $invoice)
+    {
+
+        $data  = [];
+        foreach ($invoice->invoiceItems as $item) {
+            $data[] = Fieldset::make('Матеріал '. $item->material->name)
+            ->columns(2)
+            //->columnSpan(6, 12)
+            ->schema([
+                TextEntry::make('material.name')
+                    ->label('Назва матеріалу')
+                    ->default($item->material->name)
+                    ->badge()
+                    ->color('primary'),
+                TextEntry::make('price')
+                    ->label('Вартість матеріалу')
+                    ->default($invoice->price)
+                    ->badge()
+                    ->color('primary'),
+                TextEntry::make('quantity')
+                    ->label('Кількість')
+                    ->default($item->quantity)
+                    ->badge()
+                    ->color('primary'),
+                TextEntry::make('total')
+                    ->label('Сума')
+                    ->default($item->total)
+                    ->badge()
+                    ->color('primary'),
+            ]);
         }
 
 
@@ -222,7 +296,7 @@ class InvoiceSectionBuilder
             ->columnSpanFull()
             ->headerActions([
                 Action::make('pay' . $invoice->id)
-                    ->label('Додати матеріали')
+                    ->label('Додати матеріал')
                     //->visible(fn () => $invoice->status === 'проведено')
                     ->icon('heroicon-o-document-plus')
                     ->color('success')
