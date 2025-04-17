@@ -71,6 +71,7 @@ class ViewProduction extends ViewRecord
                 ->schema([
                     ProductionViewBuilder::configureView($record),
                     InvoiceSectionBuilder::buildSection($record->invoice,' ПРОДАЖ'),
+                    InvoiceSectionBuilder::buildSection($record->invoice_off,' СПИСАННЯ'),
                 ]);
                   ///* // $stages,
                 //     Section::make('Замовлення на виробництво')

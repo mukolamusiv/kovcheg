@@ -15,6 +15,7 @@ use App\Models\ProductionSize;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\InvoiceService;
 use App\Traits\Filament\HasInvoiceSection;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
@@ -56,15 +57,15 @@ class InvoiceSectionBuilder
                     Action::make('move_invoice' . $invoice->id)
                             ->label('Провести накладну')
                             ->icon('heroicon-o-check')
-                            //->visible(fn () => $invoice->status === 'створено')
+                            ->visible(fn () => $invoice->status === 'створено')
                             ->color('success')
-                            ->action(fn () => $invoice->moveInvoice()),
+                            ->action(fn () => InvoiceService::moveInvoiceToConducted($invoice)),
                         Action::make('cancel_invoice' . $invoice->id)
                             ->label('Скасувати проведення')
-                            //->visible(fn () => $invoice->status === 'проведено')
+                            ->visible(fn () => $invoice->status === 'проведено')
                             ->icon('heroicon-o-x-mark')
                             ->color('danger')
-                            ->action(fn () => $invoice->cancelInvoice()),
+                            ->action(fn () => InvoiceService::moveInvoiceToCreated($invoice)),
                         Action::make('printInvoice_' . $invoice->id)
                             ->label('Надрукувати накладну')
                             //->visible(fn () => $invoice->status === 'проведено')
@@ -138,18 +139,35 @@ class InvoiceSectionBuilder
                                 'не оплачено' => 'danger',
                                 }),
                         ]),
+                    //fn() => $invoice->type === 'продаж' ?  : null,
+                    //isset($invoice->customer) ? self::buildCustumerInvoice($invoice) : array(),
                     self::buildCustumerInvoice($invoice),
+                    self::buildSupplinerInvoice($invoice),
                     self::buildSectionInvoiceProductionItems($invoice),
                     self::buildSectionInvoiceMaterialItems($invoice),
                 ]);
     }
 
 
+
+
+
     public static function buildCustumerInvoice($invoice){
+
+        if(!isset($invoice->customer)){
+            return Fieldset::make('Інформація про отримувача')
+            //->description('Базова інформація про накладну')
+            ->columns(2)
+            ->hidden(true)
+            ->columnSpanFull()
+            //->columnSpan(6, 12)
+            ->schema([]);
+        }
         return  Fieldset::make('Інформація про отримувача')
                         //->description('Базова інформація про накладну')
                         ->columns(2)
                         ->hidden(!isset($invoice->customer))
+                        ->columnSpanFull()
                         //->columnSpan(6, 12)
                         ->schema([
                             TextEntry::make('customer.name')
@@ -186,14 +204,67 @@ class InvoiceSectionBuilder
     }
 
 
+
+    public static function buildSupplinerInvoice($invoice){
+
+        if(!isset($invoice->supplier)){
+            return Fieldset::make('Інформація про постачальника')
+            //->description('Базова інформація про накладну')
+            ->columns(2)
+            ->hidden(true)
+            ->columnSpanFull()
+            //->columnSpan(6, 12)
+            ->schema([]);
+        }
+        return  Fieldset::make('Інформація про постачальника')
+                        //->description('Базова інформація про накладну')
+                        ->columns(2)
+                        ->hidden(!isset($invoice->supplier))
+                        ->columnSpanFull()
+                        //->columnSpan(6, 12)
+                        ->schema([
+                            TextEntry::make('customer.name')
+                                ->label('Замовник')
+                                ->default($invoice->supplier->name)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('customer.phone')
+                                ->label('Телефон замовника')
+                                ->default($invoice->supplier->phone)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('customer.email')
+                                ->label('Email замовника')
+                                ->default($invoice->supplier->email)
+                                ->badge()
+                                ->color('primary'),
+                            TextEntry::make('customer.address')
+                                ->label('Адреса замовника')
+                                ->default($invoice->supplier->address)
+                                ->badge()
+                                ->color('primary'),
+                            // TextEntry::make('user.name')
+                            //     ->label('Менеджер')
+                            //     ->default($invoice->user->name)
+                            //     ->badge()
+                            //     ->color('primary'),
+                            // TextEntry::make('warehouse.name')
+                            //     ->label('Склад')
+                            //     //->default($invoice->warehouse->name)
+                            //     ->badge()
+                            //     ->color('primary'),
+                        ]);
+    }
+
+
     public static function buildSectionInvoiceProductionItems(Invoice $invoice)
     {
 
         $data  = [];
         foreach ($invoice->invoiceProductionItems as $item) {
-            $data[] = Fieldset::make('Замовлення '. $item->id)
+            $data[] = Fieldset::make('Замовлення '. $item->production->id)
             ->columns(2)
-            //->columnSpan(6, 12)
+            ->columnSpanFull()
             ->schema([
                 BAction::make([
                     Action::make('pay' . $invoice->id)
@@ -265,6 +336,7 @@ class InvoiceSectionBuilder
             $data[] = Fieldset::make('Матеріал '. $item->material->name)
             ->columns(2)
             //->columnSpan(6, 12)
+            ->columnSpanFull()
             ->schema([
                 TextEntry::make('material.name')
                     ->label('Назва матеріалу')
