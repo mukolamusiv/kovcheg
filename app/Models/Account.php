@@ -18,7 +18,6 @@ class Account extends Model
         return $this->morphTo();
     }
 
-
     public function transactionEntries()
     {
         return $this->hasMany(TransactionEntry::class);
@@ -44,6 +43,12 @@ class Account extends Model
     }
 
 
+    //додаємо зоюбовязання наші або клієнта
+    public function addObligation($sum)
+    {
+       $this->balance = $this->balance + $sum;
+       $this->save();
+    }
     // public function calculateOutstandingInvoices()
     // {
     //     if ($this->owner_type === 'App\Models\Client') {

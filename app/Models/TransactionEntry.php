@@ -28,12 +28,7 @@ class TransactionEntry extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            //dd($model);
-
-            //dd($model->account);
-            // Update account balance
             $account = $model->account;
-
             // Validate data before saving
             if ($model->amount <= 0) {
                 throw new \Exception('Amount must be greater than zero.');
@@ -49,9 +44,9 @@ class TransactionEntry extends Model
                 $account->balance += $model->amount;
             }
 
-            if(!is_null($account->owner)){
-                dd($account->owner_type == 'App\Models\Customer' , $account->owner);
-            }
+            // if(!is_null($account->owner)){
+            //     dd($account->owner_type == 'App\Models\Customer' , $account->owner);
+            // }
 
             // if($model->account->owner == Customer::class){
             //     // $account->balance = $account->balance - $model->amount;

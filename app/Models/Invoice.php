@@ -149,10 +149,15 @@ class Invoice extends Model
         // Подія перед оновленням накладної
         static::updating(function($invoice){
             // Розрахунок загальної суми оплати з транзакцій
-            $totalPaidFromTransactions = $invoice->transactions()->with('entries')->get()->reduce(function ($carry, $transaction) {
-                return $carry + $transaction->entries->where('entry_type', 'кредит')->sum('amount');
-            }, 0);
-
+            if($invoice->type == 'продаж'){
+                $totalPaidFromTransactions = $invoice->transactions()->with('entries')->get()->reduce(function ($carry, $transaction) {
+                    return $carry + $transaction->entries->where('entry_type', 'дебет')->sum('amount');
+                }, 0);
+            } else {
+                $totalPaidFromTransactions = $invoice->transactions()->with('entries')->get()->reduce(function ($carry, $transaction) {
+                    return $carry + $transaction->entries->where('entry_type', 'кредит')->sum('amount');
+                }, 0);
+            }
             $invoice->paid = $totalPaidFromTransactions;
 
             // Розрахунок суми, що залишилася до оплати
@@ -168,6 +173,9 @@ class Invoice extends Model
             }
         });
     }
+
+
+
 
     // Метод для створення накладних для виробництва
     public static function createProductionInvoices(\App\Models\Production $production, $customer_id = null)

@@ -73,23 +73,78 @@ class InvoiceSectionBuilder
                             ->color('info')
                             ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
                         Action::make('add_discount' . $invoice->id)
-                            ->label('Додати знижку')
-                            //->visible(fn () => $invoice->status === 'створено')
+                            ->label('Знижка')
+                            ->visible(fn () => $invoice->status === 'створено')
                             ->icon('heroicon-o-percent-badge')
                             ->color('warning')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
-                        Action::make('add_discount' . $invoice->id)
+                            ->form([
+                                TextInput::make('discount')
+                                    ->label('Знижка у відсотках')
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(100)
+                                    ->default(10)
+                                    ->placeholder('Введіть знижку'),
+                            ])->action(function (array $data) use ($invoice): void {
+                                InvoiceService::addInvoiceDiscount($invoice, $data['discount']);
+                            }),
+                        Action::make('add_delivery' . $invoice->id)
                             ->label('Додати доставку')
-                            //->visible(fn () => $invoice->status === 'створено')
+                            ->visible(fn () => $invoice->status === 'створено')
                             ->icon('heroicon-o-truck')
                             ->color('warning')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                            ->form([
+                                TextInput::make('shipping')
+                                    ->label('Вартість доставки')
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->default(100)
+                                    ->placeholder('Вартість доставки'),
+                            ])
+                            ->action(function (array $data) use ($invoice): void {
+                                InvoiceService::addInvoiceDelivery($invoice, $data['shipping']);
+                            }),
                         Action::make('pay' . $invoice->id)
-                            ->label('Оплатити')
-                            //->visible(fn () => $invoice->status === 'проведено')
-                            ->icon('heroicon-o-printer')
+                            ->label('Внести оплату')
+                            ->visible(fn () => $invoice->customer()->exists() or $invoice->status === 'проведено')
+                            ->icon('heroicon-o-credit-card')
                             ->color('success')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                            ->form([
+                                Select::make('account_id')
+                                    ->label('Зарахувати кошти на рахунок')
+                                    ->options(Account::all()->pluck('name', 'id'))
+                                    ->required()
+                                    ->placeholder('Виберіть рахунок'),
+                                TextInput::make('amount')
+                                    ->label('Сума')
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->placeholder('Введіть суму'),
+                            ])
+                            ->action(function (array $data) use ($invoice): void {
+                                InvoiceService::addInvoicePayment($invoice, Account::find($data['account_id']), $data['amount']);
+                            }),
+
+                        Action::make('custumerEdit' . $invoice->id)
+                            ->label('Редагувати замовника')
+                            ->visible(fn () => $invoice->status === 'створено')
+                            ->icon('heroicon-o-user')
+                            ->color('info')
+                            ->form([
+                                Select::make('custumer_id')
+                                    ->label('Клієнт')
+                                    ->options(Customer::all()->pluck('name', 'id'))
+                                    ->preload()
+                                    ->searchable()
+                                    //->default($invoice->customer->id)
+                                    ->required()
+                                    ->placeholder('Обреріть замовника'),
+                            ])->action(function (array $data,) use ($invoice): void {
+                                InvoiceService::makeCustumer($invoice, $data['custumer_id']);
+                            }),
 
 
                 ])->columnSpanFull(),

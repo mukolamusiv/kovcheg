@@ -73,6 +73,16 @@ class Customer extends Model
 
 
 
+/**
+ * Клас Customer
+ *
+ * Цей клас представляє модель Customer і використовується для взаємодії
+ * з відповідною таблицею бази даних. Він містить методи та властивості,
+ * пов'язані з управлінням даними клієнтів.
+ *
+ * @file /d:/OSPanel/home/kovcheg/app/Models/Customer.php
+ */
+//
     public function calculateObligations()
     {
         $invoicesTotal = $this->invoices()->sum('due');
@@ -80,7 +90,7 @@ class Customer extends Model
             ->with('entries')
             ->get()
             ->flatMap(function ($transaction) {
-            return $transaction->entries;
+                return $transaction->entries;
             })
             ->sum('amount');
         return $invoicesTotal - $transactionsTotal;
