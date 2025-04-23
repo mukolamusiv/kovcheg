@@ -310,7 +310,12 @@ class InvoiceService
             return;
         }
 
-
+        $invoice->invoiceItems()->create([
+            'material_id' => $material_id,
+            'quantity' => $quantity,
+            'price' => $material->getPriceMaterial($invoice->warehouse_id),
+            'total' => $material->getPriceMaterial($invoice->warehouse_id) * $quantity,
+        ]);
         $invoice->save();
         Notification::make()
             ->title('Матеріал змінений!')
