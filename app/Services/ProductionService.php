@@ -7,7 +7,6 @@ use App\Models\Production;
 
 class ProductionService
 {
-
     /**
      * @param array $data
      * @return Production

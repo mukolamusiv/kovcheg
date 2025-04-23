@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\Invoice;
+use App\Models\Production;
 use App\Models\Transaction;
 use Filament\Notifications\Notification;
 use Illuminate\Validation\Rules\In;
@@ -98,7 +99,7 @@ class InvoiceService
 
     public static function addInvoicePayment($invoice, Account $account, int $payment)
     {
-        dd($payment, $account, $invoice);
+       // dd($payment, $account, $invoice);
         // Перевірка, чи сума платежу не перевищує залишок
         if ($payment > $invoice->due) {
             Notification::make()
@@ -139,7 +140,7 @@ class InvoiceService
             $receiver = $invoice->supplier->account; // ID рахунку постачальника
             $description = 'Оплата постачальнику згідно накладної №'.$invoice->invoice_number; // Опис транзакції
         }
-        dd($payer, $receiver, $description);
+        //dd($payer, $receiver, $description);
         $transaction = Transaction::makingPayment(
             $invoice,
             $payer,
@@ -171,7 +172,6 @@ class InvoiceService
 
     public static function makeCustumer(Invoice $invoice, $customer)
     {
-        dd($invoice, $customer);
         $invoice->update([
             'customer_id' => $customer,
         ]);
@@ -182,6 +182,65 @@ class InvoiceService
             ->icon('heroicon-o-check-circle')
             ->success()
             ->send();
+    }
+
+
+
+    public static function addProduction(Invoice $invoice, Production $production)
+    {
+
+    }
+
+
+    public static function makeInvoice($data)
+    {
+        return \DB::transaction(function () use ($data) {
+        $invoice = Invoice::create([
+            'customer_id' => $data['customer_id'],
+            'supplier_id' => $data['supplier_id'],
+            'type' => $data['type'],
+            'total' => 0,
+            'paid' => 0,
+            'due' => 0,
+            'status' => 'створено',
+            'payment_status' => 'не оплачено',
+        ]);
+        $money = 0;
+        // Додати позиції до накладної
+        foreach ($data['items'] as $item) {
+            // Перевірка наявності матеріалу на складі
+            $material = \App\Models\Material::find($item['material_id']);
+            if (!$material) {
+                Notification::make()
+                    ->title('Помилка при додаванні позиції!')
+                    ->body('Матеріал не знайдено')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                continue;
+            }
+
+
+            if(!isset($item['price'])){
+                $item['price'] = $material->getPriceMaterial($data['warehouse_id']);
+            }
+
+            $invoice->invoiceItems()->create([
+                'material_id' => $item['material_id'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'total' => $item['price'] * $item['quantity'],
+            ]);
+            $money += $item['price'] * $item['quantity'];
+        }
+
+        $invoice->total = $money;
+        $invoice->paid = 0;
+        $invoice->due = $money;
+        $invoice->save();
+        //dd($money,$invoice);
+        return $invoice;
+        });
     }
 }
 

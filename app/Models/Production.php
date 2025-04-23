@@ -146,6 +146,7 @@ class Production extends Model
         });
     }
 
+
     public function invoice()
     {
         return $this->hasOneThrough(

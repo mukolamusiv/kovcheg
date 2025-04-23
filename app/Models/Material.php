@@ -36,16 +36,19 @@ class Material extends Model
         return $this->belongsTo(Category::class);
     }
 
+    // Визначаємо зв'язок з таблицею warehouse_materials
     public function warehouses()
     {
         return $this->hasMany(WarehouseMaterial::class);
     }
 
+    // Отримуємо загальну кількість матеріалів на складі
     public function getStockInWarehouse($warehouseId)
     {
         return $this->warehouses()->where('warehouse_id', $warehouseId)->sum('quantity');
     }
 
+    // Отримуємо загальну вартість матеріалів на складі
     public function getTotalValueInWarehouse($warehouseId)
     {
         return $this->warehouses()
@@ -56,6 +59,12 @@ class Material extends Model
                     });
     }
 
+    public function getPriceMaterial($warehouseId)
+    {
+        return $this->warehouses()->where('warehouse_id', $warehouseId)->first()->price;
+    }
+
+    // Визначаємо зв'язок з таблицею suppliers
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

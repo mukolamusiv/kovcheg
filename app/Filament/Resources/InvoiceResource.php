@@ -9,6 +9,7 @@ use App\Filament\Resources\InvoiceResource\RelationManagers\InvoiceProductionIte
 use App\Filament\Resources\InvoiceResource\RelationManagers\TransactionsRelationManager;
 use App\Models\Invoice;
 use Filament\Forms;
+use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -41,106 +42,179 @@ class InvoiceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('invoice_number')
-                    ->label('Номер накладної')
-                    //->required()
-                    //->hidden(true)
-                    ->maxLength(255),
-                Forms\Components\Select::make('customer_id')
-                    ->label('Клієнт')
-                    ->relationship('customer', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        // Add other customer fields here
-                    ]),
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->hidden(true)
-                    ->label('Користувач що провів накладну')
-                    ->preload()
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        // Add other user fields here
-                    ]),
-                Forms\Components\Select::make('supplier_id')
-                    ->relationship('supplier', 'name')
-                    ->searchable()
-                    ->label('Постачальник')
-                    ->preload()
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        // Add other supplier fields here
-                    ]),
-                Forms\Components\DatePicker::make('invoice_date')
-                    ->label('Дата накладної'),
-                Forms\Components\DatePicker::make('due_date')
-                    ->hidden(true)
-                    ->label('Дата проведення'),
-                Forms\Components\TextInput::make('total')
-                    ->label('Сума')
-                    ->required()
-                    ->default(0.00)
-                    ->numeric(),
-                Forms\Components\TextInput::make('paid')
-                    ->label('Оплачено')
-                    ->required()
-                    ->default(0.00)
-                    ->numeric(),
-                Forms\Components\TextInput::make('due')
-                    ->label('Заборгованість')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('discount')
-                    ->label('Знижка')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\TextInput::make('shipping')
-                    ->label('Доставка')
-                    ->required()
-                    ->numeric()
-                    ->default(0.00),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'постачання' => 'постачання',
-                        'переміщення' => 'переміщення',
-                        'продаж' => 'продаж',
-                        'повернення' => 'повернення',
-                        'списання' => 'списання',
-                    ])
-                    ->default('продаж')
-                    ->required(),
-                Forms\Components\Select::make('payment_status')
-                    ->label('Статус оплати')
-                    ->options([
-                        'оплачено' => 'оплачено',
-                        'частково оплачено' => 'частково оплачено',
-                        'не оплачено' => 'не оплачено',
-                    ])
-                    ->default('не оплачено')
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->label('Статус накладної')
-                    ->options([
-                        'створено' => 'створено',
-                        'проведено' => 'проведено',
-                        'скасовано' => 'скасовано',
-                    ])
-                    ->default('створено')
-                    ->required(),
-                Forms\Components\Textarea::make('notes')
-                    ->label('Примітки')
-                    ->columnSpanFull(),
+                Forms\Components\Wizard::make([
+                    Step::make('Тип накладної')
+                        ->schema([
+                            Forms\Components\Select::make('type')
+                                ->label('Тип накладної')
+                                ->options([
+                                    'постачання' => 'Постачання',
+                                    'продаж' => 'Продаж',
+                                    'списання' => 'Списання',
+                                ])
+                                ->required()
+                                ->reactive(),
+                        ]),
+                    Step::make('Інформація про накладну')
+                        ->schema([
+                            Forms\Components\Select::make('supplier_id')
+                                ->label('Постачальник')
+                                ->relationship('supplier', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn (callable $get) => $get('type') === 'постачання'),
+                            Forms\Components\Select::make('customer_id')
+                                ->label('Клієнт')
+                                ->relationship('customer', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn (callable $get) => $get('type') === 'продаж'),
+                        ]),
+                    Step::make('Позиції накладної')
+                        ->schema([
+                            Forms\Components\Select::make('warehouse_id')
+                                ->label('Склад')
+                                ->options(\App\Models\Warehouse::all()->pluck('name', 'id'))
+                                ->required(),
+                            Forms\Components\Repeater::make('items')
+                                ->visible(fn (callable $get) => $get('type') === 'постачання')
+                                ->label('Матеріали')
+                                ->schema([
+                                    Forms\Components\Select::make('material_id')
+                                        ->label('Матеріал')
+                                        ->options(\App\Models\Material::all()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->preload(),
+                                        //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання'])),
+                                    Forms\Components\TextInput::make('quantity')
+                                        ->label('Кількість')
+                                        ->numeric()
+                                        ->required(),
+                                    Forms\Components\TextInput::make('price')
+                                        ->label('Вартість за одиницю')
+                                        ->numeric()
+                                        ->reactive()
+                                        ->required(),
+                                ])
+                                ->columns(3),
+                            Forms\Components\Repeater::make('items')
+                                ->visible(fn (callable $get) => $get('type') === 'продаж')
+                                ->label('Матеріали')
+                                ->schema([
+                                    Forms\Components\Select::make('material_id')
+                                        ->label('Матеріал')
+                                        ->options(\App\Models\Material::all()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->preload(),
+                                        //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання'])),
+                                    Forms\Components\TextInput::make('quantity')
+                                        ->label('Кількість')
+                                        ->numeric()
+                                        ->required(),
+                                ])
+                                ->columns(2),
+                        ]),
+                ])->columnSpanFull()
+                // Forms\Components\TextInput::make('invoice_number')
+                //     ->label('Номер накладної')
+                //     //->required()
+                //     //->hidden(true)
+                //     ->maxLength(255),
+                // Forms\Components\Select::make('customer_id')
+                //     ->label('Клієнт')
+                //     ->relationship('customer', 'name')
+                //     ->searchable()
+                //     ->preload()
+                //     ->createOptionForm([
+                //         Forms\Components\TextInput::make('name')
+                //             ->required()
+                //             ->maxLength(255),
+                //         // Add other customer fields here
+                //     ]),
+                // Forms\Components\Select::make('user_id')
+                //     ->relationship('user', 'name')
+                //     ->searchable()
+                //     ->hidden(true)
+                //     ->label('Користувач що провів накладну')
+                //     ->preload()
+                //     ->createOptionForm([
+                //         Forms\Components\TextInput::make('name')
+                //             ->required()
+                //             ->maxLength(255),
+                //         // Add other user fields here
+                //     ]),
+                // Forms\Components\Select::make('supplier_id')
+                //     ->relationship('supplier', 'name')
+                //     ->searchable()
+                //     ->label('Постачальник')
+                //     ->preload()
+                //     ->createOptionForm([
+                //         Forms\Components\TextInput::make('name')
+                //             ->required()
+                //             ->maxLength(255),
+                //         // Add other supplier fields here
+                //     ]),
+                // Forms\Components\DatePicker::make('invoice_date')
+                //     ->label('Дата накладної'),
+                // Forms\Components\DatePicker::make('due_date')
+                //     ->hidden(true)
+                //     ->label('Дата проведення'),
+                // Forms\Components\TextInput::make('total')
+                //     ->label('Сума')
+                //     ->required()
+                //     ->default(0.00)
+                //     ->numeric(),
+                // Forms\Components\TextInput::make('paid')
+                //     ->label('Оплачено')
+                //     ->required()
+                //     ->default(0.00)
+                //     ->numeric(),
+                // Forms\Components\TextInput::make('due')
+                //     ->label('Заборгованість')
+                //     ->required()
+                //     ->numeric()
+                //     ->default(0.00),
+                // Forms\Components\TextInput::make('discount')
+                //     ->label('Знижка')
+                //     ->required()
+                //     ->numeric()
+                //     ->default(0.00),
+                // Forms\Components\TextInput::make('shipping')
+                //     ->label('Доставка')
+                //     ->required()
+                //     ->numeric()
+                //     ->default(0.00),
+                // Forms\Components\Select::make('type')
+                //     ->options([
+                //         'постачання' => 'постачання',
+                //         'переміщення' => 'переміщення',
+                //         'продаж' => 'продаж',
+                //         'повернення' => 'повернення',
+                //         'списання' => 'списання',
+                //     ])
+                //     ->default('продаж')
+                //     ->required(),
+                // Forms\Components\Select::make('payment_status')
+                //     ->label('Статус оплати')
+                //     ->options([
+                //         'оплачено' => 'оплачено',
+                //         'частково оплачено' => 'частково оплачено',
+                //         'не оплачено' => 'не оплачено',
+                //     ])
+                //     ->default('не оплачено')
+                //     ->required(),
+                // Forms\Components\Select::make('status')
+                //     ->label('Статус накладної')
+                //     ->options([
+                //         'створено' => 'створено',
+                //         'проведено' => 'проведено',
+                //         'скасовано' => 'скасовано',
+                //     ])
+                //     ->default('створено')
+                //     ->required(),
+                // Forms\Components\Textarea::make('notes')
+                //     ->label('Примітки')
+                //     ->columnSpanFull(),
             ]);
     }
 

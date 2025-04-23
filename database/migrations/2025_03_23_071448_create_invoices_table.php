@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('invoice_date');
             $table->date('due_date')->nullable(); // Дата оплати
             $table->decimal('total', 15, 2); // Сума
-            $table->decimal('paid', 15, 2); // Оплачено
+            $table->decimal('paid', 15, 2);  // Оплачено
             $table->decimal('due', 15, 2)->default(0); // Заборгованість
             $table->decimal('discount', 15, 2)->default(0); // Знижка
             $table->decimal('shipping', 15, 2)->default(0); // Доставка

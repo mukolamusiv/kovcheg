@@ -218,6 +218,7 @@ class InvoiceSectionBuilder
             //->columnSpan(6, 12)
             ->schema([]);
         }
+       // dd($invoice, $invoice->customer);
         return  Fieldset::make('Інформація про отримувача')
                         //->description('Базова інформація про накладну')
                         ->columns(2)
@@ -225,22 +226,22 @@ class InvoiceSectionBuilder
                         ->columnSpanFull()
                         //->columnSpan(6, 12)
                         ->schema([
-                            TextEntry::make('customer.name')
+                            TextEntry::make('invoice.customer.name')
                                 ->label('Замовник')
                                 ->default($invoice->customer->name)
                                 ->badge()
                                 ->color('primary'),
-                            TextEntry::make('customer.phone')
+                            TextEntry::make('invoice.customer.phone')
                                 ->label('Телефон замовника')
                                 ->default($invoice->customer->phone)
                                 ->badge()
                                 ->color('primary'),
-                            TextEntry::make('customer.email')
+                            TextEntry::make('invoice.customer.email')
                                 ->label('Email замовника')
                                 ->default($invoice->customer->email)
                                 ->badge()
                                 ->color('primary'),
-                            TextEntry::make('customer.address')
+                            TextEntry::make('invoice.customer.address')
                                 ->label('Адреса замовника')
                                 ->default($invoice->customer->address)
                                 ->badge()
