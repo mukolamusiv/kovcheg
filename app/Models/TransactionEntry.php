@@ -38,11 +38,29 @@ class TransactionEntry extends Model
                 throw new \Exception("Рахунок не знайдено для транзакції ID: {$model->id}");
             }
 
-            if ($model->entry_type == 'кредит') {
-                $account->balance -= $model->amount;
-            } elseif ($model->entry_type == 'дебет') {
-                $account->balance += $model->amount;
+            // Validate entry_type
+            if($account->account_type == 'актив'){
+                if ($model->entry_type == 'кредит') {
+                    $account->balance -= $model->amount;
+                } elseif ($model->entry_type == 'дебет') {
+                    $account->balance += $model->amount;
+                }
             }
+            if($account->account_type == 'пасив'){
+                if ($model->entry_type == 'кредит') {
+                    $account->balance += $model->amount;
+                } elseif ($model->entry_type == 'дебет') {
+                    $account->balance -= $model->amount;
+                }
+            }
+
+
+
+            // if ($model->entry_type == 'кредит') {
+            //     $account->balance -= $model->amount;
+            // } elseif ($model->entry_type == 'дебет') {
+            //     $account->balance += $model->amount;
+            // }
 
             // if(!is_null($account->owner)){
             //     dd($account->owner_type == 'App\Models\Customer' , $account->owner);

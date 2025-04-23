@@ -13,38 +13,75 @@ class InvoiceService
 {
     public static function moveInvoiceToConducted(Invoice $invoice)
     {
-        if(!isset($invoice->customer)){
-            Notification::make()
-                ->title('Помилка проведення!')
-                ->body('Потрібно додати спочатку клієнта/постачальника щоб можна було провести накладну')
-                ->icon('heroicon-o-x-circle')
-                //->icon('heroicon-o-check-circle')
-                ->danger()
-                ->send();
-                return;
-        }else{
-            if($invoice->customer->account == null){
+
+        if($invoice->type == 'продаж'){
+            if(!isset($invoice->customer))
+            {
                 Notification::make()
                     ->title('Помилка проведення!')
-                    ->body('Потрібно додати спочатку рахунок клієнта/постачальника щоб можна було провести накладну')
+                    ->body('Потрібно додати спочатку клієнта щоб можна було провести накладну')
+                    ->icon('heroicon-o-x-circle')
+                    //->icon('heroicon-o-check-circle')
+                    ->danger()
+                    ->send();
+                    return;
+            }
+            if($invoice->customer->account == null )
+            {
+                Notification::make()
+                    ->title('Помилка проведення!')
+                    ->body('Потрібно додати спочатку рахунок клієнта щоб можна було провести накладну')
                     ->icon('heroicon-o-x-circle')
                     ->danger()
                     ->send();
                     return;
             }else{
-
                 $invoice->customer->calculateObligations();
                 $invoice->customer->account->balance = $invoice->customer->calculateObligations();
                 $invoice->customer->account->save();
             }
+
         }
+
+        if($invoice->type == 'постачання')
+        {
+            if(!isset($invoice->supplier))
+            {
+                Notification::make()
+                    ->title('Помилка проведення!')
+                    ->body('Потрібно додати спочатку постачальника щоб можна було провести накладну')
+                    ->icon('heroicon-o-x-circle')
+                    //->icon('heroicon-o-check-circle')
+                    ->danger()
+                    ->send();
+                    return;
+            }
+            if($invoice->supplier->account == null )
+            {
+                Notification::make()
+                    ->title('Помилка проведення!')
+                    ->body('Потрібно додати спочатку рахунок постачальника щоб можна було провести накладну')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                    return;
+            }else{
+                  $invoice->supplier->setBalans();
+                // $invoice->supplier->account->balance = $invoice->supplier->calculateObligations();
+                // $invoice->supplier->account->save();
+            }
+
+        }
+
+
+
         $invoice->update([
             'status' => 'проведено',
         ]);
         $invoice->save();
 
         $invoice->customer();
-        Notification::make()
+            Notification::make()
                 ->title('Накладна проведена!')
                 ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
                 ->icon('heroicon-o-check-circle')
@@ -185,6 +222,21 @@ class InvoiceService
     }
 
 
+    public static function makeSuppliner(Invoice $invoice, $suppliner)
+    {
+        //dd($suppliner);
+        $invoice->update([
+            'supplier_id' => $suppliner,
+        ]);
+        $invoice->save();
+        Notification::make()
+            ->title('Постачальник змінений!')
+            ->body('Постачальник змінений у накладній')
+            ->icon('heroicon-o-check-circle')
+            ->success()
+            ->send();
+    }
+
 
     public static function addProduction(Invoice $invoice, Production $production)
     {
@@ -204,6 +256,7 @@ class InvoiceService
             'due' => 0,
             'status' => 'створено',
             'payment_status' => 'не оплачено',
+            'warehouse_id' => $data['warehouse_id'],
         ]);
         $money = 0;
         // Додати позиції до накладної
@@ -241,6 +294,30 @@ class InvoiceService
         //dd($money,$invoice);
         return $invoice;
         });
+    }
+
+
+    public static function addMaterialToInvoice(Invoice $invoice, $material_id, $quantity)
+    {
+        $material = \App\Models\Material::find($material_id);
+        if (!$material) {
+            Notification::make()
+                ->title('Помилка при додаванні позиції!')
+                ->body('Матеріал не знайдено')
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->send();
+            return;
+        }
+
+
+        $invoice->save();
+        Notification::make()
+            ->title('Матеріал змінений!')
+            ->body('Матеріал змінений у накладній')
+            ->icon('heroicon-o-check-circle')
+            ->success()
+            ->send();
     }
 }
 

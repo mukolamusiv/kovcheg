@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->nullable()->constrained();
             $table->foreignId('user_id')->nullable()->constrained();
             $table->foreignId('supplier_id')->nullable()->constrained();
+            $table->foreignId('warehouse_id')->nullable()->constrained();
             $table->date('invoice_date');
             $table->date('due_date')->nullable(); // Дата оплати
             $table->decimal('total', 15, 2); // Сума

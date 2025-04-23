@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Filament\Notifications\Notification;
 
 class Supplier extends Model
 {
@@ -41,7 +42,14 @@ class Supplier extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class, 'account_id', 'account_id');
+        return $this->hasManyThrough(
+            Transaction::class,
+            TransactionEntry::class,
+            'account_id', // Foreign key on TransactionEntry table
+            'id',         // Foreign key on Transaction table
+            'account_id', // Local key on Account table
+            'transaction_id' // Local key on TransactionEntry table
+        );
     }
 
     public function getBalanceAttribute()
@@ -52,6 +60,36 @@ class Supplier extends Model
     public function BankDetails()
     {
         return $this->hasMany(SupplierBankDetail::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function setBalans()
+    {
+        $this->account->balance = $this->calculateObligations();
+        $this->account->save();
+        Notification::make()
+            ->title('Баланс оновлено!')
+            ->body('Оновлено наші зобовязання перед постачальником ' . $this->name)
+            ->success()
+            ->icon('heroicon-o-x-circle')
+            ->send();
+    }
+
+    public function calculateObligations()
+    {
+        $invoicesTotal = $this->invoices()->sum('due');
+        $transactionsTotal = $this->transactions()
+            ->with('entries')
+            ->get()
+            ->flatMap(function ($transaction) {
+                return $transaction->entries;
+            })
+            ->sum('amount');
+        return $invoicesTotal - $transactionsTotal;
     }
 
 }

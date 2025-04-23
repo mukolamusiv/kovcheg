@@ -12,6 +12,7 @@ use App\Models\InvoiceProductionItem;
 use App\Models\Material;
 use App\Models\Production;
 use App\Models\ProductionSize;
+use App\Models\Supplier;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -108,7 +109,7 @@ class InvoiceSectionBuilder
                             }),
                         Action::make('pay' . $invoice->id)
                             ->label('Внести оплату')
-                            ->visible(fn () => $invoice->customer()->exists() or $invoice->status === 'проведено')
+                            ->visible(fn () => $invoice->customer()->exists() and $invoice->status === 'проведено' and $invoice->type === 'продаж')
                             ->icon('heroicon-o-credit-card')
                             ->color('success')
                             ->form([
@@ -128,9 +129,31 @@ class InvoiceSectionBuilder
                                 InvoiceService::addInvoicePayment($invoice, Account::find($data['account_id']), $data['amount']);
                             }),
 
+                            Action::make('pay' . $invoice->id)
+                            ->label('Оплатити постачальнику')
+                            ->visible(fn () => $invoice->supplier()->exists() or $invoice->status === 'проведено' and $invoice->type === 'постачання')
+                            ->icon('heroicon-o-credit-card')
+                            ->color('success')
+                            ->form([
+                                Select::make('account_id')
+                                    ->label('Зняти кошти з рахуноку')
+                                    ->options(Account::all()->pluck('name', 'id'))
+                                    ->required()
+                                    ->placeholder('Виберіть рахунок'),
+                                TextInput::make('amount')
+                                    ->label('Сума')
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->placeholder('Введіть суму'),
+                            ])
+                            ->action(function (array $data) use ($invoice): void {
+                                InvoiceService::addInvoicePayment($invoice, Account::find($data['account_id']), $data['amount']);
+                            }),
+
                         Action::make('custumerEdit' . $invoice->id)
                             ->label('Редагувати замовника')
-                            ->visible(fn () => $invoice->status === 'створено')
+                            ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'продаж')
                             ->icon('heroicon-o-user')
                             ->color('info')
                             ->form([
@@ -146,7 +169,23 @@ class InvoiceSectionBuilder
                                 InvoiceService::makeCustumer($invoice, $data['custumer_id']);
                             }),
 
-
+                        Action::make('supplinerEdit' . $invoice->id)
+                            ->label('Редагувати постачальника')
+                            ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'постачання')
+                            ->icon('heroicon-o-user')
+                            ->color('info')
+                            ->form([
+                                Select::make('suppliner_id')
+                                    ->label('Постачальник')
+                                    ->options(Supplier::all()->pluck('name', 'id'))
+                                    ->preload()
+                                    ->searchable()
+                                    //->default($invoice->customer->id)
+                                    ->required()
+                                    ->placeholder('Обреріть постачальника'),
+                            ])->action(function (array $data,) use ($invoice): void {
+                                InvoiceService::makeSuppliner($invoice, $data['suppliner_id']);
+                            }),
                 ])->columnSpanFull(),
 
                 Fieldset::make('Інформація про накладну')
@@ -280,22 +319,22 @@ class InvoiceSectionBuilder
                         //->columnSpan(6, 12)
                         ->schema([
                             TextEntry::make('customer.name')
-                                ->label('Замовник')
+                                ->label('Постачальник')
                                 ->default($invoice->supplier->name)
                                 ->badge()
                                 ->color('primary'),
                             TextEntry::make('customer.phone')
-                                ->label('Телефон замовника')
+                                ->label('Телефон постачальника')
                                 ->default($invoice->supplier->phone)
                                 ->badge()
                                 ->color('primary'),
                             TextEntry::make('customer.email')
-                                ->label('Email замовника')
+                                ->label('Email постачальника')
                                 ->default($invoice->supplier->email)
                                 ->badge()
                                 ->color('primary'),
                             TextEntry::make('customer.address')
-                                ->label('Адреса замовника')
+                                ->label('Адреса постачальника')
                                 ->default($invoice->supplier->address)
                                 ->badge()
                                 ->color('primary'),
@@ -423,12 +462,29 @@ class InvoiceSectionBuilder
             ->columns(2)
             ->columnSpanFull()
             ->headerActions([
-                Action::make('pay' . $invoice->id)
+                Action::make('addMaterialInvoice' . $invoice->id)
                     ->label('Додати матеріал')
                     //->visible(fn () => $invoice->status === 'проведено')
                     ->icon('heroicon-o-document-plus')
-                    ->color('success')
-                    ->url(fn () => route('invoice.pdf', ['invoice' => $invoice->id])),
+                    ->form([
+                        Select::make('material_id')
+                            ->label('Матеріал')
+                            ->options(Material::all()->pluck('name', 'id'))
+                            ->preload()
+                            ->searchable()
+                            //->default($invoice->customer->id)
+                            ->required()
+                            ->placeholder('Обреріть матеріал'),
+                        TextInput::make('quantity')
+                            ->label('Кількість')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->placeholder('Введіть кількість'),
+                    ])->action(function (array $data) use ($invoice): void {
+                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity']);
+                    })->color('success'),
+
                 ])
                 ->schema(
                     $data
