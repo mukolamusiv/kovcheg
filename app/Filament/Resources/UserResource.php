@@ -24,6 +24,12 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    //обмеження доступу
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'admin';
+    }
+
     // іконка ресурсу
 
     protected static ?string $navigationIcon = 'heroicon-o-users';

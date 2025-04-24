@@ -32,6 +32,13 @@ class TransactionResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Транзакції';
 
+
+        //обмеження доступу
+        public static function canViewAny(): bool
+        {
+            return auth()->user()?->role === 'admin';
+        }
+
     public static function form(Form $form): Form
     {
         return $form
