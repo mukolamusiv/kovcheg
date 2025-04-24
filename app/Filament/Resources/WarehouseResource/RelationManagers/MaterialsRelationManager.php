@@ -60,6 +60,7 @@ class MaterialsRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('material.category.name')
                     ->label('Категорія')
+                    ->searchable()
                     ->sortable(),
             ])
             ->filters([
