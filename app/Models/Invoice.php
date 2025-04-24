@@ -57,6 +57,11 @@ class Invoice extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
     // Відношення до моделі InvoiceItem (елементи накладної)
     public function invoiceItems()
     {

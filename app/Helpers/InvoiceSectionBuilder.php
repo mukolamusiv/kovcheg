@@ -209,6 +209,10 @@ class InvoiceSectionBuilder
                             'проведено' => 'success',
                             'скасовано' => 'danger',
                         }),
+                        TextEntry::make('invoice.warehouse.name')
+                            ->label('Склад')
+                            ->default($invoice->warehouse->name)
+                            ->badge(),
                         TextEntry::make('invoice.notes')
                             ->label('Примітки'),
                         ]),
@@ -438,9 +442,9 @@ class InvoiceSectionBuilder
                     ->default($item->material->name)
                     ->badge()
                     ->color('primary'),
-                TextEntry::make('price')
+                TextEntry::make('material.price')
                     ->label('Вартість матеріалу')
-                    ->default($invoice->price)
+                    ->default($item->price)
                     ->badge()
                     ->color('primary'),
                 TextEntry::make('quantity')
@@ -464,7 +468,7 @@ class InvoiceSectionBuilder
             ->headerActions([
                 Action::make('addMaterialInvoice' . $invoice->id)
                     ->label('Додати матеріал')
-                    //->visible(fn () => $invoice->status === 'проведено')
+                    ->visible(fn () => $invoice->status === 'проведено')
                     ->icon('heroicon-o-document-plus')
                     ->form([
                         Select::make('material_id')
@@ -481,8 +485,15 @@ class InvoiceSectionBuilder
                             ->numeric()
                             ->minValue(0)
                             ->placeholder('Введіть кількість'),
+                        TextInput::make('price')
+                            ->label('Вартість за одиницю')
+                            ->required()
+                            ->hidden(fn () => $invoice->type === 'продаж' or $invoice->type === 'списання')
+                            ->numeric()
+                            ->minValue(0)
+                            ->placeholder('Введіть вартість'),
                     ])->action(function (array $data) use ($invoice): void {
-                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity']);
+                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'],$data['price']);
                     })->color('success'),
 
                 ])
