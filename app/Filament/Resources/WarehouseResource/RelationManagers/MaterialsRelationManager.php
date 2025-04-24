@@ -14,22 +14,52 @@ class MaterialsRelationManager extends RelationManager
 {
     protected static string $relationship = 'materials';
 
+    protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $label = 'Матеріали';
+
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('quantity')
+                Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('quantity')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(500),
+                Forms\Components\Select::make('category')
+                    ->options([
+                        'raw' => 'Raw Material',
+                        'finished' => 'Finished Product',
+                    ])
+                    ->required(),
+
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('quantity')
+
             ->columns([
-                Tables\Columns\TextColumn::make('quantity'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Назва')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('quantity')
+                    ->label('Кількість')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('Price')
+                    ->label('Ціна')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Коментар')
+                    ->limit(50),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Категорія')
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()

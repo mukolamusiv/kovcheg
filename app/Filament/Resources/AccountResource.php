@@ -17,6 +17,13 @@ class AccountResource extends Resource
 {
     protected static ?string $model = Account::class;
 
+
+        //обмеження доступу
+        public static function canViewAny(): bool
+        {
+            return auth()->user()?->role === 'admin';
+        }
+
     protected static ?string $navigationIcon = 'heroicon-o-document-currency-euro';
 
      //назва ресурсу

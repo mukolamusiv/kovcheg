@@ -468,7 +468,7 @@ class InvoiceSectionBuilder
             ->headerActions([
                 Action::make('addMaterialInvoice' . $invoice->id)
                     ->label('Додати матеріал')
-                    ->visible(fn () => $invoice->status === 'проведено')
+                    ->visible(fn () => $invoice->status === 'створено')
                     ->icon('heroicon-o-document-plus')
                     ->form([
                         Select::make('material_id')
