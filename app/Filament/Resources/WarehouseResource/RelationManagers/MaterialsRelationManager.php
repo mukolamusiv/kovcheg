@@ -44,20 +44,21 @@ class MaterialsRelationManager extends RelationManager
         return $table
 
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('material.name')
                     ->label('Назва')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity')
                     ->label('Кількість')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('Price')
+                Tables\Columns\TextColumn::make('price')
                     ->label('Ціна')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->label('Коментар')
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('category.name')
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Всього')
+                    ->getStateUsing(fn ($record) => $record->quantity * $record->price.'.00')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('material.category.name')
                     ->label('Категорія')
                     ->sortable(),
             ])
