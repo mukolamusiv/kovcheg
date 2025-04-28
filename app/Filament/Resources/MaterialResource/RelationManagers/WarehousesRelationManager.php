@@ -52,8 +52,8 @@ class WarehousesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('Загальна вартість')
                     ->getStateUsing(fn ($record) => $record->quantity * $record->price.'.00')
-                    ->money('UAH', true)
-                    ->sortable(),
+                    ->money('UAH', true),
+
             ])
             ->filters([
                 //
