@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MaterialResource\Pages;
 use App\Filament\Resources\MaterialResource\RelationManagers;
+use App\Filament\Resources\MaterialResource\RelationManagers\WarehousesRelationManager;
 use App\Models\Material;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -145,7 +146,7 @@ class MaterialResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            WarehousesRelationManager::class,
         ];
     }
 
