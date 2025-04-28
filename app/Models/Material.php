@@ -77,14 +77,17 @@ class Material extends Model
      */
     public static function generateBarcode()
     {
-        // Генеруємо випадкову числову частину штрихкоду з 11 цифр.
-        $randomNumber = str_pad(mt_rand(0, 99999999999), 11, '0', STR_PAD_LEFT);
+        $barcodeUa = 482; // Базовий штрихкод для України
+        $barcodeFactory = 7201; // Фабричний код
+        // Генеруємо випадкову числову частину штрихкоду з 5 цифр.
+        $randomNumber = str_pad(mt_rand(0, 9999), 5, '0', STR_PAD_LEFT);
 
+        $barcode = $barcodeUa . $barcodeFactory . $randomNumber;
         // Обчислюємо контрольну цифру за допомогою алгоритму Луна для перевірки помилок.
-        $checksum = self::calculateLuhnChecksum($randomNumber);
+        $checksum = self::calculateLuhnChecksum($barcode);
 
         // Додаємо контрольну цифру до базового штрихкоду.
-        $barcode = $randomNumber . $checksum;
+        $barcode = $barcode . $checksum;
 
         // Перевіряємо, чи є штрихкод унікальним у базі даних.
         if (self::where('barcode', $barcode)->exists()) {
@@ -103,28 +106,32 @@ class Material extends Model
      */
     protected static function calculateLuhnChecksum($number)
     {
-        $sum = 0;
-        $isSecond = false;
+        $digits = str_split($number);
+        $evenSum = 0;
+        $oddSum = 0;
 
-        // Обробляємо кожну цифру з правого боку до лівого.
-        for ($i = strlen($number) - 1; $i >= 0; $i--) {
-            $digit = (int) $number[$i];
-
-            if ($isSecond) {
-                // Подвоюємо кожну другу цифру.
-                $digit *= 2;
-
-                // Якщо результат більше 9, віднімаємо 9.
-                if ($digit > 9) {
-                    $digit -= 9;
-                }
+        foreach ($digits as $index => $digit) {
+            if (($index + 1) % 2 === 0) {
+            // Парні позиції (індексація починається з 0, тому +1)
+            $evenSum += $digit;
+            } else {
+            // Непарні позиції
+            $oddSum += $digit;
             }
-
-            $sum += $digit;
-            $isSecond = !$isSecond;
         }
 
-        // Контрольна цифра — це число, необхідне для того, щоб сума стала кратною 10.
-        return (10 - ($sum % 10)) % 10;
+        // Множимо суму парних позицій на 3
+        $evenSum *= 3;
+
+        // Складаємо суми парних і непарних позицій
+        $totalSum = $evenSum + $oddSum;
+
+        // Відкидаємо десятки
+        $remainder = $totalSum % 10;
+
+        // Віднімаємо з 10
+        $checksum = $remainder === 0 ? 0 : 10 - $remainder;
+
+        return $checksum;
     }
 }

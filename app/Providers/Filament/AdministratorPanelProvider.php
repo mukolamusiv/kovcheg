@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Resources\NResource\Widgets\UpdateInfo;
+use App\Filament\Resources\ТResource\Pages\CustomProfilePage;
+use App\Filament\Resources\ТResource\Pages\EditProfile;
 use App\Filament\Widgets\StockAndFinanceChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -28,6 +30,10 @@ class AdministratorPanelProvider extends PanelProvider
             ->default()
             ->id('administrator')
             ->path('administrator')
+            //->profile(\App\Filament\Resources\ТResource\Pages\CustomProfilePage::class)
+            // ->pages([
+            //     \App\Filament\Resources\ТResource\Pages\CustomProfilePage::class,
+            // ])
             ->login()
             ->colors([
                 'primary' => Color::Amber,
