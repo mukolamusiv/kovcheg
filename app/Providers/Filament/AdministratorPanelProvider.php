@@ -2,10 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\UserProfilePage;
 use App\Filament\Resources\NResource\Widgets\UpdateInfo;
-use App\Filament\Resources\ТResource\Pages\CustomProfilePage;
-use App\Filament\Resources\ТResource\Pages\EditProfile;
+
 use App\Filament\Widgets\StockAndFinanceChart;
+
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -22,6 +23,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+
 class AdministratorPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -30,7 +32,7 @@ class AdministratorPanelProvider extends PanelProvider
             ->default()
             ->id('administrator')
             ->path('administrator')
-            //->profile(\App\Filament\Resources\ТResource\Pages\CustomProfilePage::class)
+            ->profile(UserProfilePage::class, false)
             // ->pages([
             //     \App\Filament\Resources\ТResource\Pages\CustomProfilePage::class,
             // ])
