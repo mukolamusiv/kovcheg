@@ -47,6 +47,11 @@ class StockAndFinanceChart extends ChartWidget implements HasForms
         // ];
     }
 
+    public static function canView(): bool
+        {
+            return auth()->user()->role === 'admin'; // обмеження на працівника
+        }
+
 
     protected function getData(): array
     {
