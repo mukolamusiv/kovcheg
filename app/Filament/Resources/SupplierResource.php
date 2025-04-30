@@ -17,14 +17,14 @@ class SupplierResource extends Resource
 {
     protected static ?string $model = Supplier::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
       //назва ресурсу
    protected static ?string $label = 'Постачальники';
    //protected static ?string $pluralLabel = 'Накладні';
 
    protected static ?string $navigationLabel = 'Постачальники';
-   protected static ?string $navigationGroup = 'Виробництво';
+   protected static ?string $navigationGroup = 'Продажі';
 
    protected static ?string $modelLabel = 'Постачальник';
 

@@ -19,7 +19,12 @@ class TemplateProductionResource extends Resource
 {
     protected static ?string $model = TemplateProduction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-cube-transparent';
+
+    protected static ?string $navigationGroup = 'Виробництво';
+    protected static ?string $navigationLabel = 'Шаблони виробництв';
+    protected static ?string $label = 'Шаблон виробництва';
+    protected static ?string $pluralLabel = 'Шаблони виробництв';
 
     public static function form(Form $form): Form
     {

@@ -19,7 +19,7 @@ class ProductionResource extends Resource
 {
     protected static ?string $model = Production::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-fire';
 
           //назва ресурсу
    protected static ?string $label = 'Виробництво';
