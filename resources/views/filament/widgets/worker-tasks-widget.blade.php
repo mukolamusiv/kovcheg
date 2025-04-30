@@ -6,13 +6,14 @@
 
                 {{-- Очікують --}}
                 <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">Очікує на початок</h3>
+                    <h3 class="font-semibold mb-2">Очікує на початок</h3>
                     @foreach ($pendingTasks as $task)
                         <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <div class="font-medium">{{ $task->name }}</div>
-                                    <div class="text-sm text-gray-500">Виробництво: {{ $task->production->name }}</div>
+                                    <div class="font-medium">Етап - {{ $task->name }}</div>
+                                    <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div>
+                                    <div class="text-sm text-color-info">Виконавець: {{ $task->user->name }}</div>
                                 </div>
                                 <form wire:submit.prevent="startTask({{ $task->id }})">
                                     <x-filament::button type="submit" color="primary" size="sm">
@@ -26,13 +27,14 @@
 
                 {{-- В роботі --}}
                 <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">В роботі</h3>
+                    <h3 class="font-semibold mb-2">В роботі</h3>
                     @foreach ($inProgressTasks as $task)
                         <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <div class="font-medium">{{ $task->name }}</div>
-                                    <div class="text-sm text-gray-500">Виробництво: {{ $task->production->name }}</div>
+                                    <div class="font-medium">Етап - {{ $task->name }}</div>
+                                    <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div>
+                                    <div class="text-sm text-color-info">Виконавець: {{ $task->user->name }}</div>
                                 </div>
                                 <form wire:submit.prevent="completeTask({{ $task->id }})">
                                     <x-filament::button type="submit" color="success" size="sm">
@@ -46,12 +48,12 @@
 
                 {{-- Завершені --}}
                 <div>
-                    <h3 class="font-semibold text-gray-700 mb-2">Завершені</h3>
+                    <h3 class="font-semibold mb-2">Завершені</h3>
                     @foreach ($doneTasks as $task)
                         <x-filament::card class="mb-2 opacity-80">
                             <div>
                                 <div class="font-medium">{{ $task->name }}</div>
-                                <div class="text-sm text-gray-500">Виконано: {{ $task->end_date?->format('d.m.Y H:i') }}</div>
+                                <div class="text-sm text-gray-500">Виконано: {{ $task->date?->format('d.m.Y H:i') }}</div>
                             </div>
                         </x-filament::card>
                     @endforeach
