@@ -367,10 +367,10 @@ class ProductionViewBuilder
     {
         if(is_null($customer)) {
             return Fieldset::make('Клієнт - ')
-                ->description('Немає клієнта')
-                ->headerActions([
+                ->label('Немає клієнта')
+                // ->headerActions([
 
-                ])
+                // ])
                 ->schema([
                     BAction::make([
                         Action::make('selectCustomer')

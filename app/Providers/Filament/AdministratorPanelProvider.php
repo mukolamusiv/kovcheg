@@ -6,7 +6,7 @@ use App\Filament\Pages\Auth\UserProfilePage;
 use App\Filament\Resources\NResource\Widgets\UpdateInfo;
 
 use App\Filament\Widgets\StockAndFinanceChart;
-
+use App\Filament\Widgets\WorkerTasksWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -47,9 +47,10 @@ class AdministratorPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-                UpdateInfo::class,
+                WorkerTasksWidget::class,
+                //Widgets\AccountWidget::class,
+               // Widgets\FilamentInfoWidget::class,
+               // UpdateInfo::class,
                 StockAndFinanceChart::class,
             ])
             ->middleware([

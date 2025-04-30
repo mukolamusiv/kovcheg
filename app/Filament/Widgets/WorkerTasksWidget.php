@@ -1,0 +1,66 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use App\Models\Production;
+use App\Models\ProductionStage;
+use Filament\Widgets\Widget;
+
+class WorkerTasksWidget extends Widget
+{
+    protected static string $view = 'filament.widgets.worker-tasks-widget';
+
+
+    protected int | string | array $columnSpan = 'full';
+
+    public function getViewData(): array
+    {
+        $userId = auth()->id();
+
+        return [
+            'pendingTasks' => ProductionStage::where('user_id', $userId)
+                ->where('status', 'очікує')
+                ->get(),
+
+            'inProgressTasks' => ProductionStage::where('user_id', $userId)
+                ->where('status', 'в роботі')
+                ->get(),
+
+            'doneTasks' => ProductionStage::where('user_id', $userId)
+                ->where('status', 'виготовлено')
+                ->latest('date')
+                ->take(5)
+                ->get(),
+        ];
+    }
+
+    // public static function canView(): bool
+    // {
+    //     return auth()->check(); // обмеження на працівника
+    // }
+
+
+
+
+    public function startTask($taskId)
+    {
+        $task = ProductionStage::findOrFail($taskId);
+        if ($task->status === 'pending') {
+            $task->status = 'in_progress';
+            $task->start_date = now();
+            $task->save();
+            $this->dispatch('notify', ['message' => 'Завдання розпочате.']);
+        }
+    }
+
+    public function completeTask($taskId)
+    {
+        $task = ProductionStage::findOrFail($taskId);
+        if ($task->status === 'in_progress') {
+            $task->status = 'done';
+            $task->end_date = now();
+            $task->save();
+            $this->dispatch('notify', ['message' => 'Завдання завершене.']);
+        }
+    }
+}
