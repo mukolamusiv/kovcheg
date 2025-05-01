@@ -17,6 +17,12 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
+    //обмеження доступу
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
+    }
+
     //іконка яка описує ресурс
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
