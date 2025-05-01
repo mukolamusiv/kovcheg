@@ -11,7 +11,7 @@ class InvoiceProductionItem extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['invoice_id', 'production_id', 'quantity', 'price', 'total'];
+    protected $fillable = ['invoice_id', 'warehouse_productions_id', 'quantity', 'price', 'total'];
 
     public function invoice()
     {
@@ -20,7 +20,19 @@ class InvoiceProductionItem extends Model
 
     public function production()
     {
-        return $this->belongsTo(Production::class);
+        return $this->hasOneThrough(
+            Production::class,
+            WarehouseProduction::class,
+            'id', // Foreign key on the warehouse_productions table
+            'id', // Foreign key on the productions table
+            'warehouse_productions_id', // Local key on the invoice_production_items table
+            'production_id' // Local key on the warehouse_productions table
+        );
+    }
+
+    public function warehouseProduction()
+    {
+        return $this->belongsTo(WarehouseProduction::class);
     }
 
 

@@ -32,6 +32,10 @@ return new class extends Migration
         Schema::table('productions', function (Blueprint $table) {
             $table->foreignId('template_productions_id')->nullable()->constrained()->cascadeOnDelete();
         });
+
+        Schema::table('invoice_production_items', function (Blueprint $table) {
+            $table->foreignId('warehouse_productions_id')->constrained()->cascadeOnDelete();
+        });
     }
 
     /**
@@ -39,6 +43,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+
+         // 1. Видаляємо зовнішній ключ з таблиці invoice_production_items
+        Schema::table('invoice_production_items', function (Blueprint $table) {
+            $table->dropForeign(['warehouse_productions_id']); // або уточни назву поля
+            $table->dropColumn('warehouse_productions_id');
+        });
         // Drop the foreign key constraint from the productions table
         Schema::table('productions', function (Blueprint $table) {
             $table->dropForeign(['template_productions_id']);

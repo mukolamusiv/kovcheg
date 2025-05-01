@@ -59,18 +59,7 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-         //Списання матеріалів через накладну для виробництва
-            Schema::create('invoice_production_items', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
-                $table->foreignId('production_id')->constrained()->cascadeOnDelete();
-                //$table->foreignId('material_id')->constrained()->cascadeOnDelete();
-                $table->decimal('quantity', 15, 2)->default(1); // Кількість
-                $table->decimal('price', 15, 2)->default(0);    // Ціна
-                $table->decimal('total', 15, 2)->default(0);    // Сума
-                $table->timestamps();
-                $table->softDeletes();
-            });
+
 
 
     }
@@ -80,7 +69,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoice_production_items');
+
         Schema::dropIfExists('production_materials');
         Schema::dropIfExists('production_stages');
         Schema::dropIfExists('productions');

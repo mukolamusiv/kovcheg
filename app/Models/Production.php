@@ -23,6 +23,7 @@ class Production extends Model
         'customer_id',
         'user_id',
         'quantity',
+        'warehouse_id',
         'price',
         'production_date',
         'image'
@@ -127,10 +128,10 @@ class Production extends Model
         return $this->hasMany(ProductionStage::class);
     }
 
-    public function invoiceProductionItems()
-    {
-        return $this->hasMany(InvoiceProductionItem::class);
-    }
+    // public function invoiceProductionItems()
+    // {
+    //     return $this->hasMany(InvoiceProductionItem::class);
+    // }
 
     public function invoiceItems()
     {
@@ -159,6 +160,18 @@ class Production extends Model
         )->whereIn('type', ['продаж']);
     }
 
+    public function invoice_on()
+    {
+        return $this->hasOneThrough(
+            Invoice::class,
+            InvoiceProductionItem::class,
+            'warehouse_productions_id', // Foreign key on InvoiceProductionItem table
+            'id',            // Foreign key on Invoice table
+            'id',            // Local key on Production table
+            'invoice_id'     // Local key on InvoiceProductionItem table
+        )->whereIn('type', ['постачання', 'переміщення']);
+    }
+
 
     public function invoice_off()
     {
@@ -166,7 +179,7 @@ class Production extends Model
        return $this->hasOneThrough(
             Invoice::class,
             ProductionMaterial::class,
-            'production_id', // Foreign key on ProductionMaterial table
+            'productions_id', // Foreign key on ProductionMaterial table
             'id',            // Foreign key on Invoice table
             'id',            // Local key on Production table
             'invoice_id'     // Local key on ProductionMaterial table
