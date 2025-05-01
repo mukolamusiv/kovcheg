@@ -115,7 +115,7 @@ class InvoiceSectionBuilder
                                     ->default(100)
                                     ->placeholder('Введіть націнку'),
                             ])->action(function (array $data) use ($invoice): void {
-                                InvoiceService::addInvoiceDiscount($invoice, $data['mark-up']);
+                                InvoiceService::addInvoiceMarkUp($invoice, $data['mark-up']);
                             }),
                         Action::make('add_delivery' . $invoice->id)
                             ->label('Додати доставку')
