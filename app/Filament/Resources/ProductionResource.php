@@ -7,6 +7,7 @@ use App\Filament\Resources\ProductionResource\RelationManagers;
 use App\Filament\Resources\ProductionResource\RelationManagers\ProductionMaterialRelationManager;
 use App\Filament\Resources\ProductionResource\RelationManagers\ProductionStagesRelationManager;
 use App\Models\Production;
+use App\Models\TemplateProduction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -74,6 +75,14 @@ class ProductionResource extends Resource
                         ]),
                     Forms\Components\Wizard\Step::make('Деталі замовлення')
                         ->schema([
+
+                            Forms\Components\Select::make('template_id')
+                                ->label('Шаблон виробництва')
+                                ->options(TemplateProduction::pluck('name', 'id'))
+                                ->searchable()
+                                ->preload()
+                                ->reactive(),
+
                             Forms\Components\TextInput::make('name')
                                 ->label('Назва виробу')
                                 ->required()

@@ -47,10 +47,20 @@ use Filament\Infolists\Components\Split;
 class InvoiceSectionBuilder
 {
 
-    public static function buildSection(Invoice $invoice, $type = '')
+    public static function buildSection(Invoice $invoice = null, $type = '')
     {
+        if ($invoice === null) {
+            return Section::make('Відсутня накладна - '.$type)
+                ->label('Відсутня накладна')
+                ->visible(auth()->user()->role === 'admin' || auth()->user()->role === 'manager' || auth()->user()->role === 'cutter_end')
+                //->hidden()
+                ->columnSpanFull()
+                ->columns(12)
+                ->schema([]);
+        }
         return Section::make('Накладна № '. $invoice->invoice_number.' '.$type)
             ->label('Накладна №'. $invoice->invoice_number)
+            ->visible(auth()->user()->role === 'admin' || auth()->user()->role === 'manager' || auth()->user()->role === 'cutter_end')
             ->columnSpanFull()
             ->columns(12)
             ->schema([

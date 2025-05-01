@@ -27,7 +27,7 @@ class UserResource extends Resource
     //обмеження доступу
     public static function canViewAny(): bool
     {
-        return auth()->user()?->role === 'admin';
+        return auth()->user()->role === 'admin';
     }
 
     // іконка ресурсу

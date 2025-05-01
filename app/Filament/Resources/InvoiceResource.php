@@ -48,9 +48,11 @@ class InvoiceResource extends Resource
                             Forms\Components\Select::make('type')
                                 ->label('Тип накладної')
                                 ->options([
-                                    'постачання' => 'Постачання',
-                                    'продаж' => 'Продаж',
-                                    'списання' => 'Списання',
+                                    'постачання'    => 'Постачання',
+                                    'продаж'        => 'Продаж',
+                                    'переміщення'      => 'переміщення',
+                                    'повернення'      => 'повернення',
+                                    'списання'      => 'Списання',
                                 ])
                                 ->required()
                                 ->reactive(),
@@ -328,7 +330,7 @@ class InvoiceResource extends Resource
     {
         return [
             'index' => Pages\ListInvoices::route('/'),
-            'create' => Pages\CreateInvoice::route('/create'),
+            'create'=> Pages\CreateInvoice::route('/create'),
             'view' => Pages\ViewInvoice::route('/{record}'),
             'edit' => Pages\EditInvoice::route('/{record}/edit'),
         ];
