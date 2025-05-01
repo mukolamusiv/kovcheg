@@ -308,7 +308,7 @@ class InvoiceService
         //dd($invoice);
         $invoice->update([
             'discount' => $discount,
-            //'total' => $invoice->total - $discount,
+            'total' => $invoice->total,
             'due' => $invoice->total - $discount,
         ]);
         $invoice->save();
