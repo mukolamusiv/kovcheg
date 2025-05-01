@@ -90,12 +90,12 @@ class InvoiceSectionBuilder
                             ->color('warning')
                             ->form([
                                 TextInput::make('discount')
-                                    ->label('Знижка у відсотках')
+                                    ->label('Знижка')
                                     ->required()
                                     ->numeric()
                                     ->minValue(0)
-                                    ->maxValue(100)
-                                    ->default(10)
+                                    //->maxValue(100)
+                                    ->default(100)
                                     ->placeholder('Введіть знижку'),
                             ])->action(function (array $data) use ($invoice): void {
                                 InvoiceService::addInvoiceDiscount($invoice, $data['discount']);
@@ -106,7 +106,7 @@ class InvoiceSectionBuilder
                             ->icon('heroicon-o-percent-badge')
                             ->color('success')
                             ->form([
-                                TextInput::make('discount')
+                                TextInput::make('mark-up')
                                     ->label('Націнка у відсотках')
                                     ->required()
                                     ->numeric()
@@ -115,7 +115,7 @@ class InvoiceSectionBuilder
                                     ->default(100)
                                     ->placeholder('Введіть націнку'),
                             ])->action(function (array $data) use ($invoice): void {
-                                InvoiceService::addInvoiceDiscount($invoice, $data['discount']);
+                                InvoiceService::addInvoiceDiscount($invoice, $data['mark-up']);
                             }),
                         Action::make('add_delivery' . $invoice->id)
                             ->label('Додати доставку')
