@@ -37,6 +37,7 @@ class InvoiceService
                     ->send();
                     return;
             }else{
+                dd($invoice->customer);
                 $invoice->customer->calculateObligations();
                 $invoice->customer->account->balance = $invoice->customer->calculateObligations();
                 $invoice->customer->account->save();
