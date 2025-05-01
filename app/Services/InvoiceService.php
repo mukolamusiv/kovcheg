@@ -14,7 +14,6 @@ class InvoiceService
 {
     public static function moveInvoiceToConducted(Invoice $invoice)
     {
-
         if($invoice->type == 'продаж'){
             if(!isset($invoice->customer))
             {
@@ -37,7 +36,7 @@ class InvoiceService
                     ->send();
                     return;
             }else{
-                dd($invoice->customer);
+
                 $invoice->customer->calculateObligations();
                 $invoice->customer->account->balance = $invoice->customer->calculateObligations();
                 $invoice->customer->account->save();
