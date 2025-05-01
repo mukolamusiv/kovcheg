@@ -305,11 +305,33 @@ class InvoiceService
 
     public static function addInvoiceDiscount(Invoice $invoice, $discount)
     {
-        dd($invoice);
+        //dd($invoice);
         $invoice->update([
             'discount' => $discount,
+            'total' => $invoice->total - $discount,
+            'due' => $invoice->total - $discount,
         ]);
         $invoice->save();
+        Notification::make()
+            ->title('Знажка змінена!')
+            ->body('Знижка додана до накладної')
+            ->icon('heroicon-o-check-circle')
+            ->success()
+            ->send();
+    }
+
+    public static function addInvoiceMarkUp(Invoice $invoice, $discount)
+    {
+       // dd($invoice);
+        $invoice->update([
+            'discount' => $discount,
+            'total' => $invoice->total + $discount,
+            'due' => $invoice->total + $discount,
+        ]);
+
+        $invoice->save();
+
+
         Notification::make()
             ->title('Знажка змінена!')
             ->body('Знижка додана до накладної')
