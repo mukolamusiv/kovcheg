@@ -306,10 +306,20 @@ class InvoiceService
     public static function addInvoiceDiscount(Invoice $invoice, $discount)
     {
         //dd($invoice);
+
+        if($invoice->total - $discount < 0){
+            Notification::make()
+                ->title('Помилка при проведенні знижки!')
+                ->body('Сума знижки перевищує загальну суму накладної')
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->send();
+            return;
+
+        }
         $invoice->update([
             'discount' => $discount,
-            'total' => $invoice->total,
-            'due' => $invoice->total - $discount,
+            'total' => $invoice->total - $discount,
         ]);
         $invoice->save();
         Notification::make()
@@ -326,7 +336,6 @@ class InvoiceService
         $invoice->update([
             //'discount' => $discount,
             'total' => $invoice->total + $discount,
-            'due' => $invoice->total + $discount,
         ]);
 
         $invoice->save();
