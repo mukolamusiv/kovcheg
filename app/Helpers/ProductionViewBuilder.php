@@ -185,6 +185,7 @@ class ProductionViewBuilder
 
                     TextEntry::make($material->price ?? '')
                         ->label('Ціна')
+                        ->visible(fn () => auth()->user()->role === 'admin')
                         ->default($material->price)
                         ->prefix('₴'),
 
@@ -338,6 +339,7 @@ class ProductionViewBuilder
 
                         TextEntry::make('price')
                             ->label('Вартість виробу')
+                            ->visible(fn () => auth()->user()->role === 'admin')
                             ->prefix('₴'),
 
                         TextEntry::make('production_date')
