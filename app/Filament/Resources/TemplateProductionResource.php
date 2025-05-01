@@ -19,6 +19,13 @@ class TemplateProductionResource extends Resource
 {
     protected static ?string $model = TemplateProduction::class;
 
+
+        //обмеження доступу
+        public static function canViewAny(): bool
+        {
+            return auth()->user()?->role === 'admin';
+        }
+
     protected static ?string $navigationIcon = 'heroicon-s-cube-transparent';
 
     protected static ?string $navigationGroup = 'Виробництво';

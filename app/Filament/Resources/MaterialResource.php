@@ -20,6 +20,13 @@ class MaterialResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+
+        //обмеження доступу
+        public static function canViewAny(): bool
+        {
+            return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
+        }
+
          //назва ресурсу
          protected static ?string $label = 'Матеріали';
          //protected static ?string $pluralLabel = 'Накладні';

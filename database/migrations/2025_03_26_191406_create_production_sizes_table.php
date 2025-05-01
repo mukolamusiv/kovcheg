@@ -21,9 +21,31 @@ return new class extends Migration
             $table->string('length')->nullable();//довжина
             $table->string('sleeve')->nullable();//рукав
             $table->string('shoulder')->nullable();//плече
+
             $table->string('comment')->nullable();//коментар
             $table->timestamps();
             $table->softDeletes();
+
+            /**
+             *
+             * Горловина - int
+             * Шия - int
+             * Перід - int
+             * Зад - int
+             * Епитрахиля - int
+             * Плечі - int
+             * Рукав - int
+             * Обєм живота - int
+             * Ріст - int
+             * Ріст до підлоги - int
+             * Обєм грудей - int
+             * Нарукавники - bool
+             * Нагороди - list
+             * Стихар - bool
+             * Примітки - string
+             *
+             */
+
         });
     }
 

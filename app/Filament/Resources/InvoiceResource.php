@@ -25,6 +25,12 @@ class InvoiceResource extends Resource
 
         //іконка яка описує ресурс накладних
 
+            //обмеження доступу
+            public static function canViewAny(): bool
+            {
+                return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
+            }
+
         protected static ?string $navigationIcon = 'heroicon-o-document-text'; //heroicon-o-clipboard-list
 
         //назва ресурсу
