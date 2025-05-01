@@ -308,7 +308,7 @@ class InvoiceService
         //dd($invoice);
         $invoice->update([
             'discount' => $discount,
-            'total' => $invoice->total - $discount,
+            //'total' => $invoice->total - $discount,
             'due' => $invoice->total - $discount,
         ]);
         $invoice->save();
@@ -324,7 +324,7 @@ class InvoiceService
     {
        // dd($invoice);
         $invoice->update([
-            'discount' => $discount,
+            //'discount' => $discount,
             'total' => $invoice->total + $discount,
             'due' => $invoice->total + $discount,
         ]);
@@ -333,8 +333,8 @@ class InvoiceService
 
 
         Notification::make()
-            ->title('Знажка змінена!')
-            ->body('Знижка додана до накладної')
+            ->title('Націнка змінена!')
+            ->body('Націнка додана до накладної')
             ->icon('heroicon-o-check-circle')
             ->success()
             ->send();
