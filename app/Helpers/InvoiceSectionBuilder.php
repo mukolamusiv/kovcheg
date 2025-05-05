@@ -224,7 +224,13 @@ class InvoiceSectionBuilder
                                             ->minValue(0)
                                             ->placeholder('Введіть вартість'),
                                     ])->action(function (array $data) use ($invoice): void {
-                                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'],$data['price'],false, $invoice->warehouse_id);
+                                        if(isset($data['price']) and $data['price'] > 0){
+                                            //$invoice->total = $invoice->total + ($data['price'] * $data['quantity']);
+                                            $price = $data['price'];
+                                        }else{
+                                            $price = Material::find($data['material_id'])->getPriceMaterial($invoice->warehouse_id)->price;
+                                        }
+                                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], $price ,false, $invoice->warehouse_id);
                                     })->color('success'),
                 ])->columnSpanFull(),
 
