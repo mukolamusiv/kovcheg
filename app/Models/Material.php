@@ -61,7 +61,7 @@ class Material extends Model
 
     public function getPriceMaterial($warehouseId)
     {
-        return $this->warehouses()->where('warehouse_id', $warehouseId)->first()->price;
+        return $this->warehouses()->where('warehouse_id', $warehouseId)->first();
     }
 
     public function getMaterialWarehouse($warehouseId)

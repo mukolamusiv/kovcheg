@@ -660,12 +660,21 @@ class InvoiceService
 
        // dd($material->getMaterialWarehouse($invoice->warehouse_id)->first());
         if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
-            //
             if($price == null or $price <= 1.00){
-                if($price <= $material->getPriceMaterial($invoice->warehouse_id) or $price <= 1.00){
-                    $price = $material->getPriceMaterial($invoice->warehouse_id);
+                if($price <= $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price or $price <= 1.00){
+                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
                 }else{
-                    $price = $material->getPriceMaterial($invoice->warehouse_id);
+                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
+                }
+            }else{
+                $price = $price;
+            }
+        }else{
+            if($price == null or $price <= 1.00){
+                if($price <= $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price or $price <= 1.00){
+                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
+                }else{
+                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
                 }
             }else{
                 $price = $price;
