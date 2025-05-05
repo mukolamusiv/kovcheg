@@ -230,7 +230,7 @@ class InvoiceSectionBuilder
                                         }else{
                                             $price = Material::find($data['material_id'])->getPriceMaterial($invoice->warehouse_id)->price;
                                         }
-                                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], $price ,false, $invoice->warehouse_id);
+                                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], 0 ,false, $invoice->warehouse_id);
                                     })->color('success'),
                 ])->columnSpanFull(),
 
