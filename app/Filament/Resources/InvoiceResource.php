@@ -8,7 +8,14 @@ use App\Filament\Resources\InvoiceResource\RelationManagers\InvoiceItemsRelation
 use App\Filament\Resources\InvoiceResource\RelationManagers\InvoiceProductionItemsRelationManager;
 use App\Filament\Resources\InvoiceResource\RelationManagers\TransactionsRelationManager;
 use App\Models\Invoice;
+use Dom\Text;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Split;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -48,81 +55,259 @@ class InvoiceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Wizard::make([
-                    Step::make('Тип накладної')
-                        ->schema([
-                            Forms\Components\Select::make('type')
-                                ->label('Тип накладної')
-                                ->options([
-                                    'постачання'    => 'Постачання',
-                                    'продаж'        => 'Продаж',
-                                    'переміщення'      => 'переміщення',
-                                    'повернення'      => 'повернення',
-                                    'списання'      => 'Списання',
+                Section::make('Основна інформація')
+                    ->label('Основна інформація')
+                    ->description('Введіть основну інформацію про накладну')
+                    ->schema([
+                        Split::make([
+                            Section::make([
+                                Select::make('type')
+                                    ->label('Тип накладної')
+                                    ->options([
+                                        'постачання'    => 'Постачання',
+                                        'продаж'        => 'Продаж',
+                                        'переміщення'      => 'переміщення',
+                                        'повернення'      => 'повернення',
+                                        'списання'      => 'Списання',
+                                    ])
+                                    ->required()
+                                    ->reactive(),
+                                Select::make('supplier_id')
+                                    ->label('Постачальник')
+                                    ->relationship('supplier', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
+                                Select::make('customer_id')
+                                    ->label('Клієнт')
+                                    ->relationship('customer', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення'),
+                            ]),
+                            Section::make([
+                               Textarea::make('notes')
+                                    ->label('Примітки')
+                                    ->columnSpanFull()
+                                    ->maxLength(255)
+                                    ->placeholder('Введіть примітки до накладної'),
+                            ]),
+                        ])
+                    ])
+                    ->columnSpanFull(),
+
+                Section::make('Матеріали')
+                    ->label('Матеріали')
+                    ->visible(fn (callable $get) => $get('type') === 'постачання')
+                    ->description('Введіть матеріали до накладної')
+                    ->schema([
+                            Section::make([
+                                Forms\Components\Repeater::make('items')
+                                    ->label('Матеріали')
+                                    ->relationship('invoiceItems')
+                                    ->schema([
+                                        Select::make('material_id')
+                                            ->label('Матеріал')
+                                            ->relationship('material', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpan(6)
+                                            ->required(),
+                                        TextInput::make('quantity')
+                                            ->label('Кількість')
+                                            ->numeric()
+                                            ->default(1)
+                                            ->columnSpan(2)
+                                            ->required(),
+                                        TextInput::make('price')
+                                            ->label('Вартість за одиницю')
+                                            ->numeric()
+                                            ->default(0.01)
+                                            ->reactive()
+                                            ->columnSpan(4)
+                                            ->required(),
+                                    ])
+                                    ->columns([
+                                        'sm' => 3,
+                                        'lg' => 12,
+                                    ])
+                                    //->columnSpanFull()
+
+                           ])
+                           ->columnSpan(8),
+                        Section::make([
+                                Select::make('warehouse_id')
+                                    ->label('Склад')
+                                    ->relationship('warehouse', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                            ])->columnSpan(4),
+                    ])
+                    ->columns([
+                        'sm' => 6,
+                        'lg' => 12,
+                    ])
+                    ->columnSpanFull(),
+
+                Section::make('Матеріали')
+                    ->label('Матеріали')
+                    ->visible(fn (callable $get) => $get('type') != 'постачання')
+                    ->description('Введіть матеріали до накладної')
+                    ->schema([
+                            Section::make([
+                                Forms\Components\Repeater::make('items')
+                                    ->label('Матеріали')
+                                    ->relationship('invoiceItems')
+                                    ->schema([
+                                        Select::make('material_id')
+                                            ->label('Матеріал')
+                                            ->relationship('material', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpan(8)
+                                            ->required(),
+                                        TextInput::make('quantity')
+                                            ->label('Кількість')
+                                            ->numeric()
+                                            ->default(1)
+                                            ->columnSpan(4)
+                                            ->required(),
+                                    ])
+                                    ->columns([
+                                        'sm' => 3,
+                                        'lg' => 12,
+                                    ])
+                                    //->columnSpanFull()
+
+                           ])
+                           ->columnSpan(8),
+                        Section::make([
+                                Select::make('warehouse_id')
+                                    ->label('Склад')
+                                    ->relationship('warehouse', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                                TextInput::make('shipping')
+                                    ->label('Доставка')
+                                    ->numeric()
+                                    ->default(0.00)
+                                    ->reactive(),
+                                Select::make('saleUp')
+                                    ->label('Націнка')
+                                    ->hidden(fn (callable $get) => $get('discount') > 0)
+                                    ->options([
+                                        '0' => '0%',
+                                        '5' => '5%',
+                                        '10' => '10%',
+                                        '15' => '15%',
+                                        '20' => '20%',
+                                        '25' => '25%',
+                                        '30' => '30%',
+                                        '35' => '35%',
+                                        '40' => '40%',
+                                        '45' => '45%',
+                                        '50' => '50%',
+                                    ])
+                                    ->searchable()
+                                    ->reactive()
+                                    ->preload(),
+                                Select::make('discount')
+                                    ->label('Знижка')
+                                    ->hidden(fn (callable $get) => $get('saleUp') > 0)
+                                    ->reactive()
+                                    ->options([
+                                        '0' => '0%',
+                                        '5' => '5%',
+                                        '10' => '10%',
+                                        '15' => '15%',
+                                        '20' => '20%',
+                                        '25' => '25%',
+                                        '30' => '30%',
+                                        '35' => '35%',
+                                        '40' => '40%',
+                                        '45' => '45%',
+                                        '50' => '50%',
+                                    ])
+                                    ->searchable()
+                                    ->preload(),
+                            ])->columnSpan(4),
+                    ])
+                    ->columns([
+                        'sm' => 6,
+                        'lg' => 12,
+                    ])
+                    ->columnSpanFull(),
+
+                Section::make('Виробництво')
+                    ->label('Виробництво')
+                    ->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення' || $get('type') === 'переміщення')
+                    ->description('Введіть замовлення до накладної')
+                    ->schema([
+                            Section::make([
+                                Forms\Components\Repeater::make('productions')
+                                    ->label('Замовлення')
+                                    ->schema([
+                                        Select::make('production_id')
+                                            ->label('Замовлення')
+                                            ->options(\App\Models\WarehouseProduction::all()->pluck('name', 'id'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpan(6)
+                                            ->required(),
+                                        TextInput::make('quantity')
+                                            ->label('Кількість')
+                                            ->numeric()
+                                            ->columnSpan(3)
+                                            ->required(),
+                                    ])
+                                    ->columns(12)
+                                    //->columnSpanFull()
+                                    ->columns([
+                                        'sm' => 6,
+                                        'lg' => 12,
+                                    ]),
+
                                 ])
-                                ->required()
-                                ->reactive(),
-                        ]),
-                    Step::make('Інформація про накладну')
-                        ->schema([
-                            Forms\Components\Select::make('supplier_id')
-                                ->label('Постачальник')
-                                ->relationship('supplier', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->visible(fn (callable $get) => $get('type') === 'постачання'),
-                            Forms\Components\Select::make('customer_id')
-                                ->label('Клієнт')
-                                ->relationship('customer', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->visible(fn (callable $get) => $get('type') === 'продаж'),
-                        ]),
-                    Step::make('Позиції накладної')
-                        ->schema([
-                            Forms\Components\Select::make('warehouse_id')
+                                ->columnSpan(8),
+                        Section::make([
+                            Select::make('warehouse_id')
                                 ->label('Склад')
-                                ->options(\App\Models\Warehouse::all()->pluck('name', 'id'))
-                                ->required(),
-                            Forms\Components\Repeater::make('items')
-                                ->visible(fn (callable $get) => $get('type') === 'постачання')
-                                ->label('Матеріали')
-                                ->schema([
-                                    Forms\Components\Select::make('material_id')
-                                        ->label('Матеріал')
-                                        ->options(\App\Models\Material::all()->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->preload(),
-                                        //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання'])),
-                                    Forms\Components\TextInput::make('quantity')
-                                        ->label('Кількість')
-                                        ->numeric()
-                                        ->required(),
-                                    Forms\Components\TextInput::make('price')
-                                        ->label('Вартість за одиницю')
-                                        ->numeric()
-                                        ->reactive()
-                                        ->required(),
+                                ->relationship('warehouse', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required(fn (callable $get) => count( $get('productions')) > 0),
+                            Select::make('saleUp_p')
+                                ->label('Націнка')
+                                ->hidden(fn (callable $get) => $get('discount_p') > 0)
+                                ->options([
+                                    '0' => '0%',
+                                    '5' => '5%',
+                                    '10' => '10%',
+                                    '15' => '15%',
+                                    '20' => '20%',
+                                    '25' => '25%',
+                                    '30' => '30%',
+                                    '35' => '35%',
+                                    '40' => '40%',
+                                    '45' => '45%',
+                                    '50' => '50%',
                                 ])
-                                ->columns(3),
-                            Forms\Components\Repeater::make('items')
-                                ->visible(fn (callable $get) => $get('type') === 'продаж')
-                                ->label('Матеріали')
-                                ->schema([
-                                    Forms\Components\Select::make('material_id')
-                                        ->label('Матеріал')
-                                        ->options(\App\Models\Material::all()->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->preload(),
-                                        //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання'])),
-                                    Forms\Components\TextInput::make('quantity')
-                                        ->label('Кількість')
-                                        ->numeric()
-                                        ->required(),
-                                ])
-                                ->columns(2),
-                        ]),
-                ])->columnSpanFull()
+                                ->searchable()
+                                ->reactive()
+                                ->preload(),
+
+                        ])
+                        ->columnSpan(4),
+                    ])
+                    ->columns([
+                        'sm' => 6,
+                        'lg' => 12,
+                    ])
+                    ->columnSpanFull(),
+
+
                 // Forms\Components\TextInput::make('invoice_number')
                 //     ->label('Номер накладної')
                 //     //->required()
@@ -236,6 +421,13 @@ class InvoiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Тип')
+                    ->colors([
+                        'success' => 'продаж',
+                        'warning' => 'постачання',
+                        'danger' => 'переміщення',
+                        'primary' => 'повернення',
+                        'secondary' => 'списання',
+                    ])
                     ->icons([
                         'heroicon-o-truck' => 'постачання',
                         'heroicon-o-shopping-cart' => 'переміщення',
@@ -270,10 +462,10 @@ class InvoiceResource extends Resource
                     ->label('Дата накладної')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('due_date')
-                    ->label('Дата проведення')
-                    ->date()
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('due_date')
+                //     ->label('Дата проведення')
+                //     ->date()
+                //     ->sortable(),
 
                 Tables\Columns\TextColumn::make('paid')
                     ->label('Оплачено')
@@ -283,17 +475,16 @@ class InvoiceResource extends Resource
                     ->label('Заборгованість')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('discount')
-                    ->label('Знижка')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('shipping')
-                    ->label('Доставка')
-                    ->numeric()
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('discount')
+                //     ->label('Знижка')
+                //     ->numeric()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('shipping')
+                //     ->label('Доставка')
+                //     ->numeric()
+                //     ->sortable(),
 
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Статус накладної'),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -351,3 +542,82 @@ class InvoiceResource extends Resource
             ]);
     }
 }
+
+/*
+
+ Forms\Components\Wizard::make([
+                    Step::make('Тип накладної')
+                        ->schema([
+                            Forms\Components\Select::make('type')
+                                ->label('Тип накладної')
+                                ->options([
+                                    'постачання'    => 'Постачання',
+                                    'продаж'        => 'Продаж',
+                                    'переміщення'      => 'переміщення',
+                                    'повернення'      => 'повернення',
+                                    'списання'      => 'Списання',
+                                ])
+                                ->required()
+                                ->reactive(),
+                        ]),
+                    Step::make('Інформація про накладну')
+                        ->schema([
+                            Forms\Components\Select::make('supplier_id')
+                                ->label('Постачальник')
+                                ->relationship('supplier', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn (callable $get) => $get('type') === 'постачання'),
+                            Forms\Components\Select::make('customer_id')
+                                ->label('Клієнт')
+                                ->relationship('customer', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->visible(fn (callable $get) => $get('type') === 'продаж'),
+                        ]),
+                    Step::make('Позиції накладної')
+                        ->schema([
+                            Forms\Components\Select::make('warehouse_id')
+                                ->label('Склад')
+                                ->options(\App\Models\Warehouse::all()->pluck('name', 'id'))
+                                ->required(),
+                            Forms\Components\Repeater::make('items')
+                                ->visible(fn (callable $get) => $get('type') === 'постачання')
+                                ->label('Матеріали')
+                                ->schema([
+                                    Forms\Components\Select::make('material_id')
+                                        ->label('Матеріал')
+                                        ->options(\App\Models\Material::all()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->preload(),
+                                        //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання'])),
+                                    Forms\Components\TextInput::make('quantity')
+                                        ->label('Кількість')
+                                        ->numeric()
+                                        ->required(),
+                                    Forms\Components\TextInput::make('price')
+                                        ->label('Вартість за одиницю')
+                                        ->numeric()
+                                        ->reactive()
+                                        ->required(),
+                                ])
+                                ->columns(3),
+                            Forms\Components\Repeater::make('items')
+                                ->visible(fn (callable $get) => $get('type') === 'продаж')
+                                ->label('Матеріали')
+                                ->schema([
+                                    Forms\Components\Select::make('material_id')
+                                        ->label('Матеріал')
+                                        ->options(\App\Models\Material::all()->pluck('name', 'id'))
+                                        ->searchable()
+                                        ->preload(),
+                                        //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання'])),
+                                    Forms\Components\TextInput::make('quantity')
+                                        ->label('Кількість')
+                                        ->numeric()
+                                        ->required(),
+                                ])
+                                ->columns(2),
+                        ]),
+                ])->columnSpanFull()
+ */

@@ -19,6 +19,7 @@ class CreateInvoice extends CreateRecord
         // Створення накладної
        // $invoice = $this->record::create($this->data);
        //dd($this->data);
+
         $invoice = InvoiceService::makeInvoice($this->data);
         // // Сповіщення про успішне створення
         // Notification::make()

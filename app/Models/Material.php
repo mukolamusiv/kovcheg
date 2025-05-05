@@ -64,6 +64,11 @@ class Material extends Model
         return $this->warehouses()->where('warehouse_id', $warehouseId)->first()->price;
     }
 
+    public function getMaterialWarehouse($warehouseId)
+    {
+        return $this->warehouses()->where('warehouse_id', $warehouseId);
+    }
+
     // Визначаємо зв'язок з таблицею suppliers
     public function supplier()
     {
