@@ -658,7 +658,7 @@ class InvoiceService
         //     }
         // }
 
-        dd($material->getMaterialWarehouse($invoice->warehouse_id)->price);
+        dd($material->getMaterialWarehouse($invoice->warehouse_id), $invoice->warehouse_id);
         if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
             if($invoice->type == 'продаж'){
                 Notification::make()
