@@ -364,7 +364,7 @@ class InvoiceService
             ->send();
     }
 
-    public static function addInvoicePayment($invoice, Account $account, int $payment)
+    public static function addInvoicePayment($invoice, Account $account, $payment)
     {
        // dd($payment, $account, $invoice);
         // Перевірка, чи сума платежу не перевищує залишок
