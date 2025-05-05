@@ -23,7 +23,7 @@ class TemplateProductionResource extends Resource
         //обмеження доступу
         public static function canViewAny(): bool
         {
-            return auth()->user()?->role === 'admin';
+            return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
         }
 
     protected static ?string $navigationIcon = 'heroicon-s-cube-transparent';
