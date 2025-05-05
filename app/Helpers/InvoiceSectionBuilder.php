@@ -157,62 +157,26 @@ class InvoiceSectionBuilder
                             }),
 
                             Action::make('pay' . $invoice->id)
-                            ->label('Оплатити постачальнику')
-                            ->visible(fn () => $invoice->supplier()->exists() or $invoice->status === 'проведено' and $invoice->type === 'постачання')
-                            ->icon('heroicon-o-credit-card')
-                            ->color('success')
-                            ->form([
-                                Select::make('account_id')
-                                    ->label('Зняти кошти з рахуноку')
-                                    ->options(Account::all()->pluck('name', 'id'))
-                                    ->required()
-                                    ->placeholder('Виберіть рахунок'),
-                                TextInput::make('amount')
-                                    ->label('Сума')
-                                    ->required()
-                                    ->numeric()
-                                    ->minValue(0)
-                                    ->placeholder('Введіть суму'),
-                            ])
-                            ->action(function (array $data) use ($invoice): void {
-                                InvoiceService::addInvoicePayment($invoice, Account::find($data['account_id']), $data['amount']);
-                            }),
-
-                        Action::make('custumerEdit' . $invoice->id)
-                            ->label('Редагувати замовника')
-                            ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'продаж')
-                            ->icon('heroicon-o-user')
-                            ->color('info')
-                            ->form([
-                                Select::make('custumer_id')
-                                    ->label('Клієнт')
-                                    ->options(Customer::all()->pluck('name', 'id'))
-                                    ->preload()
-                                    ->searchable()
-                                    //->default($invoice->customer->id)
-                                    ->required()
-                                    ->placeholder('Обреріть замовника'),
-                            ])->action(function (array $data,) use ($invoice): void {
-                                InvoiceService::makeCustumer($invoice, $data['custumer_id']);
-                            }),
-
-                        Action::make('supplinerEdit' . $invoice->id)
-                            ->label('Редагувати постачальника')
-                            ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'постачання')
-                            ->icon('heroicon-o-user')
-                            ->color('info')
-                            ->form([
-                                Select::make('suppliner_id')
-                                    ->label('Постачальник')
-                                    ->options(Supplier::all()->pluck('name', 'id'))
-                                    ->preload()
-                                    ->searchable()
-                                    //->default($invoice->customer->id)
-                                    ->required()
-                                    ->placeholder('Обреріть постачальника'),
-                            ])->action(function (array $data,) use ($invoice): void {
-                                InvoiceService::makeSuppliner($invoice, $data['suppliner_id']);
-                            }),
+                                ->label('Оплатити постачальнику')
+                                ->visible(fn () => $invoice->supplier()->exists() or $invoice->status === 'проведено' and $invoice->type === 'постачання')
+                                ->icon('heroicon-o-credit-card')
+                                ->color('success')
+                                ->form([
+                                    Select::make('account_id')
+                                        ->label('Зняти кошти з рахуноку')
+                                        ->options(Account::all()->pluck('name', 'id'))
+                                        ->required()
+                                        ->placeholder('Виберіть рахунок'),
+                                    TextInput::make('amount')
+                                        ->label('Сума')
+                                        ->required()
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->placeholder('Введіть суму'),
+                                ])
+                                ->action(function (array $data) use ($invoice): void {
+                                    InvoiceService::addInvoicePayment($invoice, Account::find($data['account_id']), $data['amount']);
+                                }),
                 ])->columnSpanFull(),
 
                 Fieldset::make('Інформація про накладну')
@@ -268,8 +232,8 @@ class InvoiceSectionBuilder
                     //isset($invoice->customer) ? self::buildCustumerInvoice($invoice) : array(),
                     self::buildCustumerInvoice($invoice),
                     self::buildSupplinerInvoice($invoice),
-                    self::buildSectionInvoiceProductionItems($invoice),
-                    self::buildSectionInvoiceMaterialItems($invoice),
+                   // self::buildSectionInvoiceProductionItems($invoice),
+                   // self::buildSectionInvoiceMaterialItems($invoice),
                 ]);
     }
 
@@ -316,16 +280,26 @@ class InvoiceSectionBuilder
                                 ->default($invoice->customer->address)
                                 ->badge()
                                 ->color('primary'),
-                            // TextEntry::make('user.name')
-                            //     ->label('Менеджер')
-                            //     ->default($invoice->user->name)
-                            //     ->badge()
-                            //     ->color('primary'),
-                            // TextEntry::make('warehouse.name')
-                            //     ->label('Склад')
-                            //     //->default($invoice->warehouse->name)
-                            //     ->badge()
-                            //     ->color('primary'),
+
+                            BAction::make([
+                                Action::make('custumerEdit' . $invoice->id)
+                                    ->label('Редагувати замовника')
+                                    ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'продаж')
+                                    ->icon('heroicon-o-user')
+                                    ->color('info')
+                                    ->form([
+                                        Select::make('custumer_id')
+                                            ->label('Клієнт')
+                                            ->options(Customer::all()->pluck('name', 'id'))
+                                            ->preload()
+                                            ->searchable()
+                                            //->default($invoice->customer->id)
+                                            ->required()
+                                            ->placeholder('Обреріть замовника'),
+                                    ])->action(function (array $data,) use ($invoice): void {
+                                        InvoiceService::makeCustumer($invoice, $data['custumer_id']);
+                                    }),
+                            ])
                         ]);
     }
 
@@ -349,6 +323,25 @@ class InvoiceSectionBuilder
                         ->columnSpanFull()
                         //->columnSpan(6, 12)
                         ->schema([
+                            BAction::make([
+                                Action::make('supplinerEdit' . $invoice->id)
+                                    ->label('Редагувати постачальника')
+                                    ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'постачання')
+                                    ->icon('heroicon-o-user')
+                                    ->color('info')
+                                    ->form([
+                                        Select::make('suppliner_id')
+                                            ->label('Постачальник')
+                                            ->options(Supplier::all()->pluck('name', 'id'))
+                                            ->preload()
+                                            ->searchable()
+                                            //->default($invoice->customer->id)
+                                            ->required()
+                                            ->placeholder('Обреріть постачальника'),
+                                    ])->action(function (array $data,) use ($invoice): void {
+                                        InvoiceService::makeSuppliner($invoice, $data['suppliner_id']);
+                                    }),
+                                ]),
                             TextEntry::make('customer.name')
                                 ->label('Постачальник')
                                 ->default($invoice->supplier->name)
@@ -369,16 +362,6 @@ class InvoiceSectionBuilder
                                 ->default($invoice->supplier->address)
                                 ->badge()
                                 ->color('primary'),
-                            // TextEntry::make('user.name')
-                            //     ->label('Менеджер')
-                            //     ->default($invoice->user->name)
-                            //     ->badge()
-                            //     ->color('primary'),
-                            // TextEntry::make('warehouse.name')
-                            //     ->label('Склад')
-                            //     //->default($invoice->warehouse->name)
-                            //     ->badge()
-                            //     ->color('primary'),
                         ]);
     }
 
