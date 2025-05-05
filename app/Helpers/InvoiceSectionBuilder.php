@@ -158,7 +158,7 @@ class InvoiceSectionBuilder
 
                             Action::make('pay' . $invoice->id)
                                 ->label('Оплатити постачальнику')
-                                ->visible(fn () => $invoice->supplier()->exists() or $invoice->status === 'проведено' and $invoice->type === 'постачання')
+                                ->visible(fn () => $invoice->supplier()->exists() or $invoice->status === 'проведено' and $invoice->type === 'постачання' and $invoice->payment_status != 'оплачено')
                                 ->icon('heroicon-o-credit-card')
                                 ->color('success')
                                 ->form([

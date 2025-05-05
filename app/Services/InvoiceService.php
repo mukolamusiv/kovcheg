@@ -15,132 +15,13 @@ class InvoiceService
     public static function moveInvoiceToConducted(Invoice $invoice)
     {
         if($invoice->type == 'продаж'){
-            if(!isset($invoice->customer))
-            {
-                Notification::make()
-                    ->title('Помилка проведення!')
-                    ->body('Потрібно додати спочатку клієнта щоб можна було провести накладну')
-                    ->icon('heroicon-o-x-circle')
-                    //->icon('heroicon-o-check-circle')
-                    ->danger()
-                    ->send();
-                    return;
-            }
-            if($invoice->customer->account == null )
-            {
-                Notification::make()
-                    ->title('Помилка проведення!')
-                    ->body('Потрібно додати спочатку рахунок клієнта щоб можна було провести накладну')
-                    ->icon('heroicon-o-x-circle')
-                    ->danger()
-                    ->send();
-                    return;
-            }else{
 
-                $invoice->customer->calculateObligations();
-                $invoice->customer->account->balance = $invoice->customer->calculateObligations();
-                $invoice->customer->account->save();
-            }
 
         }
 
         if($invoice->type == 'постачання')
         {
-            if(!isset($invoice->supplier))
-            {
-                Notification::make()
-                    ->title('Помилка проведення!')
-                    ->body('Потрібно додати спочатку постачальника щоб можна було провести накладну')
-                    ->icon('heroicon-o-x-circle')
-                    //->icon('heroicon-o-check-circle')
-                    ->danger()
-                    ->send();
-                    return;
-            }
-            if($invoice->supplier->account == null )
-            {
-                Notification::make()
-                    ->title('Помилка проведення!')
-                    ->body('Потрібно додати спочатку рахунок постачальника щоб можна було провести накладну')
-                    ->icon('heroicon-o-x-circle')
-                    ->danger()
-                    ->send();
-                    return;
-            }else{
-                  $invoice->supplier->setBalans();
-
-                  //зарахування матеріалів на склад
-                foreach ($invoice->invoiceItems as $item) {
-                    $material = \App\Models\Material::find($item->material_id);
-                    if ($material) {
-                        // Отримуємо запис про матеріал на складі за матеріалом та складом
-                        $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
-                            ->where('warehouse_id', $invoice->warehouse_id)
-                            ->first();
-
-                        // Якщо запис про матеріал на складі існує
-                        if ($materialWarehouse) {
-                            // Збільшуємо кількість матеріалу на складі на кількість з накладної
-                            $materialWarehouse->quantity += $item->quantity;
-
-                            // Перевіярємо вартість продукту на складі якщо є нова яка відрізяняється тоді змінюємо
-                            if($materialWarehouse->price != $item->price){
-                                $materialWarehouse->price = $item->price;
-                                Notification::make()
-                                    ->title('Змінено вартість метеріалу на складі!')
-                                    ->body('Потрібно здіснити дії на складі згідно накладної')
-                                    ->icon('heroicon-o-check-circle')
-                                    ->success()
-                                    ->send();
-                            }
-
-                            Notification::make()
-                                ->title('Змінено залишки метеріалу на складі!')
-                                ->body('Потрібно здіснити дії на складі згідно накладної')
-                                ->icon('heroicon-o-check-circle')
-                                ->success()
-                                ->send();
-                            // Зберігаємо оновлений запис
-                            $materialWarehouse->save();
-                        } else {
-                            // Якщо запису про матеріал на складі немає, створюємо новий запис
-                            WarehouseMaterial::create([
-                                'material_id' => $item->material_id, // ID матеріалу
-                                'warehouse_id' => $invoice->warehouse_id, // ID складу
-                                'quantity' => $item->quantity, // Кількість матеріалу
-                                'price' => $item->price, // Ціна матеріалу
-                            ]);
-                            Notification::make()
-                                ->title('Додано метеріал на склад!')
-                                ->body('Потрібно здіснити дії на складі згідно накладної')
-                                ->icon('heroicon-o-check-circle')
-                                ->success()
-                                ->send();
-
-                        }
-
-                    }
-
-                // $invoice->supplier->account->balance = $invoice->supplier->calculateObligations();
-                // $invoice->supplier->account->save();
-                }
-
-            }
-
-
-
-        $invoice->update([
-            'status' => 'проведено',
-        ]);
-        $invoice->save();
-
-        $invoice->customer();
-            Notification::make()
-                ->title('Накладна проведена!')
-                ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
-                ->icon('heroicon-o-check-circle')
-                ->success()
-                ->send();
+            InvoiceService::moveIncome($invoice);
         }
 
 
@@ -247,6 +128,188 @@ class InvoiceService
                 ->send();
         }
     }
+
+
+
+    public static function moveIncome(Invoice  $invoice){
+        if(!isset($invoice->supplier))
+            {
+                Notification::make()
+                    ->title('Помилка проведення!')
+                    ->body('Потрібно додати спочатку постачальника щоб можна було провести накладну')
+                    ->icon('heroicon-o-x-circle')
+                    //->icon('heroicon-o-check-circle')
+                    ->danger()
+                    ->send();
+                    return;
+            }
+            if($invoice->supplier->account == null )
+            {
+                Notification::make()
+                    ->title('Помилка проведення!')
+                    ->body('Потрібно додати спочатку рахунок постачальника щоб можна було провести накладну')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                    return;
+            }else{
+                $invoice->supplier->setBalans();
+                  //зарахування матеріалів на склад
+                foreach ($invoice->invoiceItems as $item) {
+                    $material = \App\Models\Material::find($item->material_id);
+                    if ($material) {
+                        // Отримуємо запис про матеріал на складі за матеріалом та складом
+                        $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
+                            ->where('warehouse_id', $invoice->warehouse_id)
+                            ->first();
+                        // Якщо запис про матеріал на складі існує
+                        if ($materialWarehouse) {
+                            // Збільшуємо кількість матеріалу на складі на кількість з накладної
+                            $materialWarehouse->quantity += $item->quantity;
+                            // Перевіярємо вартість продукту на складі якщо є нова яка відрізяняється тоді змінюємо
+                            if($materialWarehouse->price != $item->price){
+                                $materialWarehouse->price = $item->price;
+                                Notification::make()
+                                    ->title('Змінено вартість метеріалу на складі!')
+                                    ->body('Потрібно здіснити дії на складі згідно накладної')
+                                    ->icon('heroicon-o-check-circle')
+                                    ->success()
+                                    ->send();
+                            }
+
+                            Notification::make()
+                                ->title('Змінено залишки метеріалу на складі!')
+                                ->body('Потрібно здіснити дії на складі згідно накладної')
+                                ->icon('heroicon-o-check-circle')
+                                ->success()
+                                ->send();
+                            // Зберігаємо оновлений запис
+                            $materialWarehouse->save();
+                        } else {
+                            // Якщо запису про матеріал на складі немає, створюємо новий запис
+                            WarehouseMaterial::create([
+                                'material_id' => $item->material_id, // ID матеріалу
+                                'warehouse_id' => $invoice->warehouse_id, // ID складу
+                                'quantity' => $item->quantity, // Кількість матеріалу
+                                'price' => $item->price, // Ціна матеріалу
+                            ]);
+                            Notification::make()
+                                ->title('Додано метеріал на склад!')
+                                ->body('Потрібно здіснити дії на складі згідно накладної')
+                                ->icon('heroicon-o-check-circle')
+                                ->success()
+                                ->send();
+                        }
+                    }
+                }
+
+            }
+        $invoice->update([
+            'status' => 'проведено',
+        ]);
+        $invoice->save();
+
+        $invoice->customer();
+            Notification::make()
+                ->title('Накладна проведена!')
+                ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
+                ->icon('heroicon-o-check-circle')
+                ->success()
+                ->send();
+    }
+
+    public static function moveSelling(Invoice  $invoice){
+        if(!isset($invoice->customer))
+        {
+            Notification::make()
+                ->title('Помилка проведення!')
+                ->body('Потрібно додати спочатку клієнта щоб можна було провести накладну')
+                ->icon('heroicon-o-x-circle')
+                //->icon('heroicon-o-check-circle')
+                ->danger()
+                ->send();
+                return;
+        }
+        if($invoice->customer->account == null )
+        {
+            Notification::make()
+                ->title('Помилка проведення!')
+                ->body('Потрібно додати спочатку рахунок клієнта щоб можна було провести накладну')
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->send();
+                return;
+        }else{
+            $invoice->customer->setBalans();
+                  //списання матеріалів зі складу
+                foreach ($invoice->invoiceItems as $item) {
+                    $material = \App\Models\Material::find($item->material_id);
+                    if ($material) {
+                        // Отримуємо запис про матеріал на складі за матеріалом та складом
+                        $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
+                            ->where('warehouse_id', $invoice->warehouse_id)
+                            ->first();
+                        // Якщо запис про матеріал на складі існує
+                        if ($materialWarehouse) {
+                            // Зменшуємо кількість матеріалу на складі на кількість з накладної
+                            if($materialWarehouse->quantity >= $item->quantity){
+                                $materialWarehouse->quantity -= $item->quantity;
+                            }else{
+                                Notification::make()
+                                    ->title('Помилка списання метеріалу на складі!')
+                                    ->body('Недостатня кількість матеріалу на складі')
+                                    ->icon('heroicon-o-x-circle')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+
+                            $materialWarehouse->quantity -= $item->quantity;
+                            Notification::make()
+                                ->title('Змінено залишки метеріалу на складі!')
+                                ->body('Потрібно здіснити дії на складі згідно накладної')
+                                ->icon('heroicon-o-check-circle')
+                                ->success()
+                                ->send();
+                            // Зберігаємо оновлений запис
+                            $materialWarehouse->save();
+                        } else {
+                            Notification::make()
+                                ->title('Помилка цього товару не було на складі!')
+                                ->body('Відсутня кількість матеріалу на складі')
+                                ->icon('heroicon-o-x-circle')
+                                ->danger()
+                                ->send();
+                        }
+                    }
+                }
+
+                $invoice->update([
+                    'status' => 'проведено',
+                ]);
+                $invoice->save();
+
+                $invoice->customer();
+                    Notification::make()
+                        ->title('Накладна проведена!')
+                        ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
+                        ->icon('heroicon-o-check-circle')
+                        ->success()
+                        ->send();
+            $invoice->customer->calculateObligations();
+            $invoice->customer->account->balance = $invoice->customer->calculateObligations();
+            $invoice->customer->account->save();
+        }
+    }
+
+    public static function moveWritingOff(Invoice  $invoice){
+
+    }
+
+    public static function moveMoving(Invoice  $invoice){
+
+    }
+
 
     public static function moveInvoiceToCreated(Invoice $invoice)
     {
