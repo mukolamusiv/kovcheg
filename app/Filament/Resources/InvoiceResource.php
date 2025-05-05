@@ -173,6 +173,14 @@ class InvoiceResource extends Resource
                                             ->default(1)
                                             ->columnSpan(4)
                                             ->required(),
+                                        TextInput::make('price')
+                                            ->label('Вартість за одиницю')
+                                            ->numeric()
+                                            ->default(0.01)
+                                            ->reactive()
+                                            ->hidden(true)
+                                            ->columnSpan(4)
+                                            ->required(),
                                     ])
                                     ->columns([
                                         'sm' => 3,
