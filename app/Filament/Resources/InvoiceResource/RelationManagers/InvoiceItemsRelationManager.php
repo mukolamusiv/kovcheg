@@ -28,9 +28,6 @@ class InvoiceItemsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Grid::make()
-                    ->columns(2)
-                    ->schema([
                         Forms\Components\Select::make('material_id')
                             ->relationship('material', 'name')
                             ->required()
@@ -50,24 +47,8 @@ class InvoiceItemsRelationManager extends RelationManager
                             ->numeric()
                             ->minValue(0)
                             ->label('Загальна вартість'),
-                    ]),
-            ])->columns(2)->columnSpan([
-                'sm' => 2,
-            ])->columnSpan([
-                'lg' => 1,
-            ])->columnSpan([
-                'xl' => 1,
-            ])->columnSpan([
-                '2xl' => 1,
-            ])->columnSpan([
-                '3xl' => 1,
-            ])->columnSpan([
-                '4xl' => 1,
-            ])->columnSpan([
-                '5xl' => 1,
-            ])->columnSpan([
-                '6xl' => 1,
             ]);
+
     }
 
     public function table(Table $table): Table
