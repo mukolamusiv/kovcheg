@@ -661,8 +661,8 @@ class InvoiceService
        // dd($material->getMaterialWarehouse($invoice->warehouse_id)->first());
         if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
             //
-            if($price == null){
-                if($price <= $material->getPriceMaterial($invoice->warehouse_id)){
+            if($price == null or $price <= 1.00){
+                if($price <= $material->getPriceMaterial($invoice->warehouse_id) or $price <= 1.00){
                     $price = $material->getPriceMaterial($invoice->warehouse_id);
                 }else{
                     $price = $material->getPriceMaterial($invoice->warehouse_id);
