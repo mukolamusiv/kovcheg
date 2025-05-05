@@ -658,8 +658,8 @@ class InvoiceService
         //     }
         // }
 
-        dd($material->getMaterialWarehouse($invoice->warehouse_id), $invoice->warehouse_id, $warehouse_id);
-        if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
+        dd($material->getMaterialWarehouse($warehouse_id), $invoice->warehouse_id, $warehouse_id);
+        if($material->getMaterialWarehouse($warehouse_id)->first() == null){
             if($invoice->type == 'продаж'){
                 Notification::make()
                     ->title('Помилка при додаванні позиції!')
@@ -671,20 +671,20 @@ class InvoiceService
                     return;
             }
             if($price == null or $price <= 1.00){
-                if($price <= $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price or $price <= 1.00){
-                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
+                if($price <= $material->getMaterialWarehouse($warehouse_id)->first()->price or $price <= 1.00){
+                    $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
                 }else{
-                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
+                    $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
                 }
             }else{
                 $price = $price;
             }
         }else{
             if($price == null or $price <= 1.00){
-                if($price <= $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price or $price <= 1.00){
-                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
+                if($price <= $material->getMaterialWarehouse($warehouse_id)->first()->price or $price <= 1.00){
+                    $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
                 }else{
-                    $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
+                    $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
                 }
             }else{
                 $price = $price;
