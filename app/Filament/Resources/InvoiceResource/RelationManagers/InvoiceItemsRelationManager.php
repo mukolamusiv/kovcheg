@@ -39,7 +39,44 @@ class InvoiceItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('quantity')
             ->columns([
-                Tables\Columns\TextColumn::make('quantity'),
+
+                Tables\Columns\TextColumn::make('material.name')
+                    ->label('Назва матеріалу')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('quantity')
+                    ->label('Кількість')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->label('Вартість')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Загальна вартість')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('material.unit')
+                    ->label('Одиниця виміру')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('material.category.name')
+                    ->label('Категорія')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('material.barcode')
+                    ->label('Штрих-код')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()

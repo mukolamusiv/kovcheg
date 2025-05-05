@@ -518,9 +518,9 @@ class InvoiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            TransactionsRelationManager::class,
             InvoiceItemsRelationManager::class,
             InvoiceProductionItemsRelationManager::class,
+            TransactionsRelationManager::class,
         ];
     }
 
