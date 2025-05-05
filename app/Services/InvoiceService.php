@@ -660,6 +660,15 @@ class InvoiceService
 
        // dd($material->getMaterialWarehouse($invoice->warehouse_id)->first());
         if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
+            if($invoice->type == 'продаж'){
+                Notification::make()
+                    ->title('Помилка при додаванні позиції!')
+                    ->body('Матеріал не знайдено на складі')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                return;
+            }
             if($price == null or $price <= 1.00){
                 if($price <= $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price or $price <= 1.00){
                     $price = $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price;
