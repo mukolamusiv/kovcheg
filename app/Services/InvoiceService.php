@@ -15,8 +15,7 @@ class InvoiceService
     public static function moveInvoiceToConducted(Invoice $invoice)
     {
         if($invoice->type == 'продаж'){
-
-
+            InvoiceService::moveSelling($invoice);
         }
 
         if($invoice->type == 'постачання')
