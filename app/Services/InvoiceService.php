@@ -667,7 +667,8 @@ class InvoiceService
                     ->icon('heroicon-o-x-circle')
                     ->danger()
                     ->send();
-                return;
+                        \DB::rollBack();
+                    return;
             }
             if($price == null or $price <= 1.00){
                 if($price <= $material->getMaterialWarehouse($invoice->warehouse_id)->first()->price or $price <= 1.00){
