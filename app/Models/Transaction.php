@@ -55,7 +55,7 @@ class Transaction extends Model
     }
 
 
-    public static function makingPayment(Invoice $invoice, Account $payer, Account $receiver, int $sum, string $description = null)
+    public static function makingPayment(Invoice $invoice, Account $payer, Account $receiver, float $sum, string $description = null)
     {
          // Використовуємо транзакцію для забезпечення цілісності даних
          return (new static)->getConnection()->transaction(function () use ($invoice, $payer, $receiver, $sum, $description) {

@@ -10,6 +10,8 @@ class EditInvoice extends EditRecord
 {
     protected static string $resource = InvoiceResource::class;
 
+
+
     protected function getHeaderActions(): array
     {
         return [

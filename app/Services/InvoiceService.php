@@ -484,11 +484,13 @@ class InvoiceService
             'total' => 0,
             'paid' => 0,
             'due' => 0,
+            'discount' => $data['discount'] ?? 0,
+            'shipping' => $data['shipping'] ?? 0,
             'status' => 'створено',
             'payment_status' => 'не оплачено',
             'warehouse_id' => $data['warehouse_id'],
         ]);
-        $money = 0;
+        $money = 0.00;
         // Додати позиції до накладної
         foreach ($data['items'] as $item) {
             // Перевірка наявності матеріалу на складі
@@ -503,23 +505,31 @@ class InvoiceService
                 continue;
             }
 
+            $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true);
 
-            if(!isset($item['price'])){
-                $item['price'] = $material->getPriceMaterial($data['warehouse_id']);
-            }
+            // if(!isset($item['price'])){
+            //     $item['price'] = $material->getPriceMaterial($data['warehouse_id']);
+            // }
 
-            $invoice->invoiceItems()->create([
-                'material_id' => $item['material_id'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price'],
-                'total' => $item['price'] * $item['quantity'],
-            ]);
-            $money += $item['price'] * $item['quantity'];
+            // $invoice->invoiceItems()->create([
+            //     'material_id' => $item['material_id'],
+            //     'quantity' => $item['quantity'],
+            //     'price' => $item['price'],
+            //     'total' => $item['price'] * $item['quantity'],
+            // ]);
+            $money += $add;
         }
 
-        $invoice->total = $money;
+        // $data['discount'] - у відсотках
+        // $data['shipping'] - у гривнях
+        // $money = $money - ($money * $data['discount'] / 100);
+
+        if(!empty($data['saleUp'])){
+            $money = $money + ($money * $data['saleUp'] / 100);
+        }
+        $invoice->total = $money + $data['shipping'];
         $invoice->paid = 0;
-        $invoice->due = $money;
+        $invoice->due = $money - ($money * $data['discount'] / 100) ?? 0;
         $invoice->warehouse_id = $data['warehouse_id']; // ID складу
         $invoice->save();
         //dd($money,$invoice);
@@ -528,13 +538,28 @@ class InvoiceService
     }
 
 
-    public static function addMaterialToInvoice(Invoice $invoice, $material_id, $quantity, $price = null)
+    public static function addMaterialToInvoice(Invoice $invoice, $material_id, $quantity, $price = null, $added = false)
     {
+        //dd($invoice);
+        //dd($material_id, $quantity, $price, $added);
+
+        // Перевірка, чи накладна існує
+        if (!$invoice) {
+            Notification::make()
+                ->title('Помилка при додаванні позиції!')
+                ->body('Накладна не знайдена')
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        // Перевірка, чи матеріал існує
         $material = \App\Models\Material::find($material_id);
         if (!$material) {
             Notification::make()
                 ->title('Помилка при додаванні позиції!')
-                ->body('Матеріал не знайдено')
+                ->body('Матеріал не знайдено у базі даних')
                 ->icon('heroicon-o-x-circle')
                 ->danger()
                 ->send();
@@ -553,23 +578,40 @@ class InvoiceService
             return;
         }
 
-        if($invoice->type == 'продаж'){
-            $price = $price;
-        }else{
-            $price = $material->getPriceMaterial($invoice->warehouse_id);
-                    // Перевірка наявності матеріалу на складі
-            if ($material->quantity < $quantity) {
-                Notification::make()
-                    ->title('Помилка при додаванні позиції!')
-                    ->body('Недостатня кількість матеріалу на складі')
-                    ->icon('heroicon-o-x-circle')
-                    ->danger()
-                    ->send();
-                return;
+
+
+        // if($invoice->type == 'продаж' or $invoice->type == 'постачання'){
+        //     $price = $price;
+        // }else{
+        //     $price = $material->getPriceMaterial($invoice->warehouse_id);
+        //             // Перевірка наявності матеріалу на складі
+        //     if ($material->quantity < $quantity) {
+        //         Notification::make()
+        //             ->title('Помилка при додаванні позиції!')
+        //             ->body('Недостатня кількість матеріалу на складі')
+        //             ->icon('heroicon-o-x-circle')
+        //             ->danger()
+        //             ->send();
+        //         return;
+        //     }
+        // }
+
+       // dd($material->getMaterialWarehouse($invoice->warehouse_id)->first());
+        if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
+            //
+            if($price == null){
+                if($price <= $material->getPriceMaterial($invoice->warehouse_id)){
+                    $price = $material->getPriceMaterial($invoice->warehouse_id);
+                }else{
+                    $price = $material->getPriceMaterial($invoice->warehouse_id);
+                }
+            }else{
+                $price = $price;
             }
         }
 
 
+        //dd($sale_up);
         $invoice->invoiceItems()->create([
             'material_id' => $material_id,
             'quantity' => $quantity,
@@ -577,12 +619,22 @@ class InvoiceService
             'total' => $price * $quantity,
         ]);
         $invoice->save();
-        Notification::make()
-            ->title('Матеріал доданий!')
-            ->body('Матеріал доданий до накладній')
-            ->icon('heroicon-o-check-circle')
-            ->success()
-            ->send();
+
+        if($added == true){
+            // $invoice->total += $price * $quantity;
+            // $invoice->due += $price * $quantity;
+            // $invoice->save();
+            return $price * $quantity;
+        }else{
+            Notification::make()
+                ->title('Матеріал доданий!')
+                ->body('Матеріал доданий до накладній')
+                ->icon('heroicon-o-check-circle')
+                ->success()
+                ->send();
+        }
+
+       // return $invoice;
     }
 }
 

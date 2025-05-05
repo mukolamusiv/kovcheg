@@ -15,6 +15,12 @@ class InvoiceItemsRelationManager extends RelationManager
     // метод який вказує на звязок
     protected static string $relationship = 'invoiceItems';
 
+
+    public function canCreate(): bool
+    {
+        return true; // або якась логіка
+    }
+
     // назва звзязку
     protected static ?string $title = 'Матеріали';
 
@@ -55,6 +61,7 @@ class InvoiceItemsRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
+            ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]));
