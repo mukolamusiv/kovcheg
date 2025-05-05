@@ -54,7 +54,7 @@ class InvoiceItemsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('quantity')
+            ->recordTitleAttribute('material.name')
             ->columns([
 
                 Tables\Columns\TextColumn::make('material.name')
