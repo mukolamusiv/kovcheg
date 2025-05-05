@@ -29,7 +29,21 @@ class TransactionsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('reference_number')
             ->columns([
-                Tables\Columns\TextColumn::make('reference_number'),
+                Tables\Columns\TextColumn::make('reference_number')
+                    ->label('Номер посилання'),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Опис'),
+                Tables\Columns\TextColumn::make('transaction_date')
+                    ->dateTime()
+                    ->label('Дата транзакції'),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Статус'),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Користувач'),
+                Tables\Columns\TextColumn::make('customer.name')
+                    ->label('Клієнт'),
+                Tables\Columns\TextColumn::make('entries.amount')
+                    ->label('Сума'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
