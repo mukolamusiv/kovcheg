@@ -177,6 +177,54 @@ class InvoiceSectionBuilder
                                 ->action(function (array $data) use ($invoice): void {
                                     InvoiceService::addInvoicePayment($invoice, Account::find($data['account_id']), $data['amount']);
                                 }),
+
+                                Action::make('custumerEdit' . $invoice->id)
+                                    ->label('Редагувати замовника')
+                                    ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'продаж')
+                                    ->icon('heroicon-o-user')
+                                    ->color('info')
+                                    ->form([
+                                        Select::make('custumer_id')
+                                            ->label('Клієнт')
+                                            ->options(Customer::all()->pluck('name', 'id'))
+                                            ->preload()
+                                            ->searchable()
+                                            //->default($invoice->customer->id)
+                                            ->required()
+                                            ->placeholder('Обреріть замовника'),
+                                    ])->action(function (array $data,) use ($invoice): void {
+                                        InvoiceService::makeCustumer($invoice, $data['custumer_id']);
+                                    }),
+
+                                Action::make('addMaterialInvoice' . $invoice->id)
+                                    ->label('Додати матеріал')
+                                    ->visible(fn () => $invoice->status === 'створено')
+                                    ->icon('heroicon-o-document-plus')
+                                    ->form([
+                                        Select::make('material_id')
+                                            ->label('Матеріал')
+                                            ->options(Material::all()->pluck('name', 'id'))
+                                            ->preload()
+                                            ->searchable()
+                                            //->default($invoice->customer->id)
+                                            ->required()
+                                            ->placeholder('Обреріть матеріал'),
+                                        TextInput::make('quantity')
+                                            ->label('Кількість')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->placeholder('Введіть кількість'),
+                                        TextInput::make('price')
+                                            ->label('Вартість за одиницю')
+                                            ->required()
+                                            ->hidden(fn () => $invoice->type === 'продаж' or $invoice->type === 'списання')
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->placeholder('Введіть вартість'),
+                                    ])->action(function (array $data) use ($invoice): void {
+                                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'],$data['price'],false, $invoice->warehouse_id);
+                                    })->color('success'),
                 ])->columnSpanFull(),
 
                 Fieldset::make('Інформація про накладну')
