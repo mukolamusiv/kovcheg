@@ -31,7 +31,8 @@ class MaterialsRelationManager extends RelationManager
                     ->label('Кількість')
                     ->required()
                     ->numeric()
-                    ->minValue(1.00),
+                    ->default(0.00)
+                    ->minValue(0.00),
             ]);
     }
 
