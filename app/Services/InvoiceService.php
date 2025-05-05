@@ -567,7 +567,7 @@ class InvoiceService
                 continue;
             }
 
-            $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true);
+            $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
 
             // if(!isset($item['price'])){
             //     $item['price'] = $material->getPriceMaterial($data['warehouse_id']);
@@ -600,7 +600,7 @@ class InvoiceService
     }
 
 
-    public static function addMaterialToInvoice(Invoice $invoice, $material_id, $quantity, $price = null, $added = false)
+    public static function addMaterialToInvoice(Invoice $invoice, $material_id, $quantity, $price = null, $added = false, $warehouse_id )
     {
         //dd($invoice);
         //dd($material_id, $quantity, $price, $added);
@@ -658,7 +658,7 @@ class InvoiceService
         //     }
         // }
 
-        dd($material->getMaterialWarehouse($invoice->warehouse_id), $invoice->warehouse_id);
+        dd($material->getMaterialWarehouse($invoice->warehouse_id), $invoice->warehouse_id, $warehouse_id);
         if($material->getMaterialWarehouse($invoice->warehouse_id)->first() == null){
             if($invoice->type == 'продаж'){
                 Notification::make()
