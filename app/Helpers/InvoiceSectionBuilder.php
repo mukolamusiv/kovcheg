@@ -218,6 +218,7 @@ class InvoiceSectionBuilder
                                         TextInput::make('price')
                                             ->label('Вартість за одиницю')
                                             ->required()
+                                            ->default(0.00)
                                             ->hidden(fn () => $invoice->type === 'продаж' or $invoice->type === 'списання')
                                             ->numeric()
                                             ->minValue(0)
