@@ -26,9 +26,9 @@ class ListInvoices extends ListRecords
             'Вся продукція' => Tab::make(),
             'Продажі' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'продаж')),
-            'Переміщення' => Tab::make()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'постачання')),
             'Постачання' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'постачання')),
+            'Переміщення' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'переміщення')),
             'Повернення' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'повернення')),
