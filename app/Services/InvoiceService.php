@@ -659,7 +659,7 @@ class InvoiceService
         // }
 
         //dd($material->getMaterialWarehouse($warehouse_id), $invoice->warehouse_id, $warehouse_id);
-        if($material->getMaterialWarehouse($warehouse_id)->first() == null){
+        if($material->checkMaterialInWarehouse($warehouse_id)){
             if($invoice->type == 'продаж'){
                 Notification::make()
                     ->title('Помилка при додаванні позиції!')
@@ -670,18 +670,24 @@ class InvoiceService
                         \DB::rollBack();
                     return;
             }
-            if($price == null or $price <= 1.00){
-                if($price <= $material->getMaterialWarehouse($warehouse_id)->first()->price or $price <= 1.00){
+
+            if($price == null or $price <= 0.01){
+                if($material->checkMaterialInWarehouse($warehouse_id)){
                     $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
                 }else{
-                    $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
+
                 }
+                // if($price <= $material->getMaterialWarehouse($warehouse_id)->first()->price or $price <= 0.01){
+                //     $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
+                // }else{
+                //     $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
+                // }
             }else{
                 $price = $price;
             }
         }else{
-            if($price == null or $price <= 1.00){
-                if($price <= $material->getMaterialWarehouse($warehouse_id)->first()->price or $price <= 1.00){
+            if($price == null){
+                if($material->checkMaterialInWarehouse($warehouse_id)){
                     $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;
                 }else{
                     $price = $material->getMaterialWarehouse($warehouse_id)->first()->price;

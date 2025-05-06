@@ -196,14 +196,19 @@ class InvoiceSectionBuilder
                                         InvoiceService::makeCustumer($invoice, $data['custumer_id']);
                                     }),
 
-                                Action::make('addMaterialInvoice' . $invoice->id)
-                                    ->label('Додати матеріал')
-                                    ->visible(fn () => $invoice->status === 'створено')
+                                Action::make('addMaterialInvoiceSale' . $invoice->id)
+                                    ->label('Додати матеріал до накладної')
+                                    ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'продаж' || $invoice->type === 'переміщення')
                                     ->icon('heroicon-o-document-plus')
                                     ->form([
                                         Select::make('material_id')
                                             ->label('Матеріал')
-                                            ->options(Material::all()->pluck('name', 'id'))
+                                            ->options(
+                                                Material::whereHas('warehouses', function ($query) use ($invoice) {
+                                                    $query->where('warehouse_id', $invoice->warehouse_id)->where('quantity', '>', 0);
+                                                })->pluck('name', 'id')
+                                                //Material::all()->pluck('name', 'id')
+                                                )
                                             ->preload()
                                             ->searchable()
                                             //->default($invoice->customer->id)
@@ -230,13 +235,76 @@ class InvoiceSectionBuilder
                                             $price = $data['price'];
                                         }else{
                                             //dd($material->checkMaterialInWarehouse($invoice->warehouse_id),$data['material_id'], $invoice->warehouse_id, $material->getPriceMaterial($invoice->warehouse_id));
-                                            if(count($material->getPriceMaterial($invoice->warehouse_id)) == 0){
+                                            if($material->getPriceMaterial($invoice->warehouse_id) == null){
                                                 $price = 0;
+                                                Notification::make()
+                                                    ->title('Помилка')
+                                                    ->body('Матеріал не знайдено на складі')
+                                                    ->danger()
+                                                    ->send();
                                             }else{
                                                 $price = $material->getPriceMaterial($invoice->warehouse_id)->price;
                                             }
                                         }
-                                        InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], 0 ,false, $invoice->warehouse_id);
+                                        if($price > 0){
+                                            InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], $price,false, $invoice->warehouse_id);
+                                        }
+                                    })->color('success'),
+
+
+
+                                    Action::make('addMaterialInvoiceAdd' . $invoice->id)
+                                    ->label('Додати матеріал до накладної')
+                                    ->visible(fn () => $invoice->status === 'створено' and $invoice->type === 'постачання' || $invoice->type === 'повернення')
+                                    ->icon('heroicon-o-document-plus')
+                                    ->form([
+                                        Select::make('material_id')
+                                            ->label('Матеріал')
+                                            ->options(
+                                                // Material::whereHas('warehouses', function ($query) use ($invoice) {
+                                                //     $query->where('warehouse_id', $invoice->warehouse_id)->where('quantity', '>', 0);
+                                                // })->pluck('name', 'id')
+                                                Material::all()->pluck('name', 'id')
+                                                )
+                                            ->preload()
+                                            ->searchable()
+                                            //->default($invoice->customer->id)
+                                            ->required()
+                                            ->placeholder('Обреріть матеріал'),
+                                        TextInput::make('quantity')
+                                            ->label('Кількість')
+                                            ->required()
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->placeholder('Введіть кількість'),
+                                        TextInput::make('price')
+                                            ->label('Вартість за одиницю')
+                                            ->required()
+                                            ->default(0.00)
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->placeholder('Введіть вартість'),
+                                    ])->action(function (array $data) use ($invoice): void {
+                                        $material = Material::find($data['material_id']);
+                                        if(isset($data['price']) and $data['price'] > 0){
+                                            //$invoice->total = $invoice->total + ($data['price'] * $data['quantity']);
+                                            $price = $data['price'];
+                                        }else{
+                                            //dd($material->checkMaterialInWarehouse($invoice->warehouse_id),$data['material_id'], $invoice->warehouse_id, $material->getPriceMaterial($invoice->warehouse_id));
+                                            if($material->getPriceMaterial($invoice->warehouse_id) == null){
+                                                $price = 0;
+                                                Notification::make()
+                                                    ->title('Помилка')
+                                                    ->body('Матеріал не знайдено на складі')
+                                                    ->danger()
+                                                    ->send();
+                                            }else{
+                                                $price = $material->getPriceMaterial($invoice->warehouse_id)->price;
+                                            }
+                                        }
+                                        if($price > 0){
+                                            InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], $price ,false, $invoice->warehouse_id);
+                                        }
                                     })->color('success'),
                 ])->columnSpanFull(),
 
