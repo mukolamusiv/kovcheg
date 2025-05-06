@@ -229,8 +229,8 @@ class InvoiceSectionBuilder
                                             //$invoice->total = $invoice->total + ($data['price'] * $data['quantity']);
                                             $price = $data['price'];
                                         }else{
-                                            dd($material->checkMaterialInWarehouse($invoice->warehouse_id),$data['material_id'], $invoice->warehouse_id, $material->getPriceMaterial($invoice->warehouse_id), $material->getPriceMaterial($invoice->warehouse_id)->price);
-                                            if(count($material->getPriceMaterial($invoice->warehouse_id)) === 0){
+                                            //dd($material->checkMaterialInWarehouse($invoice->warehouse_id),$data['material_id'], $invoice->warehouse_id, $material->getPriceMaterial($invoice->warehouse_id));
+                                            if(count($material->getPriceMaterial($invoice->warehouse_id)) == 0){
                                                 $price = 0;
                                             }else{
                                                 $price = $material->getPriceMaterial($invoice->warehouse_id)->price;

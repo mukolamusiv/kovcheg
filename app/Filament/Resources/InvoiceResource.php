@@ -162,7 +162,7 @@ class InvoiceResource extends Resource
                                     ->schema([
                                         Select::make('material_id')
                                             ->label('Матеріал')
-                                            ->relationship('warehouseMaterial', 'name')
+                                            ->relationship('material', 'name')
                                             ->searchable()
                                             ->preload()
                                             // ->validationAttribute(fn (callable $get) => \App\Models\WarehouseMaterial::where('warehouse_id', $get('warehouse_id'))
