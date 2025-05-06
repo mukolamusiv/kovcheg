@@ -381,7 +381,7 @@ class InvoiceService
         }
         $invoice->update([
             'discount' => $discount,
-            'total' => $invoice->total - $discount,
+            //'total' => $invoice->total - $discount,
         ]);
         $invoice->save();
         Notification::make()
@@ -713,12 +713,14 @@ class InvoiceService
             // $invoice->save();
             return $price * $quantity;
         }else{
+            $invoice->calculate();
             Notification::make()
                 ->title('Матеріал доданий!')
                 ->body('Матеріал доданий до накладній')
                 ->icon('heroicon-o-check-circle')
                 ->success()
                 ->send();
+
         }
 
        // return $invoice;

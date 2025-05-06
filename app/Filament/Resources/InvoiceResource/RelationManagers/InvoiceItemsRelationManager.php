@@ -6,9 +6,14 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+
+use Filament\Infolists\Components\Actions as BAction;
+use Filament\Tables\Columns\Column;
 
 class InvoiceItemsRelationManager extends RelationManager
 {
@@ -49,6 +54,11 @@ class InvoiceItemsRelationManager extends RelationManager
                             ->label('Загальна вартість'),
             ]);
 
+    }
+
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
     }
 
     public function table(Table $table): Table
@@ -94,12 +104,37 @@ class InvoiceItemsRelationManager extends RelationManager
                     ->sortable()
                     ->searchable()
                     ->toggleable(),
+
+
+                // BAction::make([
+                //     Action::make('delete')
+                //     ->label('Видалити')
+                //     ->action(function (array $records) {
+                //         foreach ($records as $record) {
+                //             $record->delete();
+                //         }
+                //     })
+                //     ->requiresConfirmation()
+                //     ->icon('heroicon-o-trash')
+                //     ->color('danger')
+                // ])
+                    // Action::make('delete')
+                    // ->label('Видалити')
+                    // ->action(function (array $records) {
+                    //     foreach ($records as $record) {
+                    //         $record->delete();
+                    //     }
+                    // })
+                    // ->requiresConfirmation()
+                    // ->icon('heroicon-o-trash')
+                    // ->color('danger'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
+                Tables\Actions\AttachAction::make(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

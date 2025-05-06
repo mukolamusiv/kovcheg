@@ -168,7 +168,7 @@ class Invoice extends Model
             $invoice->paid = $totalPaidFromTransactions;
 
             // Розрахунок суми, що залишилася до оплати
-            $invoice->due = $invoice->total - $invoice->paid;
+            $invoice->due = $invoice->total - $invoice->discount + $invoice->shipping - $invoice->paid;
 
             // Встановлення статусу оплати
             if ($invoice->due == 0) {
@@ -179,6 +179,15 @@ class Invoice extends Model
                 $invoice->payment_status = 'не оплачено';
             }
         });
+    }
+
+
+    public function calculate()
+    {
+        $this->total = $this->invoiceItems()->sum('total');
+        //$this->paid = $this->transactions()->sum('amount');
+        //$this->due = $this->total - $this->paid;
+        $this->save();
     }
 
 

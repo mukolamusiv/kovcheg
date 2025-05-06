@@ -95,8 +95,8 @@ class InvoiceSectionBuilder
                                     ->numeric()
                                     ->minValue(0)
                                     //->maxValue(100)
-                                    ->default(100)
-                                    ->placeholder('Введіть знижку'),
+                                    ->default($invoice->discount)
+                                    ->placeholder('Введіть знижку у гривнях'),
                             ])->action(function (array $data) use ($invoice): void {
                                 InvoiceService::addInvoiceDiscount($invoice, $data['discount']);
                             }),
