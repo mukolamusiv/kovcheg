@@ -36,7 +36,7 @@ class ProductionStage extends Model
     {
         static::creating(function ($stage) {
            //if(!empty( $stage->user_id)){
-                $stage->user_id = auth()->id();
+                //$stage->user_id = auth()->id();
            //}
         });
     }
