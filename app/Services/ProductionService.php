@@ -74,11 +74,20 @@ class ProductionService
             }
 
 
+            if(isset($template))
+            {
+                 // Додавання етапів виробництва
+                foreach ($template->stages as $stage) {
+                    ProductionService::setStage($production, $stage->toArray());
+                }
+            }else{
+                 // Додавання етапів виробництва
+                foreach ($data['productionStages'] as $stage) {
+                    ProductionService::setStage($production, $stage);
+                }
+            }
 
-            // Додавання етапів виробництва
-            // foreach ($data['productionStages'] as $stage) {
-            //     ProductionService::setStage($production, $stage);
-            // }
+
             // Додавання розмірів до виробництва
             // if (!empty($data['productionSizes'])) {
             //     $production->addProductionSize($data['productionSizes']);
