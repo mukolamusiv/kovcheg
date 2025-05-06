@@ -27,8 +27,11 @@ class ProductionService
                     $data['name'] = $template->name;
                     $data['description'] = $template->description;
                 }
+
+                //dd($template->stages, $template->materials);
             }
 
+            //dd($data);
             // Створення виробництва
             $production = Production::create([
                 'name' => $data['name'],
@@ -43,21 +46,39 @@ class ProductionService
                 'production_date' =>  null,
                 'image' => null,
                 'tempalte_id' => $data['template_id'] ?? null,
-                'warehouse_id' => $data['warehouse_id'],
             ]);
 
+
             $warehouse = Warehouse::findOrFail($data['warehouse_id']); // ID складу
-            // Додавання матеріалів до виробництва
-            foreach ($data['productionMaterials'] as $material) {
-                $materialModel = Material::findOrFail($material['material_id']);
-                ProductionService::setProductionMaterial($production, $materialModel, $warehouse, $material['quantity']);
-                //$production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
+            if(isset($template))
+            {
+                // Додавання матеріалів до виробництва з шаболону
+                foreach ($template->materials as $material) {
+                    $materialModel = Material::findOrFail($material->material_id);
+                    if($material->warehouse_id != null){
+                        $warehouseTemplate = Warehouse::findOrFail($material->warehouse_id);
+                    }else{
+                        $warehouseTemplate = $warehouse;
+                    }
+                    //dd($warehouseTemplate );
+                    ProductionService::setProductionMaterial($production, $materialModel, $warehouseTemplate, $material->quantity);
+                    //$production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
+                }
+            }else{
+                // Додавання матеріалів до виробництва
+                foreach ($data['productionMaterials'] as $material) {
+                    $materialModel = Material::findOrFail($material['material_id']);
+                    ProductionService::setProductionMaterial($production, $materialModel, $warehouse, $material['quantity']);
+                    //$production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
+                }
             }
 
+
+
             // Додавання етапів виробництва
-            foreach ($data['productionStages'] as $stage) {
-                ProductionService::setStage($production, $stage);
-            }
+            // foreach ($data['productionStages'] as $stage) {
+            //     ProductionService::setStage($production, $stage);
+            // }
             // Додавання розмірів до виробництва
             // if (!empty($data['productionSizes'])) {
             //     $production->addProductionSize($data['productionSizes']);
@@ -80,16 +101,21 @@ class ProductionService
             $existingMaterial->quantity = $quantity;
             $existingMaterial->warehouse_id = $warehouse->id; // ID складу
             //оновлюємо ціну
-            $existingMaterial->price = $material->getTotalValueInWarehouse($warehouse->id);
+            $existingMaterial->price = $material->getPriceMaterial($warehouse->id);
             $existingMaterial->save();
             return $existingMaterial;
         }else{
+            if($material->checkMaterialInWarehouse($warehouse->id)){
+                $price = $material->getPriceMaterial($warehouse->id)->price;
+            }else{
+                $price = 0;
+            }
             // Якщо матеріал не існує, створюємо новий запис
             $production->productionMaterials()->create([
                 'material_id' => $material->id, // ID матеріалу
                 'warehouse_id' => $warehouse->id, // ID складу
                 'quantity' => $quantity, // Кількість матеріалу
-                'price' => $material->getPriceMaterial($warehouse->id)->price, // Ціна матеріалу
+                'price' => $price, // Ціна матеріалу
                 'warehouse_id' => $warehouse->id, // ID складу
                 'description' => $description ?? null, // Опис матеріалу
             ]);

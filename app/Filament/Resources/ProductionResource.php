@@ -38,29 +38,43 @@ class ProductionResource extends Resource
         return $form
         ->columns(1)
             ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Замовник')
-                        ->schema([
-                            Forms\Components\Select::make('type')
-                                ->label('Тип виробництва')
-                                ->required()
-                                ->default('замовлення')
-                                ->options([
-                                    'замовлення' => 'замовлення',
-                                    'на продаж' => 'на продаж',
-                                ])
-                                ->reactive()
+
+                            Forms\Components\Select::make('template_production_id')
+                                ->label('Шаблон виробництва')
+                                ->options(TemplateProduction::pluck('name', 'id'))
+                                ->searchable()
+                                ->preload()->reactive()
                                 ->afterStateUpdated(function ($state, callable $set) {
                                     if ($state === 'на продаж') {
                                         $set('customer_id', null);
                                     }
                                 }),
+
+                            Forms\Components\Select::make('warehouse_id')
+                                    ->label('Виберіть склад')
+                                    ->options(\App\Models\Warehouse::pluck('name', 'id'))
+                                    ->required(),
+
+                            // Forms\Components\Select::make('type')
+                            //     ->label('Тип виробництва')
+                            //     ->required()
+                            //     ->default('замовлення')
+                            //     ->options([
+                            //         'замовлення' => 'замовлення',
+                            //         'на продаж' => 'на продаж',
+                            //     ])
+                            //     ->reactive()
+                            //     ->afterStateUpdated(function ($state, callable $set) {
+                            //         if ($state === 'на продаж') {
+                            //             $set('customer_id', null);
+                            //         }
+                            //     }),
                             Forms\Components\Select::make('customer_id')
                                 ->label('Клієнт')
                                 ->relationship('customer', 'name')
                                 ->searchable()
                                 ->preload()
-                                ->hidden(fn ($get) => $get('type') === 'на продаж')
+                                //->hidden(fn ($get) => $get('type') === 'на продаж')
                                 ->createOptionForm([
                                     Forms\Components\TextInput::make('name')
                                         ->required()
@@ -72,42 +86,23 @@ class ProductionResource extends Resource
                                         ->tel()
                                         ->maxLength(255),
                                 ]),
-                        ]),
-                    Forms\Components\Wizard\Step::make('Деталі замовлення')
-                        ->schema([
-
-                            Forms\Components\Select::make('template_id')
-                                ->label('Шаблон виробництва')
-                                ->options(TemplateProduction::pluck('name', 'id'))
-                                ->searchable()
-                                ->preload()
-                                ->reactive(),
 
                             Forms\Components\TextInput::make('name')
                                 ->label('Назва виробу')
                                 ->required()
+                                ->reactive()
+                                ->hidden(fn ($get) => $get('template_production_id'))
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('quantity')
                                 ->label('Кількість одиниць')
                                 ->required()
                                 ->default(1),
-
-
                             Forms\Components\Textarea::make('description')
                                 ->label('Опис')
-                                ->maxLength(65535),
-                            Forms\Components\Select::make('status')
-                                ->label('Статус')
-                                ->required()
-                                ->default('створено')
-                                ->options([
-                                    'створено' => 'створено',
-                                    'в роботі' => 'в роботі',
-                                    'виготовлено' => 'виготовлено',
-                                    'скасовано' => 'скасовано',
-                                ]),
+                                ->maxLength(255),
                             Forms\Components\Repeater::make('productionStages')
                                 ->label('Етапи виробництва')
+                                ->hidden(fn ($get) => $get('template_production_id'))
                                 ->relationship('productionStages')
                                 ->schema([
                                     Forms\Components\TextInput::make('name')
@@ -118,42 +113,22 @@ class ProductionResource extends Resource
                                         ->default(200)
                                         ->label('Оплата працівника')
                                         ->required(),
-
                                     Forms\Components\Select::make('user_id')
                                         ->label('Працівник')
                                         ->relationship('user', 'name')
                                         ->searchable()
                                         ->preload(),
-
-
-
                                     Forms\Components\Textarea::make('description')
                                         ->label('Опис')
                                         ->maxLength(65535),
-                                    Forms\Components\Select::make('status')
-                                        ->label('Статус')
-                                        ->default('очікує')
-                                        ->options([
-                                            'очікує' => 'очікує',
-                                            'в роботі' => 'в роботі',
-                                            'виготовлено' => 'виготовлено',
-                                            'скасовано' => 'скасовано',
-                                        ]),
-                                    Forms\Components\DatePicker::make('date')
-                                        ->label('Дата виготовлення'),
                                 ])
                                 ->createItemButtonLabel('Додати етап'),
-                        ]),
-                    Forms\Components\Wizard\Step::make('Матеріали')
-                        ->schema([
-                            Forms\Components\Select::make('warehouse_id')
-                                        ->label('Виберіть склад')
-                                        ->options(\App\Models\Warehouse::pluck('name', 'id'))
-                                        ->required(),
+
                                         // ->preload(),
                             Forms\Components\Repeater::make('productionMaterials')
                                 ->label('Матеріали для виробництва')
                                 ->relationship('productionMaterials')
+                                ->hidden(fn ($get) => $get('template_production_id'))
                                 ->schema([
                                     Forms\Components\Select::make('material_id')
                                         ->label('Матеріал')
@@ -175,7 +150,6 @@ class ProductionResource extends Resource
                                     //     ->label('Дата списання'),
                                 ])
                                 ->createItemButtonLabel('Додати матеріал'),
-                        ]),
                     // Forms\Components\Wizard\Step::make('Перевірка')
                     //     ->schema([
                     //         Forms\Components\ViewField::make('name')
@@ -196,7 +170,7 @@ class ProductionResource extends Resource
                     //         //     ->label('Матеріали')
                     //         //     ->formatStateUsing(fn ($state) => collect($state)->pluck('material_id')->map(fn ($id) => \App\Models\Material::find($id)->name)->join(', ')),
                     //     ]),
-                ]),
+
             ]);
             //]);
     }

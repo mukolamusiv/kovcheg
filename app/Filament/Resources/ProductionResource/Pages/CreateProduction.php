@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductionResource;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Production;
+use App\Services\ProductionService;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
@@ -23,7 +24,7 @@ class CreateProduction extends CreateRecord
         // dd($custumer->calculateObligations());
         //dd($this->data);
        // $production = Production::createProductionWithDetails($this->data);
-        $production = Production::createProduction($this->data);
+        $production = ProductionService::createProduction($this->data);
 
         // Invoice::createProductionInvoices($production, $this->data['customer_id']);
         //  // Сповіщення про успішне створення
