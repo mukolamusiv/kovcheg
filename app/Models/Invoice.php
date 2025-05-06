@@ -62,6 +62,8 @@ class Invoice extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
+
+
     // Відношення до моделі InvoiceItem (елементи накладної)
     public function invoiceItems()
     {

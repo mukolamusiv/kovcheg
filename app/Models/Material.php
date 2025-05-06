@@ -64,6 +64,12 @@ class Material extends Model
         return $this->warehouses()->where('warehouse_id', $warehouseId)->first();
     }
 
+    //первіркка наявності матеріалу на складі
+    public function checkMaterialInWarehouse($warehouseId)
+    {
+        return $this->warehouses()->where('warehouse_id', $warehouseId)->exists();
+    }
+
     public function getMaterialWarehouse($warehouseId)
     {
         return $this->warehouses()->where('warehouse_id', $warehouseId);

@@ -162,9 +162,19 @@ class InvoiceResource extends Resource
                                     ->schema([
                                         Select::make('material_id')
                                             ->label('Матеріал')
-                                            ->relationship('material', 'name')
+                                            ->relationship('warehouseMaterial', 'name')
                                             ->searchable()
                                             ->preload()
+                                            // ->validationAttribute(fn (callable $get) => \App\Models\WarehouseMaterial::where('warehouse_id', $get('warehouse_id'))
+                                            //     ->where('material_id', $get('material_id'))
+                                            //     ->exists())
+                                            // ->validationMessages([
+                                            //         'material_id' => 'Виберіть матеріал',
+                                            //     ])
+                                            //->visible(fn (callable $get) => in_array($get('type'), ['продаж','постачання', 'списання']))
+                                            // ->required(fn (callable $get) => \App\Models\WarehouseMaterial::where('warehouse_id', $get('warehouse_id'))
+                                            //     ->where('material_id', $get('material_id'))
+                                            //     ->exists(false))
                                             ->columnSpan(8)
                                             ->required(),
                                         TextInput::make('quantity')
