@@ -26,7 +26,8 @@ class Production extends Model
         'warehouse_id',
         'price',
         'production_date',
-        'image'
+        'image',
+        'template_production_id'
     ];
 
 
