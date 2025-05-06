@@ -229,7 +229,7 @@ class InvoiceSectionBuilder
                                             //$invoice->total = $invoice->total + ($data['price'] * $data['quantity']);
                                             $price = $data['price'];
                                         }else{
-                                            dd($data['material_id'], $invoice->warehouse_id,$material->warehouses()->where('warehouse_id', $invoice->warehouse_id));
+                                            dd($data['material_id'], $invoice->warehouse_id, $material->getPriceMaterial($invoice->warehouse_id), $material->getPriceMaterial($invoice->warehouse_id)->price);
                                             $price = Material::find($data['material_id'])->getPriceMaterial($invoice->warehouse_id);
                                         }
                                         InvoiceService::addMaterialToInvoice($invoice, $data['material_id'], $data['quantity'], 0 ,false, $invoice->warehouse_id);
