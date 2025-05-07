@@ -994,7 +994,21 @@ class ProductionViewBuilder
                                                     ->danger()
                                                     ->send();
                                             }
-                                        })
+                                        }),
+
+
+
+                                        Action::make('end-'.$stage->id.'-stage')
+                                            ->label('Завершити')
+                                            //->visible(fn (ProductionStage $stage, Production $record) => $stage->status == 'очікує')
+                                            //->hidden(fn (Production $record, ProductionStage $stage) => $record->status != 'в роботі' and $stage->status === 'в роботі' ||  $record->status != 'в роботі' and $stage->status === 'виготовлено')
+                                            ->hidden(fn (Production $record) => $record->status != 'в роботі')
+                                            ->icon('heroicon-o-stop')
+                                            ->color('warning')
+                                            ->requiresConfirmation()
+                                            ->action(function (Production $record) use ($stage): void {
+                                                ProductionService::endStage($stage);
+                                            })
 
                                 ]),
                                 TextEntry::make($stage->name ?? '')

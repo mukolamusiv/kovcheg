@@ -10,6 +10,7 @@ use App\Models\ProductionStage;
 use App\Models\TemplateProduction;
 use App\Models\Warehouse;
 use Filament\Notifications\Notification;
+use PhpParser\Node\Stmt\Nop;
 
 class ProductionService
 {
@@ -152,6 +153,15 @@ class ProductionService
     public static function endStage(ProductionStage $stage)
     {
         $stage->status = 'виготовлено';
+        $stage->save();
+        $user = $stage->user;
+        $user->paid();
+        if($user->paid){
+            Notification::make()
+                ->title('Етап виробництва успішно завершено нарахована зарпалата!')
+                ->success()
+                ->send();
+        }
         return $stage->save();
     }
 

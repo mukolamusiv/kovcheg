@@ -96,6 +96,20 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->hasMany(ProductionStage::class);
     }
 
+
+    //зарплата працівника
+    public function production_stages_total()
+    {
+         return $this->hasMany(ProductionStage::class)
+            ->where('status', 'виготовлено')
+            ->sum('paid_worker');
+    }
+
+    public function paid()
+    {
+        $this->account->syncBalance;
+    }
+
     //накладні що проводив працівник
     public function invoices()
     {

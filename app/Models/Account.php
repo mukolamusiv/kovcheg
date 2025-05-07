@@ -38,8 +38,13 @@ class Account extends Model
     {
         $debitSum = $this->debitEntries()->sum('amount');
         $creditSum = $this->creditEntries()->sum('amount');
-        $this->balance = $debitSum - $creditSum;
-        $this->save();
+        $paidUser = 0;
+        if($this->owner_type == 'App\Models\User'){
+           $user = User::find($this->owner_id);
+           $paidUser = $user->production_stages_total();
+        }
+        $this->balance = $debitSum - $creditSum + $paidUser;
+        return $this->save();
     }
 
 
