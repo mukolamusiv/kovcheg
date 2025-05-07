@@ -231,6 +231,7 @@ class ProductionViewBuilder
                                 self::recalculatePrice($record),
                                 self::actionStartProduction($record),
                                 self::actionStopProduction($record),
+                                self::actionPauseProduction($record),
                                 self::actionEditProduction($record),
                             ])->alignment(Alignment::Center),
                             self::buildOrderSection($record),
