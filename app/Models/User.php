@@ -107,7 +107,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function paid()
     {
-        $this->account->syncBalance();
+        $account = Account::find($this->account->id);
+        $account->syncBalance();
     }
 
     //накладні що проводив працівник

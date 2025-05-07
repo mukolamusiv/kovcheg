@@ -44,7 +44,7 @@ class Account extends Model
            $paidUser = $user->production_stages_total();
         }
         $this->balance = $debitSum - $creditSum + $paidUser;
-        return $this->save();
+        $this->save();
     }
 
 
