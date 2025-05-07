@@ -713,7 +713,7 @@ class ProductionViewBuilder
             ->label('Призупинити виробництво')
             ->icon('heroicon-o-puse')
             ->visible(fn (Production $record) => $record->status === 'в роботі')
-            ->color('danger')
+            ->color('warning')
             ->requiresConfirmation()
             ->action(function (Production $record): void {
                 //$record->status = 'в роботі';
