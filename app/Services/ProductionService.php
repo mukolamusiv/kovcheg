@@ -8,6 +8,7 @@ use App\Models\Production;
 use App\Models\ProductionMaterial;
 use App\Models\ProductionStage;
 use App\Models\TemplateProduction;
+use App\Models\User;
 use App\Models\Warehouse;
 use Filament\Notifications\Notification;
 use PhpParser\Node\Stmt\Nop;
@@ -154,7 +155,7 @@ class ProductionService
     {
         $stage->status = 'виготовлено';
         $stage->save();
-        $user = $stage->user;
+        $user = User::find($stage->user->id);
         $user->paid();
         if($user->paid){
             Notification::make()
