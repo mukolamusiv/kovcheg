@@ -289,13 +289,14 @@ class ProductionService
                         'date'  => now(),
                         'total' => $sum,
                         'paid'  => $sum,
+                        'warehouse_id' => $key,
                         'status'    => 'створено',
                         'user_id'   => $production->user_id,
                         'type'  => 'списання',
                         'notes' => 'Згенерована автоматично наклада списання матеріалів для виготовлення '. $production->name,
-                        'warehouse_id' =>$material->warehouse_id,
                     ]);
 
+                    //dd( $sum,$invoice);
                     foreach($materials as $material){
                         ProductionService::addMaterialInvoice($material, $invoice);
                     }

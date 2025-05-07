@@ -645,6 +645,7 @@ class ProductionViewBuilder
         return Action::make('startProduction')
             ->label('Розпочати виробництво')
             ->icon('heroicon-o-play')
+            ->visible(fn (Production $record) => $record->status === 'створено')
             ->color('success')
             ->requiresConfirmation()
             ->action(function (Production $record): void {

@@ -31,6 +31,7 @@ class Invoice extends Model
         'payment_status', // Статус оплати
         'status', // Загальний статус накладної
         'notes', // Примітки
+        'warehouse_id'//склад
     ];
 
     // Відношення до моделі Production (виробництво)
