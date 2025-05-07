@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Material;
 use App\Models\Production;
+use App\Models\ProductionStage;
 use App\Models\TemplateProduction;
 use App\Models\Warehouse;
 use Filament\Notifications\Notification;
@@ -133,6 +134,33 @@ class ProductionService
                 ->success()
                 ->send();
         }
+    }
+
+
+    public static function startStage(ProductionStage $stage)
+    {
+        $stage->status = 'в роботі';
+        return $stage->save();
+    }
+
+
+    public static function endStage(ProductionStage $stage)
+    {
+        $stage->status = 'виготовлено';
+        return $stage->save();
+    }
+
+    public static function stopStage(ProductionStage $stage)
+    {
+        $stage->status = 'скасовано';
+        return $stage->save();
+    }
+
+
+    public static function startProduction(Production $production)
+    {
+        $production->status = 'в роботі';
+
     }
 
 
