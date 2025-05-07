@@ -648,25 +648,26 @@ class ProductionViewBuilder
             ->color('success')
             ->requiresConfirmation()
             ->action(function (Production $record): void {
-                $record->status = 'в роботі';
-                try {
-                    if ($record->save()) {
-                        Notification::make()
-                            ->title('Виробництво успішно запущено!')
-                            ->success()
-                            ->send();
-                    } else {
-                        Notification::make()
-                            ->title('Не вдалося запустити виробництво!')
-                            ->danger()
-                            ->send();
-                    }
-                } catch (\Exception $e) {
-                    Notification::make()
-                        ->title('Помилка збереження: ' . $e->getMessage())
-                        ->danger()
-                        ->send();
-                }
+                //$record->status = 'в роботі';
+                ProductionService::startProduction($record);
+                // try {
+                //     if (ProductionService::startProduction($record)) {
+                //         Notification::make()
+                //             ->title('Виробництво успішно запущено!')
+                //             ->success()
+                //             ->send();
+                //     } else {
+                //         Notification::make()
+                //             ->title('Не вдалося запустити виробництво!')
+                //             ->danger()
+                //             ->send();
+                //     }
+                // } catch (\Exception $e) {
+                //     Notification::make()
+                //         ->title('Помилка збереження: ' . $e->getMessage())
+                //         ->danger()
+                //         ->send();
+                // }
             });
     }
     public static function actionEditProduction(Production $record)

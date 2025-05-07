@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Material;
 use App\Models\Production;
+use App\Models\ProductionMaterial;
 use App\Models\ProductionStage;
 use App\Models\TemplateProduction;
 use App\Models\Warehouse;
@@ -159,8 +160,24 @@ class ProductionService
 
     public static function startProduction(Production $production)
     {
-        $production->status = 'в роботі';
+        $errors = [];
+        //додати перевірку наявності на складі
+        foreach($production->productionMaterials as $material){
+            if(!$material->checkStockInWarehouse()){
+                $errors[] = 'Матеріалу не достатньо на складі: ' . $material->name;
+                //throw new \Exception('Матеріалу не достатньо на складі: ' . $material->name);
+            }
+        }
 
+
+        ProductionService::setInvoiceOff($production);
+        $production->status = 'в роботі';
+        $production->save();
+        Notification::make()
+            ->title('Виробництво стартувало')
+            ->success()
+            ->send();
+        //треба додати створення накладної на списання
     }
 
 
@@ -254,6 +271,77 @@ class ProductionService
             ]);
             return $invoice;
         });
+    }
+
+    public static function setInvoiceOff(Production $production)
+    {
+            return \DB::transaction(function () use ($production) {
+                $materialsGrup =  $production->productionMaterials()
+                    ->get()
+                    ->groupBy('warehouse_id');
+                foreach($materialsGrup as $key => $materials){
+                    //dd($materials->first(), $key, $materials);
+                    $sum = 0.00;
+                    foreach($materials as $material){
+                        $sum += $material->price * $material->quantity;
+                    }
+                    $invoice = Invoice::create([
+                        'date'  => now(),
+                        'total' => $sum,
+                        'paid'  => $sum,
+                        'status'    => 'створено',
+                        'user_id'   => $production->user_id,
+                        'type'  => 'списання',
+                        'notes' => 'Згенерована автоматично наклада списання матеріалів для виготовлення '. $production->name,
+                        'warehouse_id' =>$material->warehouse_id,
+                    ]);
+
+                    foreach($materials as $material){
+                        ProductionService::addMaterialInvoice($material, $invoice);
+                    }
+                    Notification::make()
+                        ->title('Накладна на списання успішно створено!')
+                        ->success()
+                        ->send();
+                }
+                //dd($materials);
+            });
+        // return \DB::transaction(function () use ($production) {
+        //     $invoice = Invoice::create([
+        //         'date'  => now(),
+        //         'total' => 0,
+        //         'paid'  => 0,
+        //         'status'    => 'створено',
+        //         'user_id'   => $production->user_id,
+        //         'type'  => 'списання',
+        //         'notes' => 'Згенерована автоматично наклада списання матеріалів для виготовлення '. $production->name
+        //     ]);
+
+        //     $sum = 0.00;
+        //     foreach($production->productionMaterials() as $material){
+        //         $sum += ProductionService::addMaterialInvoice($material, $invoice);
+        //     }
+
+        //     $invoice->total = $sum;
+        //     $invoice->paid  = $sum;
+        //     $invoice->save();
+
+        //     Notification::make()
+        //         ->title('Накладна на списання успішно створено!')
+        //         ->success()
+        //         ->send();
+    }
+
+    public static function addMaterialInvoice(ProductionMaterial $material, Invoice $invoice)
+    {
+        $invoice->invoiceItems()->create([
+            'material_id'   => $material->material_id,
+            'quantity'      => $material->quantity,
+            'price'         => $material->price,
+            'total'         => $material->price * $material->quantity,
+        ]);
+        $material->invoice_id = $invoice->id;
+        $material->save();
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -43,4 +44,16 @@ class ProductionMaterial extends Model
             ->sum('quantity');
     }
 
+    public function checkStockInWarehouse()
+    {
+        if ($this->quantity > $this->getStockInWarehouse()) {
+            Notification::make()
+                ->title('Матеріалу '.$this->material->name.' не достатньо на складі')
+                ->danger()
+                ->send();
+            return false;
+        }else{
+            return true;
+        }
+    }
 }
