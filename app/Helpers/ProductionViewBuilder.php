@@ -230,6 +230,7 @@ class ProductionViewBuilder
                             BAction::make([
                                 self::recalculatePrice($record),
                                 self::actionStartProduction($record),
+                                self::actionStopProduction($record),
                                 self::actionEditProduction($record),
                             ])->alignment(Alignment::Center),
                             self::buildOrderSection($record),
@@ -671,6 +672,40 @@ class ProductionViewBuilder
                 // }
             });
     }
+
+    public static function actionStopProduction(Production $record)
+    {
+        return Action::make('stopProduction')
+            ->label('Зупинити виробництво')
+            ->icon('heroicon-o-stop')
+            ->visible(fn (Production $record) => $record->status === 'в роботі')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->action(function (Production $record): void {
+                //$record->status = 'в роботі';
+                ProductionService::stopProduction($record);
+                // try {
+                //     if (ProductionService::startProduction($record)) {
+                //         Notification::make()
+                //             ->title('Виробництво успішно запущено!')
+                //             ->success()
+                //             ->send();
+                //     } else {
+                //         Notification::make()
+                //             ->title('Не вдалося запустити виробництво!')
+                //             ->danger()
+                //             ->send();
+                //     }
+                // } catch (\Exception $e) {
+                //     Notification::make()
+                //         ->title('Помилка збереження: ' . $e->getMessage())
+                //         ->danger()
+                //         ->send();
+                // }
+            });
+    }
+
+
     public static function actionEditProduction(Production $record)
     {
       return  Action::make('editProduction')
