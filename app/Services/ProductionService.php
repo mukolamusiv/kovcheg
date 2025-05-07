@@ -156,8 +156,8 @@ class ProductionService
         $stage->status = 'виготовлено';
         $stage->save();
         $user = User::find($stage->user->id);
-        $user->paid();
-        if($user->paid){
+        //$user->paid();
+        if($user->paid()){
             Notification::make()
                 ->title('Етап виробництва успішно завершено нарахована зарпалата!')
                 ->success()
