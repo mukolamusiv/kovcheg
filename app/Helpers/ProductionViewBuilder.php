@@ -969,9 +969,9 @@ class ProductionViewBuilder
                                         }),
                                         Action::make('start'.$stage->id)
                                         ->label('Почати')
-                                        //->visible(fn (ProductionStage $stage, Production $record) => $stage->status != 'в роботі' or $stage->status != 'виготовлено')
+                                        ->visible(fn (ProductionStage $stage, Production $record) => $stage->status === 'очікує' and $record->status == 'в роботі')
                                         //->hidden(fn (Production $record, ProductionStage $stage) => $record->status != 'в роботі' and $stage->status === 'в роботі' ||  $record->status != 'в роботі' and $stage->status === 'виготовлено')
-                                        ->hidden(fn (ProductionStage $stage) => $stage->status == 'в роботі' )
+                                        //->hidden(fn (ProductionStage $stage) => $stage->status == 'в роботі' )
                                         ->icon('heroicon-o-play')
                                         ->color('success')
                                         ->requiresConfirmation()
