@@ -706,6 +706,39 @@ class ProductionViewBuilder
     }
 
 
+    public static function actionPauseProduction(Production $record)
+    {
+        return Action::make('pauseProduction')
+            ->label('Призупинити виробництво')
+            ->icon('heroicon-o-stop')
+            ->visible(fn (Production $record) => $record->status === 'в роботі')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->action(function (Production $record): void {
+                //$record->status = 'в роботі';
+                ProductionService::pauseStage($record);
+                // try {
+                //     if (ProductionService::startProduction($record)) {
+                //         Notification::make()
+                //             ->title('Виробництво успішно запущено!')
+                //             ->success()
+                //             ->send();
+                //     } else {
+                //         Notification::make()
+                //             ->title('Не вдалося запустити виробництво!')
+                //             ->danger()
+                //             ->send();
+                //     }
+                // } catch (\Exception $e) {
+                //     Notification::make()
+                //         ->title('Помилка збереження: ' . $e->getMessage())
+                //         ->danger()
+                //         ->send();
+                // }
+            });
+    }
+
+
     public static function actionEditProduction(Production $record)
     {
       return  Action::make('editProduction')

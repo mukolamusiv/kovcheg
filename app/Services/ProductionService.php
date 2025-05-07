@@ -172,6 +172,11 @@ class ProductionService
         return $stage->save();
     }
 
+    public static function pauseStage(ProductionStage $stage)
+    {
+        $stage->status = 'створено';
+        return $stage->save();
+    }
 
     public static function startProduction(Production $production)
     {
