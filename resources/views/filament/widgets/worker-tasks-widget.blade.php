@@ -12,7 +12,7 @@
                             <div class="flex justify-between items-center">
                                 <div>
                                     <div class="font-medium">Етап - {{ $task->name }}</div>
-                                    <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div>
+                                    {{-- <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div> --}}
                                     <div class="text-sm text-color-info">Виконавець: {{ $task->user->name }}</div>
                                 </div>
                                 <form wire:submit.prevent="startTask({{ $task->id }})">
