@@ -12,9 +12,11 @@ use App\Models\InvoiceProductionItem;
 use App\Models\Material;
 use App\Models\Production;
 use App\Models\ProductionSize;
+use App\Models\ProductionStage;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\ProductionService;
 use App\Traits\Filament\HasInvoiceSection;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
@@ -91,6 +93,7 @@ class ProductionViewBuilder
                             Action::make('deleteMaterial'.$material->id)
                             ->label('Видалити матеріал')
                             ->hidden(fn (Production $record) => $record->status !== 'створено')
+                            ->visible(fn () => auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
                             ->icon('heroicon-o-trash')
                             ->color('danger')
                             ->requiresConfirmation()
@@ -116,6 +119,7 @@ class ProductionViewBuilder
                             }),
                             Action::make('edit'.$material->id)
                                 ->label('Редагувати')
+                                ->visible(fn () => auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
                                 ->hidden($material->date_writing_off !== null)
                                 ->icon('heroicon-o-pencil')
                                 ->color('primary')
@@ -170,8 +174,7 @@ class ProductionViewBuilder
                                 ->danger()
                                 ->send();
                             }
-                            })
-
+                            }),
                         ]),
 
                     TextEntry::make($material->material->name ?? '')
@@ -201,6 +204,7 @@ class ProductionViewBuilder
 
                     TextEntry::make($material->description.'starage' ?? '')
                         ->label('Запаси на складі')
+                        ->color(fn ($state) => $material->getStockInWarehouse() < 1 ? 'danger' : 'gray')
                         ->default($material->getStockInWarehouse()),
 
                     TextEntry::make($material->date_writing_off ?? '')
@@ -771,16 +775,16 @@ class ProductionViewBuilder
                 TextInput::make('description')
                     ->label('Опис етапу')
                     ->required(),
-                Select::make('status')
-                    ->label('Статус етапу')
-                    ->options([
-                        'очікує' => 'очікує',
-                        'в роботі' => 'в роботі',
-                        'виготовлено' => 'виготовлено',
-                        'скасовано' => 'скасовано',
-                    ])
-                    ->default('очікує')
-                    ->required(),
+                // Select::make('status')
+                //     ->label('Статус етапу')
+                //     ->options([
+                //         'очікує' => 'очікує',
+                //         'в роботі' => 'в роботі',
+                //         'виготовлено' => 'виготовлено',
+                //         'скасовано' => 'скасовано',
+                //     ])
+                //     ->default('очікує')
+                //     ->required(),
                 TextInput::make('paid_worker')
                     ->label('Оплата працівнику')
                     ->required()
@@ -797,7 +801,7 @@ class ProductionViewBuilder
                 $stage->production_id = $record->id;
                 $stage->name = $data['name'];
                 $stage->description = $data['description'];
-                $stage->status = $data['status'];
+                $stage->status = 'очікує';
                 $stage->paid_worker = $data['paid_worker'];
                 $stage->user_id = $data['user_id'];
 
@@ -832,6 +836,7 @@ class ProductionViewBuilder
                                     Action::make('edit'.$stage->id)
                                     ->label('Редагувати')
                                     ->hidden($stage->status === 'виготовлено')
+                                    ->visible(fn () => auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
                                     ->icon('heroicon-o-pencil')
                                     ->color('primary')
                                     ->form([
@@ -842,16 +847,16 @@ class ProductionViewBuilder
                                         TextInput::make('description')
                                             ->label('Опис етапу')
                                             ->default($stage->description),
-                                        Select::make('status')
-                                            ->label('Статус етапу')
-                                            ->options([
-                                                'очікує' => 'очікує',
-                                                'в роботі' => 'в роботі',
-                                                'виготовлено' => 'виготовлено',
-                                                'скасовано' => 'скасовано',
-                                            ])
-                                            ->default($stage->status)
-                                            ->required(),
+                                        // Select::make('status')
+                                        //     ->label('Статус етапу')
+                                        //     ->options([
+                                        //         'очікує' => 'очікує',
+                                        //         'в роботі' => 'в роботі',
+                                        //         'виготовлено' => 'виготовлено',
+                                        //         'скасовано' => 'скасовано',
+                                        //     ])
+                                        //     ->default($stage->status)
+                                        //     ->required(),
                                         TextInput::make('paid_worker')
                                             ->label('Оплата працівнику')
                                             ->required()
@@ -870,7 +875,7 @@ class ProductionViewBuilder
                                         //$stage = $data;
                                         $stage->user_id = $data['user_id'];
                                         $stage->paid_worker = $data['paid_worker'];
-                                        $stage->status = $data['status'];
+                                        //$stage->status = $data['status'];
                                         $stage->name = $data['name'];
                                         $stage->description = $data['description'];
 
@@ -900,30 +905,58 @@ class ProductionViewBuilder
                                     }),
 
                                     Action::make('delete'.$stage->id)
-                                    ->label('Видалити')
-                                    ->icon('heroicon-o-trash')
-                                    ->color('danger')
-                                    ->requiresConfirmation()
-                                    ->action(function (Production $record) use ($stage): void {
-                                        try {
-                                            if ($stage->delete()) {
+                                        ->label('Видалити')
+                                        ->icon('heroicon-o-trash')
+                                        ->visible(fn () => auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
+                                        ->color('danger')
+                                        ->requiresConfirmation()
+                                        ->action(function (Production $record) use ($stage): void {
+                                            try {
+                                                if ($stage->delete()) {
+                                                    Notification::make()
+                                                        ->title('Етап виробництва успішно видалено!')
+                                                        ->success()
+                                                        ->send();
+                                                } else {
+                                                    Notification::make()
+                                                        ->title('Не вдалося видалити етап виробництва!')
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            } catch (\Exception $e) {
                                                 Notification::make()
-                                                    ->title('Етап виробництва успішно видалено!')
-                                                    ->success()
-                                                    ->send();
-                                            } else {
-                                                Notification::make()
-                                                    ->title('Не вдалося видалити етап виробництва!')
+                                                    ->title('Помилка видалення: ' . $e->getMessage())
                                                     ->danger()
                                                     ->send();
                                             }
-                                        } catch (\Exception $e) {
-                                            Notification::make()
-                                                ->title('Помилка видалення: ' . $e->getMessage())
-                                                ->danger()
-                                                ->send();
-                                        }
-                                    })
+                                        }),
+                                        Action::make('start'.$stage->id)
+                                        ->label('Почати')
+                                        ->visible(fn (Production $record) => $record->status === 'в роботі')
+                                        ->hidden(fn (ProductionStage $stage) => $stage->status !== 'в роботі')
+                                        ->icon('heroicon-o-play')
+                                        ->color('success')
+                                        ->requiresConfirmation()
+                                        ->action(function (Production $record) use ($stage): void {
+                                            try {
+                                                if (ProductionService::startStage($stage)) {
+                                                    Notification::make()
+                                                        ->title('Етап виробництва успішно стартував!')
+                                                        ->success()
+                                                        ->send();
+                                                } else {
+                                                    Notification::make()
+                                                        ->title('Не вдалося запустити етап!')
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            } catch (\Exception $e) {
+                                                Notification::make()
+                                                    ->title('Помилка старту: ' . $e->getMessage())
+                                                    ->danger()
+                                                    ->send();
+                                            }
+                                        })
 
                                 ]),
                                 TextEntry::make($stage->name ?? '')
