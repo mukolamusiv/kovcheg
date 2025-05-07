@@ -141,6 +141,10 @@ class ProductionService
     public static function startStage(ProductionStage $stage)
     {
         $stage->status = 'в роботі';
+        Notification::make()
+            ->title('Етап виробництва успішно стартував!')
+            ->success()
+            ->send();
         return $stage->save();
     }
 
