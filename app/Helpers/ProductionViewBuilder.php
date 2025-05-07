@@ -88,7 +88,7 @@ class ProductionViewBuilder
 
                     ->schema([
                         BAction::make([
-                            Action::make('deleteMaterial')
+                            Action::make('deleteMaterial'.$record->id)
                             ->label('Видалити матеріал')
                             ->icon('heroicon-o-trash')
                             ->color('danger')
