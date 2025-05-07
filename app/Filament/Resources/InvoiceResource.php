@@ -461,6 +461,7 @@ class InvoiceResource extends Resource
                         'danger' => 'не оплачено',
                     ]),
                 Tables\Columns\TextColumn::make('status')
+                    ->searchable()
                     ->label('Статус накладної'),
                 Tables\Columns\TextColumn::make('total')
                     ->label('Сума')
@@ -468,9 +469,11 @@ class InvoiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('supplier.name')
                     ->label('Постачальник')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Клієнт')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Користувач')
