@@ -711,7 +711,7 @@ class ProductionViewBuilder
     {
         return Action::make('pauseProduction')
             ->label('Призупинити виробництво')
-            ->icon('heroicon-o-puse')
+            ->icon('heroicon-o-pause')
             ->visible(fn (Production $record) => $record->status === 'в роботі')
             ->color('warning')
             ->requiresConfirmation()
