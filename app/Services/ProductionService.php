@@ -180,6 +180,16 @@ class ProductionService
         //треба додати створення накладної на списання
     }
 
+    public static function stopProduction(Production $production)
+    {
+        $production->status = 'скасовано';
+        $production->save();
+        Notification::make()
+            ->title('Виробництво зупинено')
+            ->success()
+            ->send();
+    }
+
 
 
     public static function setStage(Production $production, $stage)
@@ -307,30 +317,6 @@ class ProductionService
                 }
                 //dd($materials);
             });
-        // return \DB::transaction(function () use ($production) {
-        //     $invoice = Invoice::create([
-        //         'date'  => now(),
-        //         'total' => 0,
-        //         'paid'  => 0,
-        //         'status'    => 'створено',
-        //         'user_id'   => $production->user_id,
-        //         'type'  => 'списання',
-        //         'notes' => 'Згенерована автоматично наклада списання матеріалів для виготовлення '. $production->name
-        //     ]);
-
-        //     $sum = 0.00;
-        //     foreach($production->productionMaterials() as $material){
-        //         $sum += ProductionService::addMaterialInvoice($material, $invoice);
-        //     }
-
-        //     $invoice->total = $sum;
-        //     $invoice->paid  = $sum;
-        //     $invoice->save();
-
-        //     Notification::make()
-        //         ->title('Накладна на списання успішно створено!')
-        //         ->success()
-        //         ->send();
     }
 
     public static function addMaterialInvoice(ProductionMaterial $material, Invoice $invoice)
