@@ -172,11 +172,6 @@ class ProductionService
         return $stage->save();
     }
 
-    public static function pauseStage(ProductionStage $stage)
-    {
-        $stage->status = 'створено';
-        return $stage->save();
-    }
 
     public static function startProduction(Production $production)
     {
@@ -207,6 +202,16 @@ class ProductionService
         Notification::make()
             ->title('Виробництво зупинено')
             ->success()
+            ->send();
+    }
+
+    public static function pauseProduction(Production $production)
+    {
+        $production->status = 'створено';
+        $production->save();
+        Notification::make()
+            ->title('Виробництво призупинине')
+            ->warning()
             ->send();
     }
 
