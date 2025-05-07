@@ -970,7 +970,7 @@ class ProductionViewBuilder
                                         Action::make('start'.$stage->id)
                                         ->label('Почати')
                                         ->visible(fn (ProductionStage $stage, Production $record) => $stage->status != 'в роботі' or $stage->status != 'виготовлено' and $record->status === 'в роботі')
-                                        //->visible(fn (Production $record) => $record->status === 'в роботі')
+                                        ->hidden(fn (Production $record) => $record->status != 'в роботі')
                                         ->icon('heroicon-o-play')
                                         ->color('success')
                                         ->requiresConfirmation()
