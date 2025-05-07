@@ -36,4 +36,11 @@ class ProductionMaterial extends Model
         return $this->belongsTo(Invoice::class);
     }
 
+    public function getStockInWarehouse()
+    {
+        return $this->material->warehouses()
+            ->where('warehouse_id', $this->warehouse_id)
+            ->sum('quantity');
+    }
+
 }

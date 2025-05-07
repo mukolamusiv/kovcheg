@@ -88,8 +88,9 @@ class ProductionViewBuilder
 
                     ->schema([
                         BAction::make([
-                            Action::make('deleteMaterial'.$record->id)
+                            Action::make('deleteMaterial'.$material->id)
                             ->label('Видалити матеріал')
+                            ->hidden(fn (Production $record) => $record->status !== 'створено')
                             ->icon('heroicon-o-trash')
                             ->color('danger')
                             ->requiresConfirmation()
@@ -114,32 +115,32 @@ class ProductionViewBuilder
                                 }
                             }),
                             Action::make('edit'.$material->id)
-                            ->label('Редагувати')
-                            ->hidden($material->date_writing_off !== null)
-                            ->icon('heroicon-o-pencil')
-                            ->color('primary')
-                            ->form([
-                            TextInput::make('quantity')
-                                ->label('Кількість')
-                                ->required()
-                                ->default($material->quantity)
-                                ->numeric(),
-                            Select::make('material_id')
-                                ->label('Матеріал')
-                                ->options(Material::pluck('name', 'id'))
-                                ->default($material->material_id)
-                                ->searchable()
-                                ->preload()
-                                ->required(),
+                                ->label('Редагувати')
+                                ->hidden($material->date_writing_off !== null)
+                                ->icon('heroicon-o-pencil')
+                                ->color('primary')
+                                ->form([
+                                    TextInput::make('quantity')
+                                        ->label('Кількість')
+                                        ->required()
+                                        ->default($material->quantity)
+                                        ->numeric(),
+                                    Select::make('material_id')
+                                        ->label('Матеріал')
+                                        ->options(Material::pluck('name', 'id'))
+                                        ->default($material->material_id)
+                                        ->searchable()
+                                        ->preload()
+                                        ->required(),
 
                             // TextInput::make('price')
                             //     ->label('Ціна')
                             //     ->required()
                             //     ->default($material->price)
                             //     ->numeric(),
-                            TextInput::make('description')
-                                ->label('Опис')
-                                ->default($material->description),
+                                    TextInput::make('description')
+                                        ->label('Опис')
+                                        ->default($material->description),
                             // TextInput::make('date_writing_off')
                             //     ->label('Дата списання')
                             //     ->default($material->date_writing_off),
@@ -184,14 +185,23 @@ class ProductionViewBuilder
                         ->numeric(),
 
                     TextEntry::make($material->price ?? '')
-                        ->label('Ціна')
+                        ->label('Ціна за одиницю')
                         ->visible(fn () => auth()->user()->role === 'admin')
                         ->default($material->price)
+                        ->prefix('₴'),
+                    TextEntry::make($material->price.'total' ?? '')
+                        ->label('Загальна вартість')
+                        ->visible(fn () => auth()->user()->role === 'admin')
+                        ->default($material->price * $material->quantity)
                         ->prefix('₴'),
 
                     TextEntry::make($material->description ?? '')
                         ->label('Опис')
                         ->default($material->description),
+
+                    TextEntry::make($material->description.'starage' ?? '')
+                        ->label('Запаси на складі')
+                        ->default($material->getStockInWarehouse()),
 
                     TextEntry::make($material->date_writing_off ?? '')
                         ->label('Дата списання')
