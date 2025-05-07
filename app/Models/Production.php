@@ -526,6 +526,12 @@ class Production extends Model
     public function getTotalCost()
     {
         return $this->productionMaterials->sum(function ($material) {
+            if($material->price < 1){
+                Notification::make()
+                    ->title('Деякі товари відсутні на складі!')
+                    ->danger()
+                    ->send();
+            }
             return $material->price * $material->quantity;
         });
     }
@@ -543,7 +549,7 @@ class Production extends Model
     public function getTotalCostWithStagesAndMarkup()
     {
         $totalCost = $this->getTotalCostWithStages();
-        return $totalCost * 1.4; // Додаємо 40% до загальної вартості
+        return $totalCost; // Додаємо 40% до загальної вартості
     }
 
 
