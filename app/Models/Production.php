@@ -523,6 +523,7 @@ class Production extends Model
         ]);
     }
 
+
     public function getTotalCost()
     {
         return $this->productionMaterials->sum(function ($material) {
@@ -535,6 +536,7 @@ class Production extends Model
             return $material->price * $material->quantity;
         });
     }
+
     public function getTotalCostWithStages()
     {
         $totalCost = $this->getTotalCost();
@@ -549,7 +551,7 @@ class Production extends Model
     public function getTotalCostWithStagesAndMarkup()
     {
         $totalCost = $this->getTotalCostWithStages();
-        return $totalCost; // Додаємо 40% до загальної вартості
+        return $totalCost * $this->quantity; // Додаємо 40% до загальної вартості
     }
 
 
