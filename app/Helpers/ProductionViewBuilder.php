@@ -764,28 +764,28 @@ class ProductionViewBuilder
                         ->default($record->quantity),
                 ])
                 ->action(function (array $data, Production $record): void {
-                    $record->name = $data['name'];
-                    $record->description = $data['description'];
-                    $record->quantity = $data['quantity'];
-
-                    try {
-                        if ($record->save()) {
-                            Notification::make()
-                                ->title('Виробництво успішно змінено!')
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Не вдалося змінити виробництво!')
-                                ->danger()
-                                ->send();
-                        }
-                    } catch (\Exception $e) {
-                        Notification::make()
-                            ->title('Помилка збереження: ' . $e->getMessage())
-                            ->danger()
-                            ->send();
-                    }
+                    ProductionService::updateProduction($record,$data);
+                    // $record->name = $data['name'];
+                    // $record->description = $data['description'];
+                    // $record->quantity = $data['quantity'];
+                    // try {
+                    //     if () {
+                    //         Notification::make()
+                    //             ->title('Виробництво успішно змінено!')
+                    //             ->success()
+                    //             ->send();
+                    //     } else {
+                    //         Notification::make()
+                    //             ->title('Не вдалося змінити виробництво!')
+                    //             ->danger()
+                    //             ->send();
+                    //     }
+                    // } catch (\Exception $e) {
+                    //     Notification::make()
+                    //         ->title('Помилка збереження: ' . $e->getMessage())
+                    //         ->danger()
+                    //         ->send();
+                    // }
                 });
         }
 

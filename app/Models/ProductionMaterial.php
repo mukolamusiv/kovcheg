@@ -37,6 +37,7 @@ class ProductionMaterial extends Model
         return $this->belongsTo(Invoice::class);
     }
 
+
     public function getStockInWarehouse()
     {
         return $this->material->warehouses()
@@ -55,5 +56,24 @@ class ProductionMaterial extends Model
         }else{
             return true;
         }
+    }
+
+    protected static function booted()
+    {
+        // Подія перед створенням накладної
+        static::creating(function ($productionMaterial) {
+            if($productionMaterial->material->checkMaterialInWarehouse($productionMaterial->warehouse_id)){
+                $productionMaterial->price = $productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id)->price;
+            }else{
+                $productionMaterial->price = 0;
+            }
+        });
+
+        static::updating(function($productionMaterial){
+            if($productionMaterial->material->checkMaterialInWarehouse($productionMaterial->warehouse_id)){
+               // dd($productionMaterial,$productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id),$productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id)->price);
+                $productionMaterial->price = $productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id)->price;
+            }
+        });
     }
 }

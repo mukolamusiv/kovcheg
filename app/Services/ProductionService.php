@@ -31,11 +31,8 @@ class ProductionService
                     $data['name'] = $template->name;
                     $data['description'] = $template->description;
                 }
-
-                //dd($template->stages, $template->materials);
             }
 
-            //dd($data);
             // Створення виробництва
             $production = Production::create([
                 'name' => $data['name'],
@@ -65,7 +62,7 @@ class ProductionService
                         $warehouseTemplate = $warehouse;
                     }
                     //dd($warehouseTemplate );
-                    ProductionService::setProductionMaterial($production, $materialModel, $warehouseTemplate, $material->quantity);
+                    ProductionService::setProductionMaterial($production, $materialModel, $warehouseTemplate, $material->quantity*$production->quantity);
                     //$production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
                 }
             }else{
@@ -105,6 +102,86 @@ class ProductionService
         });
     }
 
+    /**
+     * @param Production $production
+     * @param array $data
+     * @return Production
+     */
+    public static function updateProduction(Production $production, array $data)
+    {
+        return \DB::transaction(function () use ($production, $data) {
+            if(!empty($production->template_production_id))
+            {
+                $template = TemplateProduction::findOrFail($production->template_production_id);
+            }
+
+            if($data['quantity'] != $production->quantity){
+                foreach($production->productionMaterials as $material){
+                    $quantityMaterial = $material->quantity/$production->quantity;
+                    $material->quantity = $quantityMaterial*$data['quantity'];
+                    $material->save();
+                    //dd($data['quantity'], $production->quantity, $quantityMaterial, $material->quantity, $quantityMaterial*$data['quantity']);
+                }
+                Notification::make()
+                    ->title('Перераховано кількість матеріалів для виробництва!')
+                    ->success()
+                    ->send();
+            }
+            $production->update([
+                'name' => $data['name'] ?? $production->name,
+                'description' => $data['description'] ?? $production->description,
+                'quantity' => $data['quantity'] ?? $production->quantity,
+            ]);
+
+            Notification::make()
+                ->title('Змінено дані про виробництво!')
+                ->success()
+                ->send();
+            $production->save();
+
+                // if(isset($template))
+                // {
+                //     // Оновлення кількості матеріалів для виробництва з шаболону
+                //     foreach ($template->materials as $material) {
+                //         $materialModel = Material::findOrFail($material->material_id);
+                //         if($material->warehouse_id != null){
+                //             $warehouseTemplate = Warehouse::findOrFail($material->warehouse_id);
+                //         }else{
+                //             $warehouseTemplate = $warehouse;
+                //         }
+                //         //dd($warehouseTemplate );
+                //         ProductionService::setProductionMaterial($production, $materialModel, $warehouseTemplate, $material->quantity*$production->quantity);
+                //         //$production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
+                //     }
+                // }
+
+
+
+            // return $production;
+        });
+    }
+
+    /**
+     * @param Production $production
+     * @return bool
+     */
+    public static function deleteProduction(Production $production): bool
+    {
+        return Production::getConnection()->transaction(function () use ($production) {
+            return $production->delete();
+        });
+    }
+
+    /**
+     * @param Production $production
+     * @return bool
+     */
+    public static function restoreProduction(Production $production): bool
+    {
+        return Production::getConnection()->transaction(function () use ($production) {
+            return $production->restore();
+        });
+    }
 
     public static function setProductionMaterial(Production $production, Material $material, Warehouse $warehouse, $quantity)
     {
@@ -113,22 +190,17 @@ class ProductionService
             // Якщо матеріал вже існує, оновлюємо його кількість
             $existingMaterial->quantity = $quantity;
             $existingMaterial->warehouse_id = $warehouse->id; // ID складу
-            //оновлюємо ціну
-            $existingMaterial->price = $material->getPriceMaterial($warehouse->id);
             $existingMaterial->save();
-            return $existingMaterial;
+            Notification::make()
+                ->title('Матеріал успішно оновлені у виробництві!')
+                ->success()
+                ->send();
         }else{
-            if($material->checkMaterialInWarehouse($warehouse->id)){
-                $price = $material->getPriceMaterial($warehouse->id)->price;
-            }else{
-                $price = 0;
-            }
             // Якщо матеріал не існує, створюємо новий запис
             $production->productionMaterials()->create([
                 'material_id' => $material->id, // ID матеріалу
                 'warehouse_id' => $warehouse->id, // ID складу
                 'quantity' => $quantity, // Кількість матеріалу
-                'price' => $price, // Ціна матеріалу
                 'warehouse_id' => $warehouse->id, // ID складу
                 'description' => $description ?? null, // Опис матеріалу
             ]);
@@ -137,6 +209,21 @@ class ProductionService
                 ->success()
                 ->send();
         }
+    }
+
+
+    public static function setStage(Production $production, $stage)
+    {
+        //$stage = $stage['productionStages'];
+        // Додаємо етап до виробництва
+        return $production->productionStages()->create([
+            'name' => $stage['name'],
+            'description' => $stage['description'],
+            'status' => 'очікує',
+            'paid_worker' => $stage['paid_worker'],
+            'date' => null,
+            'user_id' => $stage['user_id'] ?? auth()->id(),
+        ]);
     }
 
 
@@ -213,61 +300,6 @@ class ProductionService
             ->title('Виробництво призупинине')
             ->warning()
             ->send();
-    }
-
-
-
-    public static function setStage(Production $production, $stage)
-    {
-        //$stage = $stage['productionStages'];
-        // Додаємо етап до виробництва
-        return $production->productionStages()->create([
-            'name' => $stage['name'],
-            'description' => $stage['description'],
-            'status' => 'очікує',
-            'paid_worker' => $stage['paid_worker'],
-            'date' => null,
-            'user_id' => $stage['user_id'] ?? auth()->id(),
-        ]);
-    }
-
-
-    /**
-     * @param Production $production
-     * @param array $data
-     * @return Production
-     */
-    public static function updateProduction(Production $production, array $data): Production
-    {
-        return Production::getConnection()->transaction(function () use ($production, $data) {
-            $production->update([
-                'name' => $data['name'],
-            ]);
-
-            return $production;
-        });
-    }
-
-    /**
-     * @param Production $production
-     * @return bool
-     */
-    public static function deleteProduction(Production $production): bool
-    {
-        return Production::getConnection()->transaction(function () use ($production) {
-            return $production->delete();
-        });
-    }
-
-    /**
-     * @param Production $production
-     * @return bool
-     */
-    public static function restoreProduction(Production $production): bool
-    {
-        return Production::getConnection()->transaction(function () use ($production) {
-            return $production->restore();
-        });
     }
 
 

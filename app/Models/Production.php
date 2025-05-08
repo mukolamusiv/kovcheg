@@ -551,7 +551,7 @@ class Production extends Model
     public function getTotalCostWithStagesAndMarkup()
     {
         $totalCost = $this->getTotalCostWithStages();
-        return $totalCost * $this->quantity; // Додаємо 40% до загальної вартості
+        return $totalCost; // Додаємо 40% до загальної вартості
     }
 
 
