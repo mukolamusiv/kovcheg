@@ -540,7 +540,7 @@ class Production extends Model
     public function getTotalCostWithStages()
     {
         $totalCost = $this->getTotalCost();
-        $totalStagesCost = $this->productionStages->sum('paid_worker');
+        $totalStagesCost = $this->productionStages->sum('paid_worker') * $this->quantity;
         return $totalCost + $totalStagesCost;
     }
     /**

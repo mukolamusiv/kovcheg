@@ -1074,7 +1074,7 @@ class ProductionViewBuilder
                                 TextEntry::make('paid_worker')
                                     ->label('Оплата')
                                     ->hidden(auth()->user()->role !== 'admin' && auth()->user()->id !== $stage->user_id)
-                                    ->default($stage->paid_worker)
+                                    ->default($stage->paid_worker * $record->quantity)
                                     ->numeric(),
 
                                 TextEntry::make($stage->user->name ?? '')
