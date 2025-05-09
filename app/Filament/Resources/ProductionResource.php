@@ -39,7 +39,7 @@ class ProductionResource extends Resource
         ->columns(1)
             ->schema([
 
-                            Forms\Components\Select::make('template_production_id')
+                            Forms\Components\Select::make('template_productions_id')
                                 ->label('Шаблон виробництва')
                                 ->options(TemplateProduction::pluck('name', 'id'))
                                 ->searchable()
@@ -91,7 +91,7 @@ class ProductionResource extends Resource
                                 ->label('Назва виробу')
                                 ->required()
                                 ->reactive()
-                                ->hidden(fn ($get) => $get('template_production_id'))
+                                ->hidden(fn ($get) => $get('template_productions_id'))
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('quantity')
                                 ->label('Кількість одиниць')
@@ -102,7 +102,7 @@ class ProductionResource extends Resource
                                 ->maxLength(255),
                             Forms\Components\Repeater::make('productionStages')
                                 ->label('Етапи виробництва')
-                                ->hidden(fn ($get) => $get('template_production_id'))
+                                ->hidden(fn ($get) => $get('template_productions_id'))
                                 ->relationship('productionStages')
                                 ->schema([
                                     Forms\Components\TextInput::make('name')
@@ -128,7 +128,7 @@ class ProductionResource extends Resource
                             Forms\Components\Repeater::make('productionMaterials')
                                 ->label('Матеріали для виробництва')
                                 ->relationship('productionMaterials')
-                                ->hidden(fn ($get) => $get('template_production_id'))
+                                ->hidden(fn ($get) => $get('template_productions_id'))
                                 ->schema([
                                     Forms\Components\Select::make('material_id')
                                         ->label('Матеріал')
