@@ -300,7 +300,6 @@ class ProductionService
                 'invoice_id' => $data['invoice_id'],
                 'warehouse_id' => $data['warehouse_id'],
             ]);
-
             return $production;
         });
     }
