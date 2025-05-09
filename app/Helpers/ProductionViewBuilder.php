@@ -125,11 +125,10 @@ class ProductionViewBuilder
                                 ->color('primary')
                                 ->form([
                                     Select::make('warehouse')
-                                        ->label('Кількість')
+                                        ->label('Склад')
                                         ->options(Warehouse::pluck('name', 'id'))
                                         ->required()
-                                        ->default($material->warehouse_id)
-                                        ->numeric(),
+                                        ->default($material->warehouse_id),
                                     TextInput::make('quantity')
                                         ->label('Кількість')
                                         ->required()
