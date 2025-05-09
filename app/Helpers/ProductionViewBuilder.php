@@ -1030,8 +1030,6 @@ class ProductionViewBuilder
                                             }
                                         }),
 
-
-
                                         Action::make('end-'.$stage->id.'-stage')
                                             ->label('Завершити')
                                             //->visible(fn (ProductionStage $stage, Production $record) => $stage->status == 'очікує')
