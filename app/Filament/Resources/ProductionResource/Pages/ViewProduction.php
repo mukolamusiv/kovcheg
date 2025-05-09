@@ -70,6 +70,8 @@ class ViewProduction extends ViewRecord
                 ->columns(12)
                 ->schema([
                     ProductionViewBuilder::configureView($record),
+                    $this->getInvoices($record),
+                    //dd($record->invoice_off),
                    // InvoiceSectionBuilder::buildSection($record->invoice, ' ПРОДАЖ'),
                     //InvoiceSectionBuilder::buildSection($record->invoice_off,' СПИСАННЯ'),
                    // $record->invoice_off ? InvoiceSectionBuilder::buildSection($record->invoice_off,' СПИСАННЯ'): ProductionViewBuilder::configureView($record),
@@ -779,217 +781,284 @@ class ViewProduction extends ViewRecord
      * @return array
      */
     // отримуємо накладні
-    private function getInvoices(Production $record): array
+    private function getInvoices(Production $record)
     {
-        $invoices = $record->invoice; // отримуємо накладні
-        if(is_null($invoices)) {
-            $productionItems = []; // отримуємо позиції виробництва
-            $invoiceItems = []; // отримуємо позиції товарів
-        }else{
-            $productionItems = $invoices->invoiceProductionItems; // отримуємо позиції виробництва
-            $invoiceItems = $invoices->invoiceItems; // отримуємо позиції товарів
-        }
-
-       // dd($invoices,$productionItems);
-        $invoice = [];
-        //dd($invoices);
-        if(is_null($invoices)) {
-            $invoice[] = Section::make('Немає накладної на продаж')
-                ->description('Немає накладних')
-                ->headerActions([
-                    Action::make('addInvoice')
-                        ->label('Додати накладну')
-                        ->icon('heroicon-o-plus')
-                        ->requiresConfirmation()
-                        ->color('success')
-                        ->form([
-                            Select::make('invoice_id')
-                                ->label('Виберіть накладну')
-                                ->options(Invoice::pluck('invoice_number', 'id'))
-                                ->searchable()
-                                ->placeholder('Створити нову накладну')
-                        ])
-                        ->action(function (array $data, Production $record): void {
-                            $record->makeInvoice($data['invoice_id'], $data);
-                        })
-                ])
-                ->columnSpanFull();
-        }else {
-                $invoice[] = Section::make('Накладна на продаж виробу')
-                    ->visible(fn () => $invoices !== null)
-                    ->collapsed(false)
-                    ->columnSpanFull()
-                    ->columns(12)
+        $data = [];
+        foreach ($record->invoice_off as $invoices){
+            $invoiceItemsOff = [];
+            foreach($invoices->invoiceItems as $items){
+               $invoiceItemsOff [] = Section::make('Матеріал - '.$items->material->name)
+                    ->label($items->material->name)
+                    ->columnSpan(12)
+                    ->columns(4)
                     ->schema([
-                    Section::make('Інформація про накладну')
-                       // ->description('Загально')
-                        ->columns(2)
-                        ->columnSpan(6, 12)
-                        ->footerActions([
+                        TextEntry::make($items->quantity)->default($items->quantity)->label('Кількість'),
+                        TextEntry::make('price')->default($items->price)->label('Ціна'),
+                        TextEntry::make('total')->default($items->total)->label('Сума'),
+                        BAction::make([
+                            Action::make('Змінити кількість')
+                                ->label('Змінити кількість')
+                                ->visible(fn () => $invoices->status === 'створено')
+                                ->icon('heroicon-o-pencil')
+                                ->color('info')
+                                ->action(fn () => $items),
+                        ])
+                    ]);
+            }
+            $data[] = Section::make('Накладна '.$invoices->invoice_number)
+                ->label('Накладна - '.$invoices->invoice_number)
+                ->description('Автоматично створена накладна на списання матеріалів')
+                ->columnSpan(12)
+                ->columns(4)
+                ->schema([
+                    TextEntry::make('status'.$invoices->id)
+                        ->default($invoices->status)->label('Статус накладної'),
+                    TextEntry::make('total'.$invoices->id)
+                        ->default($invoices->total)->label('Сума'),
+                    TextEntry::make('notes'.$invoices->id)
+                        ->default($invoices->notes)->label('Примітки'),
+                    BAction::make([
                         Action::make('move_invoice' . $invoices->id)
                             ->label('Провести накладну')
                             ->icon('heroicon-o-check')
                             ->visible(fn () => $invoices->status === 'створено')
                             ->color('success')
-                            ->action(fn () => $invoices->moveInvoice()),
+                            ->action(fn () => $invoices),
                         Action::make('cancel_invoice' . $invoices->id)
                             ->label('Скасувати проведення')
-                            ->visible(fn () => $invoices->status === 'проведено')
+                            //->visible(fn () => $invoices->status === 'проведено')
                             ->icon('heroicon-o-x-mark')
                             ->color('danger')
-                            ->action(fn () => $invoices->cancelInvoice()),
-                        Action::make('printInvoice_' . $invoices->id)
-                            ->label('Надрукувати накладну')
-                            ->visible(fn () => $invoices->status === 'проведено')
-                            ->icon('heroicon-o-printer')
-                            ->color('info')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
-                        ])
-                        ->footerActionsAlignment(Alignment::Center)
-                        ->schema([
-                        TextEntry::make('invoice_number')
-                            ->label('Номер накладної')
-                            ->default($invoices->invoice_number)
-                            ->badge()
-                            ->color('info'),
-                        TextEntry::make('invoice_date')
-                            ->label('Дата накладної')
-                            ->default($invoices->invoice_date)
-                            ->badge()
-                            ->color('info'),
-                        TextEntry::make('type')->label('Тип')->default($invoices->type)->badge()->color('primary'),
-                        TextEntry::make('status')->label('Статус')->default($invoices->status)->badge()->color(fn () => match ($invoices->status) {
-                            'створено' => 'info',
-                            'проведено' => 'success',
-                            'скасовано' => 'danger',
-                        }),
-                        TextEntry::make('invoice.notes')
-                            ->label('Примітки'),
+                            ->action(fn () => $invoices),
+                    ]),
+                    Fieldset::make('invoiceItems')
+                        ->label('Позиції у накладній')
+                        ->columnSpan(12)
+                        ->columns(4)
+                        ->schema(
+                            $invoiceItemsOff
+                        )->columns([
+                            'sm' => 2,
+                            'lg' => 4,
                         ]),
-                    Section::make('Фінанси')
-                        //->description('Базова інформація про накладну')
-                        ->columns(2)
-                        ->columnSpan(6, 12)
-                        ->footerActions([
-                        Action::make('add_discount' . $invoices->id)
-                            ->label('Додати знижку')
-                            ->visible(fn () => $invoices->status === 'створено')
-                            ->icon('heroicon-o-printer')
-                            ->color('warning')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
-                        Action::make('pay' . $invoices->id)
-                            ->label('Оплатити')
-                            ->visible(fn () => $invoices->status === 'проведено')
-                            ->icon('heroicon-o-printer')
-                            ->color('success')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
-                        ])
-                        ->footerActionsAlignment(Alignment::Center)
-                        ->schema([
-                            TextEntry::make('total')->label('Сума')->default($invoices->total)->badge()->color('success'),
-                            TextEntry::make('paid')->label('Оплачено')->default($invoices->paid)->badge()->color('warning'),
-                            TextEntry::make('due')->label('Заборгованість')->default($invoices->due)->badge()->color('danger'),
-                            TextEntry::make('discount')->label('Знижка')->default($invoices->discount)->badge()->color('success'),
-                            TextEntry::make('payment_status')
-                                ->badge()
-                                ->label('Статус оплати')
-                                ->default($invoices->payment_status)
-                                ->color(fn () => match ($invoices->payment_status) {
-                                'завдаток' => 'info',
-                                'частково оплачено' => 'warning',
-                                'оплачено' => 'success',
-                                'не оплачено' => 'danger',
-                                }),
-                        ]),
+                ])
+                ->columns([
+                    'sm' => 2,
+                    'lg' => 4,
+                ]);
+        }
+        $invoice = Fieldset::make('Накладні на списання матеріалів')
+                ->schema($data);
 
-                        Section::make('Усі замовлення накладної')
-                            //->description('Усі транзакції накладної')
-                            ->collapsed(true)
-                            ->columns(2)
-                            ->columnSpanFull()
-                            ->schema(
-                                $this->getProductionInvoice($productionItems)
-                            ),
+    //     $invoices = $record->invoice; // отримуємо накладні
+    //     if(is_null($invoices)) {
+    //         $productionItems = []; // отримуємо позиції виробництва
+    //         $invoiceItems = []; // отримуємо позиції товарів
+    //     }else{
+    //         $productionItems = $invoices->invoiceProductionItems; // отримуємо позиції виробництва
+    //         $invoiceItems = $invoices->invoiceItems; // отримуємо позиції товарів
+    //     }
 
-                        Section::make('Усі товари у накладній')
-                            //->description('Усі транзакції накладної')
-                            ->collapsed(true)
-                            ->columns(2)
-                            ->columnSpanFull()
-                            ->schema(
-                                $this->getItemsInvoice($invoiceItems)
-                            ),
+    //    // dd($invoices,$productionItems);
+    //     $invoice = [];
+    //     //dd($invoices);
+    //     if(is_null($invoices)) {
+    //         $invoice[] = Section::make('Немає накладної на продаж')
+    //             ->description('Немає накладних')
+    //             ->headerActions([
+    //                 Action::make('addInvoice')
+    //                     ->label('Додати накладну')
+    //                     ->icon('heroicon-o-plus')
+    //                     ->requiresConfirmation()
+    //                     ->color('success')
+    //                     ->form([
+    //                         Select::make('invoice_id')
+    //                             ->label('Виберіть накладну')
+    //                             ->options(Invoice::pluck('invoice_number', 'id'))
+    //                             ->searchable()
+    //                             ->placeholder('Створити нову накладну')
+    //                     ])
+    //                     ->action(function (array $data, Production $record): void {
+    //                         $record->makeInvoice($data['invoice_id'], $data);
+    //                     })
+    //             ])
+    //             ->columnSpanFull();
+    //     }else {
+    //             $invoice[] = Section::make('Накладна на продаж виробу')
+    //                 ->visible(fn () => $invoices !== null)
+    //                 ->collapsed(false)
+    //                 ->columnSpanFull()
+    //                 ->columns(12)
+    //                 ->schema([
+    //                 Section::make('Інформація про накладну')
+    //                    // ->description('Загально')
+    //                     ->columns(2)
+    //                     ->columnSpan(6, 12)
+    //                     ->footerActions([
+    //                     Action::make('move_invoice' . $invoices->id)
+    //                         ->label('Провести накладну')
+    //                         ->icon('heroicon-o-check')
+    //                         ->visible(fn () => $invoices->status === 'створено')
+    //                         ->color('success')
+    //                         ->action(fn () => $invoices->moveInvoice()),
+    //                     Action::make('cancel_invoice' . $invoices->id)
+    //                         ->label('Скасувати проведення')
+    //                         ->visible(fn () => $invoices->status === 'проведено')
+    //                         ->icon('heroicon-o-x-mark')
+    //                         ->color('danger')
+    //                         ->action(fn () => $invoices->cancelInvoice()),
+    //                     Action::make('printInvoice_' . $invoices->id)
+    //                         ->label('Надрукувати накладну')
+    //                         ->visible(fn () => $invoices->status === 'проведено')
+    //                         ->icon('heroicon-o-printer')
+    //                         ->color('info')
+    //                         ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+    //                     ])
+    //                     ->footerActionsAlignment(Alignment::Center)
+    //                     ->schema([
+    //                     TextEntry::make('invoice_number')
+    //                         ->label('Номер накладної')
+    //                         ->default($invoices->invoice_number)
+    //                         ->badge()
+    //                         ->color('info'),
+    //                     TextEntry::make('invoice_date')
+    //                         ->label('Дата накладної')
+    //                         ->default($invoices->invoice_date)
+    //                         ->badge()
+    //                         ->color('info'),
+    //                     TextEntry::make('type')->label('Тип')->default($invoices->type)->badge()->color('primary'),
+    //                     TextEntry::make('status')->label('Статус')->default($invoices->status)->badge()->color(fn () => match ($invoices->status) {
+    //                         'створено' => 'info',
+    //                         'проведено' => 'success',
+    //                         'скасовано' => 'danger',
+    //                     }),
+    //                     TextEntry::make('invoice.notes')
+    //                         ->label('Примітки'),
+    //                     ]),
+    //                 Section::make('Фінанси')
+    //                     //->description('Базова інформація про накладну')
+    //                     ->columns(2)
+    //                     ->columnSpan(6, 12)
+    //                     ->footerActions([
+    //                     Action::make('add_discount' . $invoices->id)
+    //                         ->label('Додати знижку')
+    //                         ->visible(fn () => $invoices->status === 'створено')
+    //                         ->icon('heroicon-o-printer')
+    //                         ->color('warning')
+    //                         ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+    //                     Action::make('pay' . $invoices->id)
+    //                         ->label('Оплатити')
+    //                         ->visible(fn () => $invoices->status === 'проведено')
+    //                         ->icon('heroicon-o-printer')
+    //                         ->color('success')
+    //                         ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+    //                     ])
+    //                     ->footerActionsAlignment(Alignment::Center)
+    //                     ->schema([
+    //                         TextEntry::make('total')->label('Сума')->default($invoices->total)->badge()->color('success'),
+    //                         TextEntry::make('paid')->label('Оплачено')->default($invoices->paid)->badge()->color('warning'),
+    //                         TextEntry::make('due')->label('Заборгованість')->default($invoices->due)->badge()->color('danger'),
+    //                         TextEntry::make('discount')->label('Знижка')->default($invoices->discount)->badge()->color('success'),
+    //                         TextEntry::make('payment_status')
+    //                             ->badge()
+    //                             ->label('Статус оплати')
+    //                             ->default($invoices->payment_status)
+    //                             ->color(fn () => match ($invoices->payment_status) {
+    //                             'завдаток' => 'info',
+    //                             'частково оплачено' => 'warning',
+    //                             'оплачено' => 'success',
+    //                             'не оплачено' => 'danger',
+    //                             }),
+    //                     ]),
 
-                    //,
+    //                     Section::make('Усі замовлення накладної')
+    //                         //->description('Усі транзакції накладної')
+    //                         ->collapsed(true)
+    //                         ->columns(2)
+    //                         ->columnSpanFull()
+    //                         ->schema(
+    //                             $this->getProductionInvoice($productionItems)
+    //                         ),
 
-                    // RepeatableEntry::make('invoiceItems')
-                    //     ->label('Позиції накладної')
-                    //     ->columns(4)
-                    //     ->columnSpanFull()
-                    //     ->schema([
-                    //     TextEntry::make('quantity')->label('Кількість'),
-                    //     TextEntry::make('price')->label('Ціна'),
-                    //     TextEntry::make('total')->label('Сума'),
-                    //     ]),
-                    Section::make('Транзакції')
-                        ->description('Усі транзакції накладної')
-                        ->collapsed(true)
-                        ->columns(2)
-                        ->columnSpanFull()
-                        ->footerActions([
-                        Action::make('add_discount' . $invoices->id)
-                            ->label('Додати знижку')
-                            ->icon('heroicon-o-printer')
-                            ->color('warning')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
-                        Action::make('pay' . $invoices->id)
-                            ->label('Оплатити')
-                            ->icon('heroicon-o-printer')
-                            ->color('success')
-                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
-                        ])
-                        ->schema([
-                        RepeatableEntry::make('transactions')
-                            ->label('Транзакції')
-                            ->columnSpan(12)
-                            ->columns(4)
-                            ->schema([
-                            TextEntry::make('reference_number'),
-                            TextEntry::make('description'),
-                            TextEntry::make('debet.amount'),
-                            TextEntry::make('transaction_date'),
-                            ]),
-                        ]),
-                    ])
-                    ->headerActions([
-                    Action::make('reconcileFinances_' . $invoices->id)
-                        ->label('Перерахувати фінанси')
-                        ->icon('heroicon-s-variable')
-                        ->color('danger')
-                        ->action(fn () => $invoices->reconcileFinances()),
-                    Action::make('customer_pay_' . $invoices->id)
-                        ->label('Внести оплату')
-                        ->icon('heroicon-s-currency-euro')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->form([
-                        Select::make('account_id')
-                            ->label('Гроші на рахунок')
-                            ->options(Account::query()->whereNull('owner_id')->pluck('name', 'id'))
-                            ->required(),
-                        TextInput::make('amount')
-                            ->numeric()
-                            ->maxValue($invoices->due ?? 100)
-                            ->default($invoices->due ?? 100)
-                            ->label('Сума'),
-                        TextInput::make('description')
-                            ->label('Опис'),
-                        ])
-                        ->action(function (array $data) use ($invoices) {
-                        Transaction::customer_pay_transaction($data, $invoices->customer, $invoices);
-                        }),
-                    ]);
-                }
+    //                     Section::make('Усі товари у накладній')
+    //                         //->description('Усі транзакції накладної')
+    //                         ->collapsed(true)
+    //                         ->columns(2)
+    //                         ->columnSpanFull()
+    //                         ->schema(
+    //                             $this->getItemsInvoice($invoiceItems)
+    //                         ),
+
+    //                 //,
+
+    //                 // RepeatableEntry::make('invoiceItems')
+    //                 //     ->label('Позиції накладної')
+    //                 //     ->columns(4)
+    //                 //     ->columnSpanFull()
+    //                 //     ->schema([
+    //                 //     TextEntry::make('quantity')->label('Кількість'),
+    //                 //     TextEntry::make('price')->label('Ціна'),
+    //                 //     TextEntry::make('total')->label('Сума'),
+    //                 //     ]),
+    //                 Section::make('Транзакції')
+    //                     ->description('Усі транзакції накладної')
+    //                     ->collapsed(true)
+    //                     ->columns(2)
+    //                     ->columnSpanFull()
+    //                     ->footerActions([
+    //                     Action::make('add_discount' . $invoices->id)
+    //                         ->label('Додати знижку')
+    //                         ->icon('heroicon-o-printer')
+    //                         ->color('warning')
+    //                         ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+    //                     Action::make('pay' . $invoices->id)
+    //                         ->label('Оплатити')
+    //                         ->icon('heroicon-o-printer')
+    //                         ->color('success')
+    //                         ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+    //                     ])
+    //                     ->schema([
+    //                     RepeatableEntry::make('transactions')
+    //                         ->label('Транзакції')
+    //                         ->columnSpan(12)
+    //                         ->columns(4)
+    //                         ->schema([
+    //                         TextEntry::make('reference_number'),
+    //                         TextEntry::make('description'),
+    //                         TextEntry::make('debet.amount'),
+    //                         TextEntry::make('transaction_date'),
+    //                         ]),
+    //                     ]),
+    //                 ])
+    //                 ->headerActions([
+    //                 Action::make('reconcileFinances_' . $invoices->id)
+    //                     ->label('Перерахувати фінанси')
+    //                     ->icon('heroicon-s-variable')
+    //                     ->color('danger')
+    //                     ->action(fn () => $invoices->reconcileFinances()),
+    //                 Action::make('customer_pay_' . $invoices->id)
+    //                     ->label('Внести оплату')
+    //                     ->icon('heroicon-s-currency-euro')
+    //                     ->color('success')
+    //                     ->requiresConfirmation()
+    //                     ->form([
+    //                     Select::make('account_id')
+    //                         ->label('Гроші на рахунок')
+    //                         ->options(Account::query()->whereNull('owner_id')->pluck('name', 'id'))
+    //                         ->required(),
+    //                     TextInput::make('amount')
+    //                         ->numeric()
+    //                         ->maxValue($invoices->due ?? 100)
+    //                         ->default($invoices->due ?? 100)
+    //                         ->label('Сума'),
+    //                     TextInput::make('description')
+    //                         ->label('Опис'),
+    //                     ])
+    //                     ->action(function (array $data) use ($invoices) {
+    //                     Transaction::customer_pay_transaction($data, $invoices->customer, $invoices);
+    //                     }),
+    //                 ]);
+    //             }
         return $invoice;
     }
     /**
