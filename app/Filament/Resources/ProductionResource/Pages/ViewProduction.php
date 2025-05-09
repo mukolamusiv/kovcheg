@@ -809,6 +809,19 @@ class ViewProduction extends ViewRecord
                 ->label('Накладна - '.$invoices->invoice_number)
                 ->description('Автоматично створена накладна на списання матеріалів зі складу '. $invoices->warehouse->name)
                 ->columnSpan(12)
+                ->headerActions([
+                    Action::make('printInvoice_' . $invoices->id)
+                        ->label('Надрукувати накладну')
+                        ->visible(fn () => $invoices->status === 'проведено')
+                        ->icon('heroicon-o-printer')
+                        ->color('info')
+                        ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+                    Action::make('deleteInvoice_' . $invoices->id)
+                        ->label('Видалити накладну')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->action(fn () => $invoices->delete()),
+                ])
                 ->columns(4)
                 ->schema([
                     TextEntry::make('status'.$invoices->id)
