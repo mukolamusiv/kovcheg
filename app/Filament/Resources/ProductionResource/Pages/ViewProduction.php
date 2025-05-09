@@ -790,8 +790,21 @@ class ViewProduction extends ViewRecord
             foreach($invoices->invoiceItems as $items){
                $invoiceItemsOff [] = Section::make('Матеріал - '.$items->material->name)
                     ->label($items->material->name)
+                    ->headerActions([
+                        Action::make('count_items'.$items->id)
+                        ->label('Змінити кількість матеріалу')
+                        ->visible(fn () => $invoices->status === 'створено')
+                        ->icon('heroicon-o-pencil')
+                        ->color('info')
+                        ->form([
+                            TextInput::make('quantity')
+                                ->label('Кількість матеріалу')
+                                ->default($items->quantity)
+                        ])
+                        ->action(fn () => $items),
+                    ])
                     ->columnSpan(12)
-                    ->columns(5)
+                    ->columns(4)
                     ->schema([
                         //dd($items->material->getStockInWarehouse($invoices->warehouse_id)),
                         TextEntry::make('quantity'.$items->id)
@@ -803,14 +816,9 @@ class ViewProduction extends ViewRecord
                             ->label('Кількість на складі'),
                         TextEntry::make('price')->default($items->price)->label('Ціна'),
                         TextEntry::make('total')->default($items->total)->label('Сума'),
-                        BAction::make([
-                            Action::make('Змінити кількість')
-                                ->label('Змінити кількість')
-                                ->visible(fn () => $invoices->status === 'створено')
-                                ->icon('heroicon-o-pencil')
-                                ->color('info')
-                                ->action(fn () => $items),
-                        ])
+                        // BAction::make([
+
+                        // ])
                     ]);
             }
             $data[] = Section::make('Накладна '.$invoices->invoice_number)
@@ -818,14 +826,27 @@ class ViewProduction extends ViewRecord
                 ->description('Автоматично створена накладна на списання матеріалів зі складу '. $invoices->warehouse->name)
                 ->columnSpan(12)
                 ->headerActions([
+                    Action::make('move_invoice' . $invoices->id)
+                            ->label('Провести накладну')
+                            ->icon('heroicon-o-check')
+                            ->visible(fn () => $invoices->status === 'створено')
+                            ->color('success')
+                            ->action(fn () => $invoices),
+                    Action::make('cancel_invoice' . $invoices->id)
+                            ->label('Скасувати проведення')
+                            //->visible(fn () => $invoices->status === 'проведено')
+                            ->icon('heroicon-o-x-mark')
+                            ->color('danger')
+                            ->action(fn () => $invoices),
                     Action::make('printInvoice_' . $invoices->id)
                         ->label('Надрукувати накладну')
-                        ->visible(fn () => $invoices->status === 'проведено')
+                        //->visible(fn () => $invoices->status === 'проведено')
                         ->icon('heroicon-o-printer')
                         ->color('info')
                         ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
                     Action::make('deleteInvoice_' . $invoices->id)
                         ->label('Видалити накладну')
+                        ->visible(fn () => $invoices->status === 'створено')
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->action(fn () => $invoices->delete()),
@@ -839,23 +860,12 @@ class ViewProduction extends ViewRecord
                     TextEntry::make('notes'.$invoices->id)
                         ->default($invoices->notes)->label('Примітки'),
                     BAction::make([
-                        Action::make('move_invoice' . $invoices->id)
-                            ->label('Провести накладну')
-                            ->icon('heroicon-o-check')
-                            ->visible(fn () => $invoices->status === 'створено')
-                            ->color('success')
-                            ->action(fn () => $invoices),
-                        Action::make('cancel_invoice' . $invoices->id)
-                            ->label('Скасувати проведення')
-                            //->visible(fn () => $invoices->status === 'проведено')
-                            ->icon('heroicon-o-x-mark')
-                            ->color('danger')
-                            ->action(fn () => $invoices),
+
                     ]),
                     Fieldset::make('invoiceItems')
                         ->label('Позиції у накладній')
                         ->columnSpan(12)
-                        ->columns(4)
+                        ->columns(12)
                         ->schema(
                             $invoiceItemsOff
                         )->columns([

@@ -4,7 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\UserProfilePage;
 use App\Filament\Resources\NResource\Widgets\UpdateInfo;
-
+use App\Filament\Widgets\FinanceCart;
 use App\Filament\Widgets\StockAndFinanceChart;
 use App\Filament\Widgets\WorkerTasksWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -47,6 +47,7 @@ class AdministratorPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                FinanceCart::class,
                 WorkerTasksWidget::class,
                 //Widgets\AccountWidget::class,
                // Widgets\FilamentInfoWidget::class,

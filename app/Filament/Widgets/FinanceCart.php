@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use App\Models\Account;
+use App\Models\TransactionEntry;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+
+class FinanceCart extends BaseWidget
+{
+
+
+    protected function getData(): array
+    {
+        $accountId = Account::query()
+            ->select('id', 'name')
+            ->where('owner_type', null)
+            ->orderBy('name')
+            ->get();
+
+        foreach ($accountId as $account) {
+            $data[$account->id] = $account->id;
+        }
+        $entries = TransactionEntry::query()
+            ->selectRaw('
+                DATE_FORMAT(created_at, "%Y-%m-01") as month,
+                SUM(CASE WHEN entry_type = "дебет" THEN amount ELSE 0 END) as total_debet,
+                SUM(CASE WHEN entry_type = "кредит" THEN amount ELSE 0 END) as total_credit
+            ')
+            ->where('account_id',  $data)
+            ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
+            ->orderByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
+            ->get();
+
+        $debet = $entries->pluck('total_debet')->map(fn($v) => (float) $v)->count();
+        $credit = $entries->pluck('total_credit')->map(fn($v) => (float) $v)->count();
+
+        //dd($debet, $credit);
+        // $labels = $entries->pluck('month')->toArray();
+        $datas = [
+            'total' => $debet,
+            'total_increase' => 32,
+            'total_decrease' => 21,
+            'profit' => 3.12,
+            'profit_increase' => 3,
+        ];
+
+        return $datas;
+    }
+
+    protected function getStats(): array
+    {
+        $data = $this->getData();
+
+        $total = [
+            Stat::make('Дохід', $data['total'])
+                ->description('32k increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color('success'),
+            Stat::make('Витрати', '21%')
+                ->description('7% increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-down')
+                ->color('danger'),
+            Stat::make('Прибуток', '3:12')
+                ->description('3% increase')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color('success'),
+        ];
+
+        return $total;
+    }
+}

@@ -210,7 +210,11 @@ class ProductionViewBuilder
                     TextEntry::make($material->date_writing_off ?? '')
                         ->label('Дата списання')
                         ->default($material->date_writing_off),
-
+                    TextEntry::make('errors')
+                        ->badge()
+                        ->label('Повідомлення')
+                        ->default('Матеріалів не достатньо на складі!')
+                        ->color('danger')
                     ])
                     ->columns([
                     'sm' => 2,

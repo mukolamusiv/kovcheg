@@ -187,6 +187,20 @@ class Production extends Model
         )->whereIn('type', ['списання', 'переміщення'])->distinct(); // Фільтруємо записи за типом "списання" або "переміщення"
     }
 
+        // відображення накладних повязаних зі складом
+        // public function invoice_off_warehouse()
+        // {
+        //     return $this->hasManyThrough(
+        //         Invoice::class,            // Встановлюємо зв'язок з моделлю Invoice
+        //         ProductionMaterial::class, // Встановлюємо зв'язок через модель ProductionMaterial
+        //         'production_id',           // Зовнішній ключ у таблиці ProductionMaterial, який посилається на таблицю Production
+        //         'id',                      // Зовнішній ключ у таблиці Invoice
+        //         'id',                      // Локальний ключ у таблиці Production
+        //         'invoice_id'               // Локальний ключ у таблиці ProductionMaterial, який посилається на таблицю Invoice
+        //     )->whereIn('type', ['списання', 'переміщення'])
+        //     ->distinct(); // Фільтруємо записи за типом "списання" або "переміщення"
+        // }
+
 
     public function productionSizes()
     {
