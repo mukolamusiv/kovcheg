@@ -124,6 +124,12 @@ class ProductionViewBuilder
                                 ->icon('heroicon-o-pencil')
                                 ->color('primary')
                                 ->form([
+                                    Select::make('warehouse')
+                                        ->label('Кількість')
+                                        ->options(Warehouse::pluck('name', 'id'))
+                                        ->required()
+                                        ->default($material->warehouse_id)
+                                        ->numeric(),
                                     TextInput::make('quantity')
                                         ->label('Кількість')
                                         ->required()
