@@ -791,9 +791,16 @@ class ViewProduction extends ViewRecord
                $invoiceItemsOff [] = Section::make('Матеріал - '.$items->material->name)
                     ->label($items->material->name)
                     ->columnSpan(12)
-                    ->columns(4)
+                    ->columns(5)
                     ->schema([
-                        TextEntry::make($items->quantity)->default($items->quantity)->label('Кількість'),
+                        //dd($items->material->getStockInWarehouse($invoices->warehouse_id)),
+                        TextEntry::make('quantity'.$items->id)
+                            ->default($items->quantity)
+                            ->color(fn ($state) => $items->material->getStockInWarehouse($invoices->warehouse_id) < $items->quantity ? 'danger' : 'gray')
+                            ->label('Кількість'),
+                        TextEntry::make('warehouse_id'.$items->id)
+                            ->default($items->material->getStockInWarehouse($invoices->warehouse_id))
+                            ->label('Кількість на складі'),
                         TextEntry::make('price')->default($items->price)->label('Ціна'),
                         TextEntry::make('total')->default($items->total)->label('Сума'),
                         BAction::make([
