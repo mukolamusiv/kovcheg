@@ -807,7 +807,7 @@ class ViewProduction extends ViewRecord
             }
             $data[] = Section::make('Накладна '.$invoices->invoice_number)
                 ->label('Накладна - '.$invoices->invoice_number)
-                ->description('Автоматично створена накладна на списання матеріалів')
+                ->description('Автоматично створена накладна на списання матеріалів зі складу '. $invoices->warehouse->name)
                 ->columnSpan(12)
                 ->columns(4)
                 ->schema([
