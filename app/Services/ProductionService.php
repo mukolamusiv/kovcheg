@@ -133,31 +133,13 @@ class ProductionService
                 'quantity' => $data['quantity'] ?? $production->quantity,
             ]);
 
+
+            $production->save();
+            $production->getTotalCostWithStagesAndMarkup(); // перерахунок вартості
             Notification::make()
                 ->title('Змінено дані про виробництво!')
                 ->success()
                 ->send();
-            $production->save();
-
-                // if(isset($template))
-                // {
-                //     // Оновлення кількості матеріалів для виробництва з шаболону
-                //     foreach ($template->materials as $material) {
-                //         $materialModel = Material::findOrFail($material->material_id);
-                //         if($material->warehouse_id != null){
-                //             $warehouseTemplate = Warehouse::findOrFail($material->warehouse_id);
-                //         }else{
-                //             $warehouseTemplate = $warehouse;
-                //         }
-                //         //dd($warehouseTemplate );
-                //         ProductionService::setProductionMaterial($production, $materialModel, $warehouseTemplate, $material->quantity*$production->quantity);
-                //         //$production->addProductionMaterial($materialModel, $warehouse, $material['quantity']); //передаємо модель матерілау, скалду і потрібно дати дані
-                //     }
-                // }
-
-
-
-            // return $production;
         });
     }
 
@@ -275,6 +257,7 @@ class ProductionService
         ProductionService::setInvoiceOff($production);
         $production->status = 'в роботі';
         $production->save();
+        $production->getTotalCostWithStagesAndMarkup(); // перерахунок вартості
         Notification::make()
             ->title('Виробництво стартувало')
             ->success()
