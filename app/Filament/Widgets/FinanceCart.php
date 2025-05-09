@@ -33,8 +33,8 @@ class FinanceCart extends BaseWidget
             ->orderByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
             ->get();
 
-        $debet = $entries->pluck('total_debet')->map(fn($v) => (float) $v)->count();
-        $credit = $entries->pluck('total_credit')->map(fn($v) => (float) $v)->count();
+        $debet = $entries->pluck('total_debet')->map(fn($v) => (float) $v)->sum();
+        $credit = $entries->pluck('total_credit')->map(fn($v) => (float) $v)->sum();
 
         //dd($debet, $credit);
         // $labels = $entries->pluck('month')->toArray();

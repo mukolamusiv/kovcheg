@@ -19,4 +19,10 @@ class EditProduction extends EditRecord
             Actions\RestoreAction::make(),
         ];
     }
+    public function updated(bool $another = false): void
+    {
+        // $this->validate();
+        // unset($this->data['warehouse_id']);
+        //dd($this->data);
+    }
 }
