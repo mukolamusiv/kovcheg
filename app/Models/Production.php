@@ -154,10 +154,10 @@ class Production extends Model
         return $this->hasOneThrough(
             Invoice::class,
             InvoiceProductionItem::class,
-            'production_id', // Foreign key on InvoiceProductionItem table
-            'id',            // Foreign key on Invoice table
-            'id',            // Local key on Production table
-            'invoice_id'     // Local key on InvoiceProductionItem table
+            'production_id', // Зовнішній ключ у таблиці InvoiceProductionItem
+            'id',            // Зовнішній ключ у таблиці Invoice
+            'id',            // Локальний ключ у таблиці Production
+            'invoice_id'     // Локальний ключ у таблиці InvoiceProductionItem
         )->whereIn('type', ['продаж']);
     }
 
@@ -174,17 +174,17 @@ class Production extends Model
     }
 
 
+    // відображення накладних на списання
     public function invoice_off()
     {
-
-       return $this->hasOneThrough(
-            Invoice::class,
-            ProductionMaterial::class,
-            'productions_id', // Foreign key on ProductionMaterial table
-            'id',            // Foreign key on Invoice table
-            'id',            // Local key on Production table
-            'invoice_id'     // Local key on ProductionMaterial table
-        )->whereIn('type', ['списання', 'переміщення']);
+        return $this->hasManyThrough(
+            Invoice::class,            // Встановлюємо зв'язок з моделлю Invoice
+            ProductionMaterial::class, // Встановлюємо зв'язок через модель ProductionMaterial
+            'production_id',           // Зовнішній ключ у таблиці ProductionMaterial, який посилається на таблицю Production
+            'id',                      // Зовнішній ключ у таблиці Invoice
+            'id',                      // Локальний ключ у таблиці Production
+            'invoice_id'               // Локальний ключ у таблиці ProductionMaterial, який посилається на таблицю Invoice
+        )->whereIn('type', ['списання', 'переміщення']); // Фільтруємо записи за типом "списання" або "переміщення"
     }
 
 
