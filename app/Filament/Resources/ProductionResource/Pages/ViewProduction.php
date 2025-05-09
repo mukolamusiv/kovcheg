@@ -785,7 +785,7 @@ class ViewProduction extends ViewRecord
     {
         $data = [];
         foreach ($record->invoice_off as $invoices){
-            dd($invoices, $record->invoice_off);
+           // dd($invoices, $record->invoice_off);
             $invoiceItemsOff = [];
             foreach($invoices->invoiceItems as $items){
                $invoiceItemsOff [] = Section::make('Матеріал - '.$items->material->name)
