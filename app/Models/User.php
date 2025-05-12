@@ -104,7 +104,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             ->where('status', 'виготовлено')
             ->get()
             ->sum(function ($stage) {
-                dd($stage->paid_worker, $stage->production);
+                //dd($stage->paid_worker, $stage->production);
                 return $stage->paid_worker * $stage->production->quantity;
             });
     }
