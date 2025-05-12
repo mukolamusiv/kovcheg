@@ -815,7 +815,6 @@ class ProductionViewBuilder
                     ->label('Фінальна вартість')
                     ->required()
                     ->numeric()
-                    ->default($record->price)
                     ->prefix('₴'),
                 Select::make('warehouse_id')
                     ->label('Перемістити на склад')

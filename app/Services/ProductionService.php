@@ -316,6 +316,7 @@ class ProductionService
 
             $sum = $production->price + $data['addprice'];
 
+           // $sum = $data['addprice'];
             $invoice = Invoice::create([
                 'date'  => now(),
                 'total' => $sum,
