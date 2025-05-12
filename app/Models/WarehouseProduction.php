@@ -29,6 +29,4 @@ class WarehouseProduction extends Model
     {
         return $this->hasMany(InvoiceProductionItem::class);
     }
-
-
 }

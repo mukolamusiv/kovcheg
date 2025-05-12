@@ -124,7 +124,7 @@ class ProductionViewBuilder
                                 ->icon('heroicon-o-pencil')
                                 ->color('primary')
                                 ->form([
-                                    Select::make('warehouse')
+                                    Select::make('warehouse_id')
                                         ->label('Склад')
                                         ->options(Warehouse::pluck('name', 'id'))
                                         ->required()
@@ -155,30 +155,31 @@ class ProductionViewBuilder
                             //     ->default($material->date_writing_off),
                             ])
                             ->action(function (array $data, Production $record) use ($material): void {
-                                $material->quantity = $data['quantity'];
+                                ProductionService::updateMaterialProduction($material, $data);
+                               // $material->quantity = $data['quantity'];
                                 //$material->price = $data['price'];
-                                $material->description = $data['description'];
-                                $material->material_id = $data['material_id'];
+                               // $material->description = $data['description'];
+                               // $material->material_id = $data['material_id'];
                                 //$material->date_writing_off = $data['date_writing_off'];
 
-                            try {
-                                if ($material->save()) {
-                                Notification::make()
-                                    ->title('Оновлено матеріал виробництва!')
-                                    ->success()
-                                    ->send();
-                                } else {
-                                Notification::make()
-                                    ->title('Не вдалося оновити матеріал виробництва!')
-                                    ->danger()
-                                    ->send();
-                                }
-                            } catch (\Exception $e) {
-                                Notification::make()
-                                ->title('Помилка збереження: ' . $e->getMessage())
-                                ->danger()
-                                ->send();
-                            }
+                            // try {
+                            //     if ($material->save()) {
+                            //     Notification::make()
+                            //         ->title('Оновлено матеріал виробництва!')
+                            //         ->success()
+                            //         ->send();
+                            //     } else {
+                            //     Notification::make()
+                            //         ->title('Не вдалося оновити матеріал виробництва!')
+                            //         ->danger()
+                            //         ->send();
+                            //     }
+                            // } catch (\Exception $e) {
+                            //     Notification::make()
+                            //     ->title('Помилка збереження: ' . $e->getMessage())
+                            //     ->danger()
+                            //     ->send();
+                            // }
                             }),
                         ]),
 
@@ -217,6 +218,7 @@ class ProductionViewBuilder
                         ->default($material->date_writing_off),
                     TextEntry::make('errors')
                         ->badge()
+                        ->hidden($material->getStockInWarehouse() > $material->quantity)
                         ->label('Повідомлення')
                         ->default('Матеріалів не достатньо на складі!')
                         ->color('danger')
@@ -797,6 +799,51 @@ class ProductionViewBuilder
                     // }
                 });
         }
+
+
+    public static function addInvoiceOn($record){
+
+        return Action::make('addInvoiceOn')
+            ->label('Встановити вартість виробу')
+            ->icon('heroicon-o-calculator')
+            ->color('success')
+            ->visible(fn () => $record->status !== 'виготовлено')
+            ->form([
+                TextInput::make('addprice')
+                    ->label('Фінальна вартість')
+                    ->required()
+                    ->numeric()
+                    ->default($record->price)
+                    ->prefix('₴'),
+                Select::make('warehouse_id')
+                    ->label('Перемістити на склад')
+                    ->options(Warehouse::pluck('name', 'id'))
+                    ->required(),
+            ])
+            ->action(function (array $data, Production $record): void {
+
+                // try {
+                //     $record->price = $record->getTotalCostWithStagesAndMarkup(); // перерахунок вартості
+                //     if ($record->save()) {
+                //         Notification::make()
+                //             ->title('Вартість успішно перераховано!')
+                //             ->success()
+                //             ->send();
+                //     } else {
+                //         Notification::make()
+                //             ->title('Не вдалося перерахувати вартість!')
+                //             ->danger()
+                //             ->send();
+                //     }
+                // } catch (\Exception $e) {
+                //     Notification::make()
+                //         ->title('Помилка перерахунку: ' . $e->getMessage())
+                //         ->danger()
+                //         ->send();
+                // }
+            });
+    }
+
 
 
     public static function recalculatePrice($record){

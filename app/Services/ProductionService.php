@@ -310,13 +310,18 @@ class ProductionService
      */
     public static function createInvoice(Production $production, array $data): Invoice
     {
-        return Invoice::getConnection()->transaction(function () use ($data) {
+        return \DB::transaction(function () use ($production, $data) {
+
+            $sum = $production->price + $data['addprice'];
             $invoice = Invoice::create([
-                'number' => $data['number'],
-                'date' => $data['date'],
-                'customer_id' => $data['customer_id'],
-                'total_amount' => $data['total_amount'],
-                'status' => $data['status'],
+                'date'  => now(),
+                'total' => $sum,
+                'paid'  => 0,
+                'warehouse_id' => $key,
+                'status'    => 'створено',
+                'user_id'   => $production->user_id,
+                'type'  => 'переміщення',
+                'notes' => 'Згенерована автоматично наклада переміщення говтої продукції на склад '. $production->name,
             ]);
             return $invoice;
         });
@@ -368,6 +373,87 @@ class ProductionService
         ]);
         $material->invoice_id = $invoice->id;
         $material->save();
+    }
+
+
+    public static function updateMaterialProduction(ProductionMaterial $materialProduction, array $data)
+    {
+
+       // exit;
+        return \DB::transaction(function () use ($materialProduction, $data) {
+            $materialProduction->update([
+                'material_id' => $data['material_id'],
+                'warehouse_id' => $data['warehouse_id'],
+                'quantity' => $data['quantity'],
+                //'price' => $data['price'],
+                'description' => $data['description'],
+            ]);
+            Notification::make()
+                ->title('Матеріал успішно оновлено у виробництві!')
+                ->success()
+                ->send();
+               // ProductionService::syncFromProduction($materialProduction, $materialProduction->production);
+            return $materialProduction;
+        });
+    }
+
+
+
+    public static function syncFromProduction(ProductionMaterial $materialProduction, Production $production)
+    {
+        return \DB::transaction(function () use ($materialProduction, $production ) {
+            $materialsGrup =  $production->productionMaterials()
+                ->get()
+                ->groupBy('warehouse_id');
+
+            $materialsGrupArray =  $materialsGrup->toArray();
+            $materialsGrupKey =  $materialsGrup->keys()->toArray();
+
+                $invoiceOff = $production->invoice_off; // накладні, які вже є
+                $matchedInvoices = collect();
+                $unmatchedInvoices = collect();
+
+                foreach ($invoiceOff as $invoice) {
+                    if (in_array($invoice->warehouse_id, $materialsGrupKey)) {
+                        $matchedInvoices->push($invoice);
+                    } else {
+                        $unmatchedInvoices->push($invoice);
+                    }
+                }
+
+                dd($matchedInvoices, $unmatchedInvoices);
+            Notification::make()
+                ->title('Матеріал успішно оновлено у виробництві!')
+                ->success()
+                ->send();
+            return $materialProduction;
+        });
+    }
+
+    //онвити накладну на списання
+    public static function updateMaterialProductionToInvoiceOff(ProductionMaterial $materialProduction, Production $production)
+    {
+        $materialsGrup =  $production->productionMaterials()
+            ->get()
+            ->groupBy('warehouse_id')->toArray();
+
+
+        foreach($production->invoice_off as $invoice){
+            // Перевіряємо, чи статус накладної "створено" і чи ID складу матеріалу співпадає з ID складу накладної
+            if($invoice->status === 'створено' and isset($materialsGrup[$invoice->warehouse_id])){
+                $countGrup += 1;
+            }else{
+
+            }
+        }
+
+        return \DB::transaction(function () use ($materialProduction, $production) {
+            Notification::make()
+                ->title('Матеріал успішно оновлено у виробництві!')
+                ->success()
+                ->send();
+            return $materialProduction;
+        });
     }
 
 }

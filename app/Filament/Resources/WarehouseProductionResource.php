@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\WarehouseProductionResource\Pages;
+use App\Filament\Resources\WarehouseProductionResource\RelationManagers;
+use App\Models\WarehouseProduction;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class WarehouseProductionResource extends Resource
+{
+    protected static ?string $model = WarehouseProduction::class;
+
+
+              //назва ресурсу
+   protected static ?string $label = 'Готова продукція';
+   //protected static ?string $pluralLabel = 'Накладні';
+
+   protected static ?string $navigationLabel = 'Готова продукція';
+   protected static ?string $navigationGroup = 'Продажі';
+
+
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('warehouse_id')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('production_id')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\TextInput::make('quantity')
+                    ->required()
+                    ->numeric()
+                    ->default(0),
+                Forms\Components\TextInput::make('price')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('$'),
+                Forms\Components\TextInput::make('description')
+                    ->maxLength(255),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('warehouse_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('production_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('quantity')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->money()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListWarehouseProductions::route('/'),
+            'create' => Pages\CreateWarehouseProduction::route('/create'),
+            'view' => Pages\ViewWarehouseProduction::route('/{record}'),
+            'edit' => Pages\EditWarehouseProduction::route('/{record}/edit'),
+        ];
+    }
+}
