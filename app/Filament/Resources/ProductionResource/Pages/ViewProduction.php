@@ -780,7 +780,7 @@ class ViewProduction extends ViewRecord
 
     private function getWarehouseInvoice($record)
     {
-        $invoiceOn = $record->invoice_off;
+       /* $invoiceOn = $record->invoice_off;
         return Fieldset::make('Накладні для переміщення на склад')
                 ->schema([
                     Section::make('Накладна '.$invoices->invoice_number)
@@ -839,7 +839,7 @@ class ViewProduction extends ViewRecord
                         'sm' => 2,
                         'lg' => 4,
                     ])
-                ]);
+                ]);*/
     }
 
     /**
