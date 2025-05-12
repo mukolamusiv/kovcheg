@@ -224,6 +224,8 @@ class ProductionService
     {
         $stage->status = 'виготовлено';
         $stage->save();
+        $production = $stage->production;
+        $production->productionStagesComplited();
         $user = User::find($stage->user->id);
         //$user->paid();
         if($user->paid()){
@@ -313,16 +315,31 @@ class ProductionService
         return \DB::transaction(function () use ($production, $data) {
 
             $sum = $production->price + $data['addprice'];
+
             $invoice = Invoice::create([
                 'date'  => now(),
                 'total' => $sum,
                 'paid'  => 0,
-                'warehouse_id' => $key,
+                'warehouse_id' => $data['warehouse_id'] ?? null,
                 'status'    => 'створено',
                 'user_id'   => $production->user_id,
+                'warehouse_to_id' => $data['warehouse_to_id'] ?? null,
                 'type'  => 'переміщення',
                 'notes' => 'Згенерована автоматично наклада переміщення говтої продукції на склад '. $production->name,
             ]);
+
+            $invoice->invoiceProductionItems()->create([
+                'production_id'=>$production->id,
+                'quantity'=>$data['quantity'],
+                'warehouse_productions_id'=>$data['warehouse_productions_id'],
+                'price'=>$sum,
+                'total'=>$sum,
+            ]);
+            Notification::make()
+                ->title('Накладна для зарахування виробу створена!')
+                ->success()
+                ->send();
+
             return $invoice;
         });
     }

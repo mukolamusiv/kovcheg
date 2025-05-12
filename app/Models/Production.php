@@ -129,6 +129,24 @@ class Production extends Model
         return $this->hasMany(ProductionStage::class);
     }
 
+    public function productionStagesComplited()
+    {
+        // Повертає результат перевірки, чи всі етапи виробництва відповідають заданій умові
+        // Перевіряє кожен етап виробництва у колекції $this->productionStages
+        // Використовує метод every для ітерації через всі елементи колекції
+        // Для кожного етапу перевіряє, чи статус етапу дорівнює 'виготовлено'
+        $allStagesCompleted = $this->productionStages->every(function ($stage) {
+            return $stage->status === 'виготовлено';
+        });
+
+        if ($allStagesCompleted) {
+            $this->status = 'виготовлено';
+            $this->save();
+        }
+
+        return $allStagesCompleted;
+    }
+
     // public function invoiceProductionItems()
     // {
     //     return $this->hasMany(InvoiceProductionItem::class);

@@ -11,7 +11,7 @@ class InvoiceProductionItem extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['invoice_id', 'warehouse_productions_id', 'quantity', 'price', 'total'];
+    protected $fillable = ['invoice_id', 'warehouse_productions_id', 'productions_id', 'quantity', 'price', 'total'];
 
     public function invoice()
     {

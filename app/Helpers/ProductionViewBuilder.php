@@ -821,7 +821,7 @@ class ProductionViewBuilder
                     ->required(),
             ])
             ->action(function (array $data, Production $record): void {
-
+                ProductionService::createInvoice($record, $data);
                 // try {
                 //     $record->price = $record->getTotalCostWithStagesAndMarkup(); // перерахунок вартості
                 //     if ($record->save()) {
