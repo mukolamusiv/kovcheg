@@ -33,6 +33,7 @@ class ProductionService
                 }
             }
 
+            dd($data );
             // Створення виробництва
             $production = Production::create([
                 'name' => $data['name'] ?? $template->name,
