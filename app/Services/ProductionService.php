@@ -35,7 +35,7 @@ class ProductionService
 
             // Створення виробництва
             $production = Production::create([
-                'name' => $data['name'],
+                'name' => $data['name'] ?? $template->name,
                 'description' => $data['description'] ?? null,
                 'status' => 'створено',
                 'type' => $data['type'] ?? 'замовлення',
