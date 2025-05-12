@@ -70,7 +70,7 @@ class ViewProduction extends ViewRecord
                 ->columns(12)
                 ->schema([
                     ProductionViewBuilder::configureView($record),
-                    $this->getWarehouseInvoice($record),
+                    //$this->getWarehouseInvoice($record),
                     $this->getInvoices($record),
                     //dd($record->invoice_off),
                    // InvoiceSectionBuilder::buildSection($record->invoice, ' ПРОДАЖ'),
