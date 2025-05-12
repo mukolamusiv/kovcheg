@@ -206,7 +206,7 @@ class ProductionViewBuilder
                         ->prefix('₴'),
 
                    ImageEntry::make('photo'.$material->material->image)
-                        ->defaultImageUrl('/'.$material->material->image)
+                        ->defaultImageUrl('/storage/'.$material->material->image)
                         ->label('Зображення'),
 
                     TextEntry::make($material->description.'starage' ?? '')
