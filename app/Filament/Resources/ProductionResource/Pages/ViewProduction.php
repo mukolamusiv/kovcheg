@@ -35,9 +35,12 @@ use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Set;
 
 use Filament\Infolists\Components\Actions as BAction;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Tabs;
 use Pest\ArchPresets\Custom;
 use Filament\Support\Enums\Alignment;
+use Illuminate\Container\Attributes\Auth;
+
 //use Filament\Infolists\Components\Actions;
 
 
@@ -787,6 +790,32 @@ class ViewProduction extends ViewRecord
                 ->columnSpan(12);
         }
         $invoiceOn = $record->invoice;
+
+        $invoiceItemsOn = [];
+        foreach($invoiceOn->invoiceProductionItems as $items){
+            $invoiceItemsOn [] = Section::make('Виріб - '.$items->production->name)
+                ->label($items->production->name)
+                ->columnSpan(12)
+                ->columns(4)
+                ->schema([
+                    //dd($items->material->getStockInWarehouse($invoices->warehouse_id)),
+                    TextEntry::make('quantity'.$items->id)
+                        ->default($items->quantity)
+                        ->label('Кількість'),
+                    // TextEntry::make('warehouse_id'.$items->id)
+                    //     ->default($items->material->getStockInWarehouse($invoices->warehouse_id))
+                    //     ->label('Кількість на складі'),
+                    TextEntry::make('price')->default($items->production->price)->label('Собівартість'),
+                    TextEntry::make('total')->default($items->total)->label('Ціна'),
+                    ImageEntry::make('photo')
+                        ->defaultImageUrl($items->production->image)
+                        ->label('Зображення')
+                    // BAction::make([
+
+                    // ])
+                ]);
+
+        }
         //dd($invoiceOn, $record);
         $invoices = $invoiceOn;
         return Fieldset::make('Накладні для переміщення на склад')
@@ -829,14 +858,14 @@ class ViewProduction extends ViewRecord
                             ->default($invoices->total)->label('Сума'),
                         TextEntry::make('notes'.$invoices->id)
                             ->default($invoices->notes)->label('Примітки'),
-                        BAction::make([
+                        // BAction::make([
 
-                        ]),
+                        // ]),
                         Fieldset::make('invoiceItems')
                             ->label('Позиції у накладній')
                             ->columnSpan(12)
                             ->columns(12)
-                            ->schema([]
+                            ->schema($invoiceItemsOn
                                 //$invoiceItemsOff
                             )->columns([
                                 'sm' => 2,

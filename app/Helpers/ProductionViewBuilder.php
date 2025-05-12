@@ -37,6 +37,7 @@ use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Set;
 
 use Filament\Infolists\Components\Actions as BAction;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Tabs;
 use Pest\ArchPresets\Custom;
 use Filament\Support\Enums\Alignment;
@@ -204,9 +205,9 @@ class ProductionViewBuilder
                         ->default($material->price * $material->quantity)
                         ->prefix('₴'),
 
-                    TextEntry::make($material->description ?? '')
-                        ->label('Опис')
-                        ->default($material->description),
+                   ImageEntry::make('photo'.$material->image)
+                        ->defaultImageUrl($material->image)
+                        ->label('Зображення'),
 
                     TextEntry::make($material->description.'starage' ?? '')
                         ->label('Запаси на складі')

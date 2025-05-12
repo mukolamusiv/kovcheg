@@ -315,6 +315,13 @@ class ProductionService
     {
         return \DB::transaction(function () use ($production, $data) {
 
+            if($production->invoice != null){
+                Notification::make()
+                    ->title('Накладна для зарахування виробу вже створена!')
+                    ->danger()
+                    ->send();
+                return $production->invoice;
+            }
             $sum = $production->price + $data['addprice'];
 
            // $sum = $data['addprice'];
@@ -331,10 +338,10 @@ class ProductionService
             ]);
 
             $invoice->invoiceProductionItems()->create([
-                'production_id'=>$production->id,
+                'production_id' => $production->id,
                 'quantity'=>$production->quantity,
                 //'warehouse_productions_id'=>$data['warehouse_id'],
-                'price'=>$sum,
+                'price'=>$sum*$production->quantity,
                 'total'=>$sum*$production->quantity,
             ]);
             Notification::make()
