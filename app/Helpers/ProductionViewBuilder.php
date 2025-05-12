@@ -812,7 +812,7 @@ class ProductionViewBuilder
             ->visible(fn () => $record->status === 'виготовлено')
             ->form([
                 TextInput::make('addprice')
-                    ->label('Фінальна вартість')
+                    ->label('Сума націнки')
                     ->required()
                     ->numeric()
                     ->prefix('₴'),
