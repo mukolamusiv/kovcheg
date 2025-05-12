@@ -70,6 +70,7 @@ class ViewProduction extends ViewRecord
                 ->columns(12)
                 ->schema([
                     ProductionViewBuilder::configureView($record),
+                    $this->getWarehouseInvoice($record),
                     $this->getInvoices($record),
                     //dd($record->invoice_off),
                    // InvoiceSectionBuilder::buildSection($record->invoice, ' ПРОДАЖ'),
@@ -773,6 +774,73 @@ class ViewProduction extends ViewRecord
         return $invoice;
     }
 
+
+
+
+
+    private function getWarehouseInvoice($record)
+    {
+        $invoiceOn = $record->invoice_off;
+        return Fieldset::make('Накладні для переміщення на склад')
+                ->schema([
+                    Section::make('Накладна '.$invoices->invoice_number)
+                    ->label('Накладна - '.$invoices->invoice_number)
+                    ->description('Автоматично створена накладна на списання матеріалів зі складу '. $invoices->warehouse->name)
+                    ->columnSpan(12)
+                    ->headerActions([
+                        Action::make('move_invoice' . $invoices->id)
+                                ->label('Провести накладну')
+                                ->icon('heroicon-o-check')
+                                ->visible(fn () => $invoices->status === 'створено')
+                                ->color('success')
+                                ->action(fn () => $invoices),
+                        Action::make('cancel_invoice' . $invoices->id)
+                                ->label('Скасувати проведення')
+                                //->visible(fn () => $invoices->status === 'проведено')
+                                ->icon('heroicon-o-x-mark')
+                                ->color('danger')
+                                ->action(fn () => $invoices),
+                        Action::make('printInvoice_' . $invoices->id)
+                            ->label('Надрукувати накладну')
+                            //->visible(fn () => $invoices->status === 'проведено')
+                            ->icon('heroicon-o-printer')
+                            ->color('info')
+                            ->url(fn () => route('invoice.pdf', ['invoice' => $invoices->id])),
+                        Action::make('deleteInvoice_' . $invoices->id)
+                            ->label('Видалити накладну')
+                            ->visible(fn () => $invoices->status === 'створено')
+                            ->icon('heroicon-o-trash')
+                            ->color('danger')
+                            ->action(fn () => $invoices->delete()),
+                    ])
+                    ->columns(4)
+                    ->schema([
+                        TextEntry::make('status'.$invoices->id)
+                            ->default($invoices->status)->label('Статус накладної'),
+                        TextEntry::make('total'.$invoices->id)
+                            ->default($invoices->total)->label('Сума'),
+                        TextEntry::make('notes'.$invoices->id)
+                            ->default($invoices->notes)->label('Примітки'),
+                        BAction::make([
+
+                        ]),
+                        Fieldset::make('invoiceItems')
+                            ->label('Позиції у накладній')
+                            ->columnSpan(12)
+                            ->columns(12)
+                            ->schema(
+                                $invoiceItemsOff
+                            )->columns([
+                                'sm' => 2,
+                                'lg' => 4,
+                            ]),
+                    ])
+                    ->columns([
+                        'sm' => 2,
+                        'lg' => 4,
+                    ])
+                ]);
+    }
 
     /**
      * Отримуємо накладні

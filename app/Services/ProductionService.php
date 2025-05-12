@@ -323,17 +323,17 @@ class ProductionService
                 'warehouse_id' => $data['warehouse_id'] ?? null,
                 'status'    => 'створено',
                 'user_id'   => $production->user_id,
-                'warehouse_to_id' => $data['warehouse_to_id'] ?? null,
+                'warehouse_to_id' => $data['warehouse_id'] ?? null,
                 'type'  => 'переміщення',
                 'notes' => 'Згенерована автоматично наклада переміщення говтої продукції на склад '. $production->name,
             ]);
 
             $invoice->invoiceProductionItems()->create([
                 'production_id'=>$production->id,
-                'quantity'=>$data['quantity'],
-                'warehouse_productions_id'=>$data['warehouse_productions_id'],
+                'quantity'=>$production->quantity,
+                //'warehouse_productions_id'=>$data['warehouse_id'],
                 'price'=>$sum,
-                'total'=>$sum,
+                'total'=>$sum*$production->quantity,
             ]);
             Notification::make()
                 ->title('Накладна для зарахування виробу створена!')

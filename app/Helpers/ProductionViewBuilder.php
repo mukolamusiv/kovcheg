@@ -244,6 +244,7 @@ class ProductionViewBuilder
                                 self::actionStopProduction($record),
                                 self::actionPauseProduction($record),
                                 self::actionEditProduction($record),
+                                self::addInvoiceOn($record),
                             ])->alignment(Alignment::Center),
                             self::buildOrderSection($record),
                         ]),
@@ -801,13 +802,14 @@ class ProductionViewBuilder
         }
 
 
+
     public static function addInvoiceOn($record){
 
         return Action::make('addInvoiceOn')
             ->label('Встановити вартість виробу')
             ->icon('heroicon-o-calculator')
             ->color('success')
-            ->visible(fn () => $record->status !== 'виготовлено')
+            ->visible(fn () => $record->status === 'виготовлено')
             ->form([
                 TextInput::make('addprice')
                     ->label('Фінальна вартість')

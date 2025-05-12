@@ -34,7 +34,7 @@ return new class extends Migration
         });
 
         Schema::table('invoice_production_items', function (Blueprint $table) {
-            $table->foreignId('warehouse_productions_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('warehouse_productions_id')->nullable()->constrained()->cascadeOnDelete();
         });
     }
 
