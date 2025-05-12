@@ -70,7 +70,7 @@ class ViewProduction extends ViewRecord
                 ->columns(12)
                 ->schema([
                     ProductionViewBuilder::configureView($record),
-                  //  $this->getWarehouseInvoice($record),
+                    $this->getWarehouseInvoice($record),
                     $this->getInvoices($record),
                     //dd($record->invoice_off),
                    // InvoiceSectionBuilder::buildSection($record->invoice, ' ПРОДАЖ'),
@@ -780,7 +780,9 @@ class ViewProduction extends ViewRecord
 
     private function getWarehouseInvoice($record)
     {
-        $invoiceOn = $record->invoice_off;
+        $invoiceOn = $record->invoice;
+        //dd($invoiceOn, $record);
+        $invoices = $invoiceOn;
         return Fieldset::make('Накладні для переміщення на склад')
                 ->schema([
                     Section::make('Накладна '.$invoices->invoice_number)
@@ -828,8 +830,8 @@ class ViewProduction extends ViewRecord
                             ->label('Позиції у накладній')
                             ->columnSpan(12)
                             ->columns(12)
-                            ->schema(
-                                $invoiceItemsOff
+                            ->schema([]
+                                //$invoiceItemsOff
                             )->columns([
                                 'sm' => 2,
                                 'lg' => 4,

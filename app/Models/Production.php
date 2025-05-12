@@ -140,6 +140,7 @@ class Production extends Model
         });
 
         if ($allStagesCompleted) {
+            $this->production_date = now();
             $this->status = 'виготовлено';
             $this->save();
         }
@@ -176,10 +177,10 @@ class Production extends Model
             'id',            // Зовнішній ключ у таблиці Invoice
             'id',            // Локальний ключ у таблиці Production
             'invoice_id'     // Локальний ключ у таблиці InvoiceProductionItem
-        )->whereIn('type', ['продаж']);
+        )->whereIn('type', ['переміщення', 'продаж']);
     }
 
-    public function invoice_on()
+    public function invoice_in_warehouse()
     {
         return $this->hasOneThrough(
             Invoice::class,
