@@ -24,9 +24,9 @@ class ProductionService
         // Використовуємо транзакцію для забезпечення цілісності даних
         return \DB::transaction(function () use ($data) {
 
-            if(isset($data['template_production_id']) and !empty($data['template_production_id']))
+            if(isset($data['template_productions_id']) and !empty($data['template_productions_id']))
             {
-                $template = TemplateProduction::findOrFail($data['template_production_id']);
+                $template = TemplateProduction::findOrFail($data['template_productions_id']);
                 if(empty($data['name'])){
                     $data['name'] = $template->name;
                     $data['description'] = $template->description;
