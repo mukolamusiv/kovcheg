@@ -237,6 +237,45 @@ class ProductionViewBuilder
         return Tabs::make('Tabs')
                 ->columnSpanFull()
                 ->tabs([
+                    Tabs\Tab::make('Клієнт')
+                    ->schema([
+                        BAction::make([
+                            Action::make('selectCustomer')
+                            ->label('Вибрати клієнта')
+                            ->icon('heroicon-o-user')
+                            ->color('success')
+                            ->form([
+                                Select::make('customer_id')
+                                    ->label('Клієнт')
+                                    ->options(Customer::pluck('name', 'id'))
+                                    ->required(),
+                            ])
+                            ->action(function (array $data, Production $record): void {
+                                $record->customer_id = $data['customer_id'];
+
+                                try {
+                                    if ($record->save()) {
+                                        Notification::make()
+                                            ->title('Клієнта успішно змінено!')
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        Notification::make()
+                                            ->title('Не вдалося змінити клієнта!')
+                                            ->danger()
+                                            ->send();
+                                    }
+                                } catch (\Exception $e) {
+                                    Notification::make()
+                                        ->title('Помилка збереження: ' . $e->getMessage())
+                                        ->danger()
+                                        ->send();
+                                }
+                            })
+
+                        ])->alignment(Alignment::Center),
+                        self::buildCustomerSection($record->customer),
+                    ]),
                     Tabs\Tab::make('Замовлення')
                         ->schema([
                             BAction::make([
@@ -256,45 +295,6 @@ class ProductionViewBuilder
                                 self::applyCustomerSizeSection($record),
                             ])->alignment(Alignment::Center),
                             self::buildSizeSection($record),
-                        ]),
-                    Tabs\Tab::make('Клієнт')
-                        ->schema([
-                            BAction::make([
-                                Action::make('selectCustomer')
-                                ->label('Вибрати клієнта')
-                                ->icon('heroicon-o-user')
-                                ->color('success')
-                                ->form([
-                                    Select::make('customer_id')
-                                        ->label('Клієнт')
-                                        ->options(Customer::pluck('name', 'id'))
-                                        ->required(),
-                                ])
-                                ->action(function (array $data, Production $record): void {
-                                    $record->customer_id = $data['customer_id'];
-
-                                    try {
-                                        if ($record->save()) {
-                                            Notification::make()
-                                                ->title('Клієнта успішно змінено!')
-                                                ->success()
-                                                ->send();
-                                        } else {
-                                            Notification::make()
-                                                ->title('Не вдалося змінити клієнта!')
-                                                ->danger()
-                                                ->send();
-                                        }
-                                    } catch (\Exception $e) {
-                                        Notification::make()
-                                            ->title('Помилка збереження: ' . $e->getMessage())
-                                            ->danger()
-                                            ->send();
-                                    }
-                                })
-
-                            ])->alignment(Alignment::Center),
-                            self::buildCustomerSection($record->customer),
                         ]),
                     Tabs\Tab::make('Виробництво')
                         ->schema(
