@@ -71,7 +71,7 @@ class Material extends Model
 
     public function getPricesMaterial()
     {
-        return $this->warehouses();
+        return $this->warehouses;
     }
 
     //первіркка наявності матеріалу на складі
