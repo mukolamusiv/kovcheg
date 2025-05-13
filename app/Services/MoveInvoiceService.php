@@ -23,7 +23,7 @@ class MoveInvoiceService
             // Скасування накладної
 
             foreach ($this->invoice->invoiceItems as $item) {
-                $this->cancelMaterialWarehouse($item->material_id, $this->invoice->warehouse_id, $item->quantity);
+                $this->cancelMaterialWarehouse($item->material_id, $this->invoice->warehouse_id, $item->quantity, $item->price);
             }
             foreach($this->invoice->invoiceProductionItems as $item){
                 //$this->cancelMaterialWarehouse($item->production->material_id, $this->invoice->warehouse_id, $item->quantity);
@@ -48,9 +48,10 @@ class MoveInvoiceService
         $invoice = $this->invoice;
         return \DB::transaction(function () use ($invoice) {
             // Перевірка валідності матеріалу в складі
-            foreach ($invoice->invoiceItems as $item) {
+            foreach ($invoice->invoiceItems as $item){
+                //dd($item->material_id, $invoice->warehouse_id, $item);
                 $this->validateMaterialWarehouse($item->material_id, $invoice->warehouse_id);
-                $this->moveMaterialWarehouse($item->material_id, $invoice->warehouse_id, $item->quantity);
+                $this->moveMaterialWarehouse($item->material_id, $invoice->warehouse_id, $item->quantity, $item->price);
             }
             foreach($invoice->invoiceProductionItems as $item){
                 //$this->validateMaterialWarehouse($item->production->material_id, $invoice->warehouse_id);
@@ -138,11 +139,11 @@ class MoveInvoiceService
         return true;
     }
 
-    private function moveMaterialWarehouse(int $materialId, int $warehouseId, int $quantity): bool
+    private function moveMaterialWarehouse(int $materialId, int $warehouseId, $quantity, $price): bool
     {
-        $materialWarehouse = $this->getMaterialWarehouse($materialId, $warehouseId);
+        $materialWarehouse = $this->getMaterialWarehouse($materialId, $warehouseId, $quantity, $price);
         if($this->invoice->warehouse_to_id != null){
-            $materialWarehouseTo = $this->getMaterialWarehouse($materialId, $this->invoice->warehouse_to_id);
+            $materialWarehouseTo = $this->getMaterialWarehouse($materialId, $this->invoice->warehouse_to_id, $quantity, $price);
         }
 
         if($this->invoice->type == 'постачання'){
@@ -158,6 +159,7 @@ class MoveInvoiceService
                 throw new \Exception('Постачальник не вказаний');
             }
             $materialWarehouse->quantity += $quantity;
+            $this->upPrice($materialWarehouse, $price);
             $materialWarehouse->save();
         }
         if($this->invoice->type == 'продаж'){
@@ -174,10 +176,12 @@ class MoveInvoiceService
                 }
                 //dd('asdasd');
             $materialWarehouse->quantity -= $quantity;
+            $this->upPrice($materialWarehouse, $price);
             $materialWarehouse->save();
         }
         if($this->invoice->type == 'переміщення'){
             $materialWarehouse->quantity -= $quantity;
+            $this->upPrice($materialWarehouse, $price);
             $materialWarehouse->save();
 
             $materialWarehouseTo->quantity += $quantity;
@@ -190,30 +194,74 @@ class MoveInvoiceService
                 throw new \Exception('Отримувач не вказаний');
             }
             $materialWarehouse->quantity += $quantity;
+            $this->upPrice($materialWarehouse, $price);
             $materialWarehouse->save();
         }
         if($this->invoice->type == 'списання'){
             $materialWarehouse->quantity -= $quantity;
+            $this->upPrice($materialWarehouse, $price);
             $materialWarehouse->save();
         }
         return true;
     }
 
-    private function getMaterialWarehouse(int $materialId, int $warehouseId): WarehouseMaterial
+    private function upPrice(WarehouseMaterial $materialWarehouse, $price): WarehouseMaterial
+    {
+        if($materialWarehouse->price < $price){
+            $materialWarehouse->price = $price;
+            $materialWarehouse->save();
+            Notification::make()
+                ->title('Ціна матеріалу змінена!')
+                ->body('Ціна матеріалу ' . $materialWarehouse->material->name . ' змінена на ' . $price)
+                ->icon('heroicon-o-check-circle')
+                ->success()
+                ->send();
+        }
+        $materialWarehouse->save();
+        return $materialWarehouse;
+
+    }
+
+    private function getMaterialWarehouse(int $materialId, int $warehouseId, $quantity, $price): WarehouseMaterial
     {
         $warehouseMaterial = WarehouseMaterial::where('material_id', $materialId)
             ->where('warehouse_id', $warehouseId)
             ->first();
         if (!$warehouseMaterial) {
-            throw new \Exception('Матеріал відсутній на складі або у базі даних');
+            if($this->invoice->type === 'постачання'){
+                $material = Material::findOrFail($materialId);
+                $warehouseMaterial = new WarehouseMaterial();
+                $warehouseMaterial->material_id = $material->id;
+                $warehouseMaterial->warehouse_id = $warehouseId;
+                $warehouseMaterial->quantity = $quantity;
+                $warehouseMaterial->price = $price;
+                $warehouseMaterial->save();
+                Notification::make()
+                    ->title('Матеріл доданий до складу!')
+                    ->body('Матеріал ' . $material->name . ' доданий до складу ')
+                    ->icon('heroicon-o-check-circle')
+                    ->success()
+                    ->send();
+                return $warehouseMaterial;
+            }else{
+                Notification::make()
+                    ->title('Помилка проведення!')
+                    ->body('Матеріал відсутній на складі')
+                    ->icon('heroicon-o-x-circle')
+                    //->icon('heroicon-o-check-circle')
+                    ->danger()
+                    ->send();
+                    throw new \Exception('Матеріал відсутній на складі або у базі даних');
+                }
+        }else{
+            return $warehouseMaterial;
         }
-        return $warehouseMaterial;
     }
 
 
-    private function cancelMaterialWarehouse(int $materialId, int $warehouseId, int $quantity): bool
+    private function cancelMaterialWarehouse(int $materialId, int $warehouseId, $quantity, $price): bool
     {
-        $materialWarehouse = $this->getMaterialWarehouse($materialId, $warehouseId);
+        $materialWarehouse = $this->getMaterialWarehouse($materialId, $warehouseId, $quantity, $price);
         if ($this->invoice->type == 'постачання') {
            // dd('asdasd');
             $materialWarehouse->quantity -= $quantity;
@@ -242,7 +290,7 @@ class MoveInvoiceService
             $materialWarehouse->quantity -= $quantity;
             $materialWarehouse->save();
             if($this->invoice->warehouse_to_id != null){
-                $materialWarehouseTo = $this->getMaterialWarehouse($materialId, $this->invoice->warehouse_to_id);
+                $materialWarehouseTo = $this->getMaterialWarehouse($materialId, $this->invoice->warehouse_to_id, $quantity, $price);
             }
             $materialWarehouseTo->quantity += $quantity;
             $materialWarehouseTo->price = $materialWarehouse->price;
