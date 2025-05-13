@@ -31,7 +31,8 @@ class Invoice extends Model
         'payment_status', // Статус оплати
         'status', // Загальний статус накладної
         'notes', // Примітки
-        'warehouse_id'//склад
+        'warehouse_id',//склад
+        'warehouse_to_id'//склад
     ];
 
     // Відношення до моделі Production (виробництво)
@@ -179,6 +180,39 @@ class Invoice extends Model
             } else {
                 $invoice->payment_status = 'не оплачено';
             }
+        });
+
+
+        // Подія після оновлення накладної
+        static::updated(function($invoice){
+            if(!is_null($invoice->notes)){
+                $invoice->notes = 'Автоматичне створення накладної: ' . $invoice->invoice_number . ' ' . $invoice->notes.'<br>';
+                // Додавання виробничих елементів до приміток накладної
+                foreach ($invoice->invoiceProductionItems as $item) {
+                    $invoice->notes += $item->production->name . ' ' . $item->quantity . ' ' . $item->price . ' ' . $item->total;
+                }
+                // Додавання матеріалів до приміток накладної
+                foreach ($invoice->invoiceItems as $item) {
+                    $invoice->notes += $item->material->name . ' ' . $item->quantity . ' ' . $item->price . ' ' . $item->total;
+                }
+            }
+            $invoice->save();
+        });
+
+        // Подія після створення накладної
+        static::created(function($invoice){
+            if(!is_null($invoice->notes)){
+                $invoice->notes = 'Автоматичне створення накладної: ' . $invoice->invoice_number . ' ' . $invoice->notes.'<br>';
+                // Додавання виробничих елементів до приміток накладної
+                foreach ($invoice->invoiceProductionItems as $item) {
+                    $invoice->notes += $item->production->name . ' ' . $item->quantity . ' ' . $item->price . ' ' . $item->total;
+                }
+                // Додавання матеріалів до приміток накладної
+                foreach ($invoice->invoiceItems as $item) {
+                    $invoice->notes += $item->material->name . ' ' . $item->quantity . ' ' . $item->price . ' ' . $item->total;
+                }
+            }
+            $invoice->save();
         });
     }
 
