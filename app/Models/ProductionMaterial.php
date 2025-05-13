@@ -75,7 +75,7 @@ class ProductionMaterial extends Model
                 $productionMaterial->price = $productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id)->price;
             }else{
                // $productionMaterial->price = $productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id)->price;
-                dd($productionMaterial->material->getPriceMaterial($productionMaterial->warehouse_id), $productionMaterial->material, $productionMaterial);
+                dd($productionMaterial->material->getPricesMaterial($productionMaterial->warehouse_id), $productionMaterial->material, $productionMaterial);
             }
         });
     }
