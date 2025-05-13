@@ -18,6 +18,21 @@ class Warehouse extends Model
         return $this->hasMany(WarehouseMaterial::class);
     }
 
+    public function productionMaterials()
+    {
+        return $this->hasMany(ProductionMaterial::class);
+    }
+
+    public function warehouseMaterials()
+    {
+        return $this->hasMany(WarehouseMaterial::class);
+    }
+
+    public function warehouseMaterial($materialId)
+    {
+        return $this->hasMany(WarehouseMaterial::class)->where('material_id', $materialId)->last();
+    }
+
     public function account()
     {
         return $this->morphOne(Account::class, 'owner');
