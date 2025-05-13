@@ -895,6 +895,7 @@ class ProductionViewBuilder
         $stages[] = BAction::make([
             Action::make('addStage')
             ->label('Додати етап')
+            ->visible(fn () => auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
             ->icon('heroicon-o-plus')
             ->color('success')
             ->form([
@@ -918,7 +919,7 @@ class ProductionViewBuilder
                     ->label('Оплата працівнику')
                     ->required()
                     ->numeric()
-                    ->hidden(auth()->user()->role !== 'admin')
+                    //->hidden(auth()->user()->role !== 'admin')
                     ->helperText('Оплата працівнику за виконану роботу'),
                 Select::make('user_id')
                     ->label('Виконавець')

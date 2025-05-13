@@ -15,6 +15,7 @@ use App\Models\ProductionSize;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\InvoiceService;
 use App\Traits\Filament\HasInvoiceSection;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
@@ -826,17 +827,17 @@ class ViewProduction extends ViewRecord
                     ->columnSpan(12)
                     ->headerActions([
                         Action::make('move_invoice' . $invoices->id)
-                                ->label('Провести накладну')
-                                ->icon('heroicon-o-check')
-                                ->visible(fn () => $invoices->status === 'створено')
-                                ->color('success')
-                                ->action(fn () => $invoices),
+                            ->label('Провести накладну')
+                            ->icon('heroicon-o-check')
+                            ->visible(fn () => $invoices->status === 'створено')
+                            ->color('success')
+                            ->action(fn () => InvoiceService::moveInvoiceToConducted($invoices)),
                         Action::make('cancel_invoice' . $invoices->id)
-                                ->label('Скасувати проведення')
-                                //->visible(fn () => $invoices->status === 'проведено')
-                                ->icon('heroicon-o-x-mark')
-                                ->color('danger')
-                                ->action(fn () => $invoices),
+                            ->label('Скасувати проведення')
+                            ->visible(fn () => $invoices->status === 'проведено')
+                            ->icon('heroicon-o-x-mark')
+                            ->color('danger')
+                            ->action(fn () => InvoiceService::moveInvoiceToCreated($invoices)),
                         Action::make('printInvoice_' . $invoices->id)
                             ->label('Надрукувати накладну')
                             //->visible(fn () => $invoices->status === 'проведено')
@@ -936,13 +937,13 @@ class ViewProduction extends ViewRecord
                             ->icon('heroicon-o-check')
                             ->visible(fn () => $invoices->status === 'створено')
                             ->color('success')
-                            ->action(fn () => $invoices),
-                    Action::make('cancel_invoice' . $invoices->id)
+                            ->action(fn () => InvoiceService::moveInvoiceToConducted($invoices)),
+                        Action::make('cancel_invoice' . $invoices->id)
                             ->label('Скасувати проведення')
-                            //->visible(fn () => $invoices->status === 'проведено')
+                            ->visible(fn () => $invoices->status === 'проведено')
                             ->icon('heroicon-o-x-mark')
                             ->color('danger')
-                            ->action(fn () => $invoices),
+                            ->action(fn () => InvoiceService::moveInvoiceToCreated($invoices)),
                     Action::make('printInvoice_' . $invoices->id)
                         ->label('Надрукувати накладну')
                         //->visible(fn () => $invoices->status === 'проведено')

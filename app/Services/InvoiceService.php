@@ -14,22 +14,35 @@ class InvoiceService
 {
     public static function moveInvoiceToConducted(Invoice $invoice)
     {
-        if($invoice->type == 'продаж'){
-            InvoiceService::moveSelling($invoice);
+
+        $move = new MoveInvoiceService($invoice);
+        $move->moveInvoice();
+
+        // if($invoice->type == 'продаж'){
+        //     InvoiceService::moveSelling($invoice);
+        // }
+
+        // if($invoice->type == 'постачання')
+        // {
+        //     InvoiceService::moveIncome($invoice);
+        // }
+
+        if($invoice->type == 'списання')
+        {
+
+
+            //dd($move);
+
+            //InvoiceService::moveWritingOff($invoice);
         }
 
-        if($invoice->type == 'постачання')
-        {
-            InvoiceService::moveIncome($invoice);
-        }
 
 
 
 
 
-
-        if($invoice->type == 'переміщення')
-        {
+        // if($invoice->type == 'переміщення')
+        // {
             // if(!isset($invoice->supplier))
             // {
             //     Notification::make()
@@ -54,78 +67,78 @@ class InvoiceService
                 //  $invoice->supplier->setBalans();
 
                   //зарахування матеріалів на склад
-                foreach ($invoice->invoiceItems as $item) {
-                    $material = \App\Models\Material::find($item->material_id);
-                    if ($material) {
-                        // Отримуємо запис про матеріал на складі за матеріалом та складом
-                        $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
-                            ->where('warehouse_id', $invoice->warehouse_id)
-                            ->first();
+        //         foreach ($invoice->invoiceItems as $item) {
+        //             $material = \App\Models\Material::find($item->material_id);
+        //             if ($material) {
+        //                 // Отримуємо запис про матеріал на складі за матеріалом та складом
+        //                 $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
+        //                     ->where('warehouse_id', $invoice->warehouse_id)
+        //                     ->first();
 
-                        // Якщо запис про матеріал на складі існує
-                        if ($materialWarehouse) {
-                            // Збільшуємо кількість матеріалу на складі на кількість з накладної
-                            $materialWarehouse->quantity += $item->quantity;
+        //                 // Якщо запис про матеріал на складі існує
+        //                 if ($materialWarehouse) {
+        //                     // Збільшуємо кількість матеріалу на складі на кількість з накладної
+        //                     $materialWarehouse->quantity += $item->quantity;
 
-                            // Перевіярємо вартість продукту на складі якщо є нова яка відрізяняється тоді змінюємо
-                            if($materialWarehouse->price != $item->price){
-                                $materialWarehouse->price = $item->price;
-                                Notification::make()
-                                    ->title('Змінено вартість метеріалу на складі!')
-                                    ->body('Потрібно здіснити дії на складі згідно накладної')
-                                    ->icon('heroicon-o-check-circle')
-                                    ->success()
-                                    ->send();
-                            }
+        //                     // Перевіярємо вартість продукту на складі якщо є нова яка відрізяняється тоді змінюємо
+        //                     if($materialWarehouse->price != $item->price){
+        //                         $materialWarehouse->price = $item->price;
+        //                         Notification::make()
+        //                             ->title('Змінено вартість метеріалу на складі!')
+        //                             ->body('Потрібно здіснити дії на складі згідно накладної')
+        //                             ->icon('heroicon-o-check-circle')
+        //                             ->success()
+        //                             ->send();
+        //                     }
 
-                            Notification::make()
-                                ->title('Змінено залишки метеріалу на складі!')
-                                ->body('Потрібно здіснити дії на складі згідно накладної')
-                                ->icon('heroicon-o-check-circle')
-                                ->success()
-                                ->send();
-                            // Зберігаємо оновлений запис
-                            $materialWarehouse->save();
-                        } else {
-                            // Якщо запису про матеріал на складі немає, створюємо новий запис
-                            WarehouseMaterial::create([
-                                'material_id' => $item->material_id, // ID матеріалу
-                                'warehouse_id' => $invoice->warehouse_id, // ID складу
-                                'quantity' => $item->quantity, // Кількість матеріалу
-                                'price' => $item->price, // Ціна матеріалу
-                            ]);
-                            Notification::make()
-                                ->title('Додано метеріал на склад!')
-                                ->body('Потрібно здіснити дії на складі згідно накладної')
-                                ->icon('heroicon-o-check-circle')
-                                ->success()
-                                ->send();
+        //                     Notification::make()
+        //                         ->title('Змінено залишки метеріалу на складі!')
+        //                         ->body('Потрібно здіснити дії на складі згідно накладної')
+        //                         ->icon('heroicon-o-check-circle')
+        //                         ->success()
+        //                         ->send();
+        //                     // Зберігаємо оновлений запис
+        //                     $materialWarehouse->save();
+        //                 } else {
+        //                     // Якщо запису про матеріал на складі немає, створюємо новий запис
+        //                     WarehouseMaterial::create([
+        //                         'material_id' => $item->material_id, // ID матеріалу
+        //                         'warehouse_id' => $invoice->warehouse_id, // ID складу
+        //                         'quantity' => $item->quantity, // Кількість матеріалу
+        //                         'price' => $item->price, // Ціна матеріалу
+        //                     ]);
+        //                     Notification::make()
+        //                         ->title('Додано метеріал на склад!')
+        //                         ->body('Потрібно здіснити дії на складі згідно накладної')
+        //                         ->icon('heroicon-o-check-circle')
+        //                         ->success()
+        //                         ->send();
 
-                        }
+        //                 }
 
-                    }
+        //             }
 
-                // $invoice->supplier->account->balance = $invoice->supplier->calculateObligations();
-                // $invoice->supplier->account->save();
-                }
+        //         // $invoice->supplier->account->balance = $invoice->supplier->calculateObligations();
+        //         // $invoice->supplier->account->save();
+        //         }
 
-            //}
+        //     //}
 
 
 
-        $invoice->update([
-            'status' => 'проведено',
-        ]);
-        $invoice->save();
+        // $invoice->update([
+        //     'status' => 'проведено',
+        // ]);
+        // $invoice->save();
 
-        $invoice->customer();
-            Notification::make()
-                ->title('Накладна проведена!')
-                ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
-                ->icon('heroicon-o-check-circle')
-                ->success()
-                ->send();
-        }
+        // $invoice->customer();
+        //     Notification::make()
+        //         ->title('Накладна проведена!')
+        //         ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
+        //         ->icon('heroicon-o-check-circle')
+        //         ->success()
+        //         ->send();
+        // }
     }
 
 
@@ -302,31 +315,30 @@ class InvoiceService
     }
 
     public static function moveWritingOff(Invoice  $invoice){
-
-    }
-
-    public static function moveMoving(Invoice  $invoice){
-
-    }
-
-
-    public static function moveInvoiceToCreated(Invoice $invoice)
-    {
-
-           //зарахування матеріалів на склад
-           foreach ($invoice->invoiceItems as $item) {
+       //списання матеріалів зі складу
+        foreach ($invoice->invoiceItems as $item) {
             $material = \App\Models\Material::find($item->material_id);
             if ($material) {
                 // Отримуємо запис про матеріал на складі за матеріалом та складом
-                $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
-                    ->where('warehouse_id', $invoice->warehouse_id)
+                $materialWarehouse = WarehouseMaterial::where('warehouse_id', $invoice->warehouse_id)
+                    ->where('material_id', $item->material_id)
                     ->first();
-
                 // Якщо запис про матеріал на складі існує
                 if ($materialWarehouse) {
                     // Зменшуємо кількість матеріалу на складі на кількість з накладної
-                    $materialWarehouse->quantity -= $item->quantity;
+                    if($materialWarehouse->quantity >= $item->quantity){
+                        $materialWarehouse->quantity -= $item->quantity;
+                    }else{
+                        Notification::make()
+                            ->title('Помилка списання метеріалу на складі!')
+                            ->body('Недостатня кількість матеріалу на складі')
+                            ->icon('heroicon-o-x-circle')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
 
+                    $materialWarehouse->quantity -= $item->quantity;
                     Notification::make()
                         ->title('Змінено залишки метеріалу на складі!')
                         ->body('Потрібно здіснити дії на складі згідно накладної')
@@ -342,26 +354,85 @@ class InvoiceService
                         ->icon('heroicon-o-x-circle')
                         ->danger()
                         ->send();
-
-
                 }
-
             }
-
-        // $invoice->supplier->account->balance = $invoice->supplier->calculateObligations();
-        // $invoice->supplier->account->save();
         }
 
         $invoice->update([
-            'status' => 'створено',
+            'status' => 'проведено',
         ]);
         $invoice->save();
-        Notification::make()
-                ->title('Накладна скасована!')
-                ->body('Повернути усе на місце що було на складі чи касі перед накладною')
+
+        $invoice->customer();
+            Notification::make()
+                ->title('Накладна проведена!')
+                ->body('Потрібно здіснити дії на складі чи касі згідно накладної')
                 ->icon('heroicon-o-check-circle')
-                ->warning()
+                ->success()
                 ->send();
+        $invoice->customer->calculateObligations();
+        $invoice->customer->account->balance = $invoice->customer->calculateObligations();
+        $invoice->customer->account->save();
+    }
+
+    public static function moveMoving(Invoice  $invoice){
+
+    }
+
+
+    public static function moveInvoiceToCreated(Invoice $invoice)
+    {
+        $move = new MoveInvoiceService($invoice);
+        $move->cancelInvoice();
+        //    //зарахування матеріалів на склад
+        //    foreach ($invoice->invoiceItems as $item) {
+        //     $material = \App\Models\Material::find($item->material_id);
+        //     if ($material) {
+        //         // Отримуємо запис про матеріал на складі за матеріалом та складом
+        //         $materialWarehouse = WarehouseMaterial::where('material_id', $item->material_id)
+        //             ->where('warehouse_id', $invoice->warehouse_id)
+        //             ->first();
+
+        //         // Якщо запис про матеріал на складі існує
+        //         if ($materialWarehouse) {
+        //             // Зменшуємо кількість матеріалу на складі на кількість з накладної
+        //             $materialWarehouse->quantity -= $item->quantity;
+
+        //             Notification::make()
+        //                 ->title('Змінено залишки метеріалу на складі!')
+        //                 ->body('Потрібно здіснити дії на складі згідно накладної')
+        //                 ->icon('heroicon-o-check-circle')
+        //                 ->success()
+        //                 ->send();
+        //             // Зберігаємо оновлений запис
+        //             $materialWarehouse->save();
+        //         } else {
+        //             Notification::make()
+        //                 ->title('Помилка цього товару не було на складі!')
+        //                 ->body('Відсутня кількість матеріалу на складі')
+        //                 ->icon('heroicon-o-x-circle')
+        //                 ->danger()
+        //                 ->send();
+
+
+        //         }
+
+        //     }
+
+        // // $invoice->supplier->account->balance = $invoice->supplier->calculateObligations();
+        // // $invoice->supplier->account->save();
+        // }
+
+        // $invoice->update([
+        //     'status' => 'створено',
+        // ]);
+        // $invoice->save();
+        // Notification::make()
+        //         ->title('Накладна скасована!')
+        //         ->body('Повернути усе на місце що було на складі чи касі перед накладною')
+        //         ->icon('heroicon-o-check-circle')
+        //         ->warning()
+        //         ->send();
     }
 
 

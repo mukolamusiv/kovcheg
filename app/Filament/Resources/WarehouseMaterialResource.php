@@ -99,6 +99,10 @@ class WarehouseMaterialResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('material.barcode')
+                    ->label('Штрих-код')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('warehouse.name')
                     ->label('Склад')
                     ->sortable()
@@ -121,9 +125,11 @@ class WarehouseMaterialResource extends Resource
                 Tables\Columns\TextColumn::make('total_cost')
                     ->label('Загальна вартість')
                     ->getStateUsing(fn ($record) => $record->quantity * $record->price)
-                    ->money('UAH', true)
-                    ->sortable(),
+                    ->money('UAH', true),
+
                 Tables\Columns\TextColumn::make('description')
+                    ->label('Опис')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

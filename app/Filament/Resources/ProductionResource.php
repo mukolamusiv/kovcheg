@@ -209,6 +209,7 @@ class ProductionResource extends Resource
                 Tables\Columns\TextColumn::make('price')
                     ->label('Варітсть')
                     ->money('UAN')
+                    ->visible(fn () => auth()->user()->role == 'admin' || auth()->user()->role== 'manager')
                     ->sortable(),
                 // Tables\Columns\TextColumn::make('production_date')
                 //     ->date()
