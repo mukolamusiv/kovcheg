@@ -35,13 +35,11 @@ class WarehouseProductionResource extends Resource
                 Forms\Components\Select::make('warehouse_id')
                     ->label('Склад')
                     ->relationship('warehouse', 'name')
-                    ->required()
-                    ->numeric(),
+                    ->required(),
                 Forms\Components\Select::make('production_id')
                     ->label('Готова продукція')
                     ->relationship('production', 'name')
-                    ->required()
-                    ->numeric(),
+                    ->required(),
                 Forms\Components\TextInput::make('quantity')
                     ->label('Кількість')
                     ->required()
