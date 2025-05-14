@@ -8,7 +8,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class UserAccaunt extends BaseWidget
 {
 
-    private $account;
+    public $account;
 
     public function mount($account)
     {
