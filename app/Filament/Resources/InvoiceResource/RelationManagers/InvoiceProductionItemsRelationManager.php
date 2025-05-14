@@ -43,6 +43,11 @@ class InvoiceProductionItemsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price')
                     ->label('Ціна')
                     ->sortable()
+                    ->money('UAN', true),
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Усього')
+                    ->formatStateUsing(fn ($state, $record) => $record->quantity * $record->price)
+                    ->sortable()
                     ->money('UAN', true)
             ])
             ->filters([
