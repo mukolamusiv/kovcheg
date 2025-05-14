@@ -51,7 +51,7 @@ class UserAccaunt extends BaseWidget
                 //->icon('heroicon-o-archive'),
             Stat::make('На рахунку ', $this->account->balance),
             Stat::make('Випалатити зарплату ',
-            BAction::make([
+            //BAction::make([
                     Action::make('pay_salary')
                         ->label('Виплатити зарплату')
                         ->color('success')
@@ -76,7 +76,7 @@ class UserAccaunt extends BaseWidget
                             $this->record->account->syncBalance();
                             $this->notify('success', 'Зарплата виплачена');
                         })
-                ])
+               // ])
 
                 ),
                 //->icon('heroicon-o-shopping-cart'),
