@@ -190,10 +190,10 @@ class ProductionResource extends Resource
                     ->label('Статус')
                     ->color(function ($state) {
                         return match ($state) {
-                            'створено' => 'blue',
-                            'в роботі' => 'yellow',
-                            'виготовлено' => 'green',
-                            'скасовано' => 'red',
+                            'створено' => 'info',
+                            'в роботі' => 'warning',
+                            'виготовлено' => 'success',
+                            'скасовано' => 'danger',
                             default => 'gray',
                         };
                     })
