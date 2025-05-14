@@ -63,18 +63,33 @@ class WarehouseProductionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('warehouse_id')
+                    ->label('Склад')
+                    ->relationship('warehouse', 'name')
+                    ->sortable()
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('production_id')
+                    ->label('Готова продукція')
+                    ->relationship('production', 'name')
+                    ->sortable()
+                    ->searchable()
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('quantity')
+                    ->label('Кількість')
+                    ->sortable()
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
+                    ->label('Ціна')
+                    ->sortable()
+                    ->numeric()
+                    ->sortable()
+                    ->prefix('₴')
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
