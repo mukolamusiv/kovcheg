@@ -81,12 +81,12 @@ class FinanceCart extends BaseWidget
         $productionSale = 0.00;
         foreach (WarehouseProduction::all() as $production) {
             $productionActive += $production->price * $production->quantity;
-            $productionSale += $production->production->price * $production->quantity;
+            $productionSale += $production->production->price;
         }
         // $active = 0.00;
         $productionSale = number_format( $productionSale, 2, '.', '');
         $productionActive = number_format($productionActive, 2, '.', '');
-        $all = $productionSale - $productionActive;
+        $all = $productionActive - $productionSale;
 
 
         $datas = [
@@ -118,7 +118,7 @@ class FinanceCart extends BaseWidget
                 ->color('success'),
 
 
-            Stat::make('Вартість готової продукції', $data['productionSale'].' грн')
+            Stat::make('Вартість готової продукції', $data['productionActive'].' грн')
                 ->description('Загальна вартість виробів на складах')
                 ->color('success'),
             Stat::make('Зобовязання', $data['productionActive'].' грн')
