@@ -99,7 +99,7 @@ class InvoiceResource extends Resource
 
                 Section::make('Матеріали для постачання')
                     ->label('Матеріали')
-                    ->visible(fn (callable $get) => $get('type') === 'постачання')
+                //    ->visible(fn (callable $get) => $get('type') === 'постачання')
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
@@ -153,7 +153,7 @@ class InvoiceResource extends Resource
 
                 Section::make('Матеріали')
                     ->label('Матеріали')
-                    ->visible(fn (callable $get) => $get('type') != 'постачання')
+     //               ->visible(fn (callable $get) => $get('type') != 'постачання')
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
