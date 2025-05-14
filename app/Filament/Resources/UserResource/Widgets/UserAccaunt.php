@@ -8,11 +8,11 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class UserAccaunt extends BaseWidget
 {
 
-    private $user;
+    private $account;
 
-    public function mount($user)
+    public function mount($account)
     {
-        $this->user = $user;
+        $this->account = $account;
         //$this->calculate($record);
     }
 
@@ -30,11 +30,11 @@ class UserAccaunt extends BaseWidget
 
         //dd($balance);
 
-        dd($this->user,$this->user->account);
+        dd($this,$this->account);
         return [
            // Stat::make('Total Products', $this->record->production->count()),
                 //->icon('heroicon-o-archive'),
-            Stat::make('На рахунку', $this->user->account->balance)
+            Stat::make('На рахунку', $this->account->balance)
                 ->description('32k increase')
                 ->descriptionIcon('heroicon-m-arrow-trending-up'),
                 //->icon('heroicon-o-shopping-cart'),
