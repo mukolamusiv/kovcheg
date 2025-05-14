@@ -70,20 +70,21 @@ class InvoiceResource extends Resource
                                         'повернення'      => 'повернення',
                                         'списання'      => 'Списання',
                                     ])
+                                    ->default('продаж')
                                     ->required()
                                     ->reactive(),
                                 Select::make('supplier_id')
                                     ->label('Постачальник')
                                     ->relationship('supplier', 'name')
                                     ->searchable()
-                                    ->preload()
-                                    ->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
+                                    ->preload(),
+                                    //->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
                                 Select::make('customer_id')
                                     ->label('Клієнт')
                                     ->relationship('customer', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення'),
+                                    //->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення'),
                             ]),
                             Section::make([
                                Textarea::make('notes')
