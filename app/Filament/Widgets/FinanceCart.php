@@ -129,7 +129,7 @@ class FinanceCart extends BaseWidget
 
             Stat::make('Не виплачена зарплата', $data['user'].' грн')
                 ->description('Зарплата працівникам')
-                ->color('success'),
+                ->color('danger'),
             Stat::make('Собівартість продукції', $data['productionSale'].' грн')
                 ->description('Собівартість готової продукції')
                 ->color('warning'),
