@@ -288,10 +288,11 @@ class InvoiceResource extends Resource
                                     ]),
 
                                 ])
+                                ->label('Замовлення')
                                 ->columnSpan(8),
                         Section::make([
-                            Select::make('warehouse_id')
-                                ->label('Склад')
+                            Select::make('warehouse_id_asd')
+                                ->label('Склад asd')
                                 ->relationship('warehouse', 'name')
                                 ->searchable()
                                 ->preload()
@@ -317,6 +318,7 @@ class InvoiceResource extends Resource
                                 ->preload(),
 
                         ])
+                        ->label('Склад')
                         ->columnSpan(4),
                     ])
                     ->columns([
