@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Widgets;
 
+use Filament\Infolists\Components\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -43,8 +44,10 @@ class UserAccaunt extends BaseWidget
         return [
            // Stat::make('Total Products', $this->record->production->count()),
                 //->icon('heroicon-o-archive'),
-            Stat::make('На рахунку', $this->account)
-                ->description('32k increase'),
+            Stat::make('На рахунку ', $this->account->balance),
+            Stat::make('Випалатити зарплату ', Action::make('Виплатити зарплату')
+                ->url('/transactions/create')
+                ->icon('heroicon-o-currency-dollar')),
                 //->icon('heroicon-o-shopping-cart'),
             //Stat::make('Total Transactions', $this->record->transactions->count()),
                 //->icon('heroicon-o-currency-dollar'),
