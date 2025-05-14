@@ -322,7 +322,13 @@ class ProductionService
                     ->send();
                 return $production->invoice;
             }
-            $sum = $production->price + $data['addprice'];
+            $sum = $production->price;
+            if($data['type_price'] == 'у відсотках'){
+                $sum = $production->price*$data['addprice_percent']/100;
+            }
+            if($data['type_price'] == 'у гривнях'){
+                $sum = $production->price + $data['addprice'];
+            }
 
            // $sum = $data['addprice'];
             $invoice = Invoice::create([
@@ -341,8 +347,8 @@ class ProductionService
                 'production_id' => $production->id,
                 'quantity'=>$production->quantity,
                 //'warehouse_productions_id'=>$data['warehouse_id'],
-                'price'=>$sum*$production->quantity,
-                'total'=>$sum*$production->quantity,
+                'price'=>$sum/$production->quantity,
+                'total'=>$sum,//*$production->quantity,
             ]);
             Notification::make()
                 ->title('Накладна для зарахування виробу створена!')

@@ -27,7 +27,7 @@ class MoveInvoiceService
                 $this->cancelMaterialWarehouse($item->material_id, $this->invoice->warehouse_id, $item->quantity, $item->price);
             }
             foreach($this->invoice->invoiceProductionItems as $item){
-                $this->cancelProductionWarehouse($item->production->id, $item->warehouse_id, $item);
+                $this->cancelProductionWarehouse($item->production->id, $this->invoice->warehouse_id, $item);
                 //$this->cancelMaterialWarehouse($item->production->material_id, $this->invoice->warehouse_id, $item->quantity);
             }
             $this->invoice->status = 'створено';
@@ -56,7 +56,7 @@ class MoveInvoiceService
                 $this->moveMaterialWarehouse($item->material_id, $invoice->warehouse_id, $item->quantity, $item->price);
             }
             foreach($invoice->invoiceProductionItems as $item){
-                $this->moveProductionWarehouse($item->production->id, $item->warehouse_id, $item);
+                $this->moveProductionWarehouse($item->production->id, $invoice->warehouse_id, $item);
                 //$this->moveMaterialWarehouse($item->production->material_id, $invoice->warehouse_id, $item->quantity);
             }
 
@@ -314,6 +314,8 @@ class MoveInvoiceService
             $warehouseMaterial->price = $productionItems->price;
         }
         $warehouseMaterial->save();
+        // $productionItems->warehouse_productions_id = $warehouseMaterial->id;
+        // $productionItems->save();
         Notification::make()
             ->title('Запаси складу оновлено!')
             ->body('Матеріал ' . $warehouseMaterial->production->name . ' доданий до складу ')
@@ -334,6 +336,8 @@ class MoveInvoiceService
                 'price' => $productionItems->price,
             ]);
             $warehouseCreate->save();
+            $productionItems->warehouse_productions_id = $warehouseCreate->id;
+            $productionItems->save();
             Notification::make()
                 ->title('Матеріл доданий до складу!')
                 ->body('Матеріал ' . $warehouseCreate->production->name . ' доданий до складу ')

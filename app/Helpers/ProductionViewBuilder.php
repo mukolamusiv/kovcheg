@@ -807,16 +807,32 @@ class ProductionViewBuilder
     public static function addInvoiceOn($record){
 
         return Action::make('addInvoiceOn')
-            ->label('Встановити вартість виробу')
+            ->label('Встановити вартість виробу і перемістити на склад')
             ->icon('heroicon-o-calculator')
             ->color('success')
             ->visible(fn () => $record->status === 'виготовлено')
             ->form([
+                Select::make('type_price')
+                    ->label('Спосіб націнки')
+                    ->options([
+                        'у відсотках' => 'у відсотках',
+                        'у гривнях' => 'у гривнях',
+                    ])
+                    ->default('у відсотках')
+                    ->reactive()
+                    ->required(),
                 TextInput::make('addprice')
                     ->label('Сума націнки')
                     ->required()
                     ->numeric()
-                    ->prefix('₴'),
+                    ->prefix('₴')
+                    ->visible(fn (Get $get) => $get('type_price') === 'у гривнях'),
+                TextInput::make('addprice_percent')
+                    ->label('Сума націнки у відсотках')
+                    ->required()
+                    ->numeric()
+                    ->prefix('%')
+                    ->visible(fn (Get $get) => $get('type_price') === 'у відсотках'),
                 Select::make('warehouse_id')
                     ->label('Перемістити на склад')
                     ->options(Warehouse::pluck('name', 'id'))
@@ -824,25 +840,6 @@ class ProductionViewBuilder
             ])
             ->action(function (array $data, Production $record): void {
                 ProductionService::createInvoice($record, $data);
-                // try {
-                //     $record->price = $record->getTotalCostWithStagesAndMarkup(); // перерахунок вартості
-                //     if ($record->save()) {
-                //         Notification::make()
-                //             ->title('Вартість успішно перераховано!')
-                //             ->success()
-                //             ->send();
-                //     } else {
-                //         Notification::make()
-                //             ->title('Не вдалося перерахувати вартість!')
-                //             ->danger()
-                //             ->send();
-                //     }
-                // } catch (\Exception $e) {
-                //     Notification::make()
-                //         ->title('Помилка перерахунку: ' . $e->getMessage())
-                //         ->danger()
-                //         ->send();
-                // }
             });
     }
 
