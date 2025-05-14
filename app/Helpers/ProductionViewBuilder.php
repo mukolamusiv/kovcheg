@@ -219,7 +219,7 @@ class ProductionViewBuilder
                         ->default($material->date_writing_off),
                     TextEntry::make('errors')
                         ->badge()
-                        ->hidden($material->getStockInWarehouse() > $material->quantity)
+                        ->hidden($material->getStockInWarehouse() >= $material->quantity)
                         ->label('Повідомлення')
                         ->default('Матеріалів не достатньо на складі!')
                         ->color('danger')
