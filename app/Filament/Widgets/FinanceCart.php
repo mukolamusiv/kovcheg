@@ -70,7 +70,7 @@ class FinanceCart extends BaseWidget
 
         // зобовязання клієнтів постачальниками
         $active = 0.00;
-        foreach (Account::where('account_type', '=', 'актив')->where('owner_id', '!=', null)->get() as $account_types) {
+        foreach (Account::where('owner_type', '=', 'App\Models\Customer')->get() as $account_types) {
             $active += $account_types->balance;
         }
         $active = number_format($active, 2, '.', '');
