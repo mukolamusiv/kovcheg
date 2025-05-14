@@ -23,28 +23,28 @@ class FinanceCart extends BaseWidget
 
     protected function getData(): array
     {
-        $accountId = Account::query()
-            ->select('id', 'name')
-            ->where('owner_type', null)
-            ->orderBy('name')
-            ->get();
+        // $accountId = Account::query()
+        //     ->select('id', 'name')
+        //     ->where('owner_type', null)
+        //     ->orderBy('name')
+        //     ->get();
 
-        foreach ($accountId as $account) {
-            $data[$account->id] = $account->id;
-        }
-        $entries = TransactionEntry::query()
-            ->selectRaw('
-                DATE_FORMAT(created_at, "%Y-%m-01") as month,
-                SUM(CASE WHEN entry_type = "дебет" THEN amount ELSE 0 END) as total_debet,
-                SUM(CASE WHEN entry_type = "кредит" THEN amount ELSE 0 END) as total_credit
-            ')
-            ->where('account_id',  $data)
-            ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
-            ->orderByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
-            ->get();
+        // foreach ($accountId as $account) {
+        //     $data[$account->id] = $account->id;
+        // }
+        // $entries = TransactionEntry::query()
+        //     ->selectRaw('
+        //         DATE_FORMAT(created_at, "%Y-%m-01") as month,
+        //         SUM(CASE WHEN entry_type = "дебет" THEN amount ELSE 0 END) as total_debet,
+        //         SUM(CASE WHEN entry_type = "кредит" THEN amount ELSE 0 END) as total_credit
+        //     ')
+        //     ->where('account_id',  $data)
+        //     ->groupByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
+        //     ->orderByRaw('DATE_FORMAT(created_at, "%Y-%m-01")')
+        //     ->get();
 
-        $debet = $entries->pluck('total_debet')->map(fn($v) => (float) $v)->sum();
-        $credit = $entries->pluck('total_credit')->map(fn($v) => (float) $v)->sum();
+        // $debet = $entries->pluck('total_debet')->map(fn($v) => (float) $v)->sum();
+        // $credit = $entries->pluck('total_credit')->map(fn($v) => (float) $v)->sum();
 
         //dd($debet, $credit);
         // $labels = $entries->pluck('month')->toArray();
@@ -77,16 +77,19 @@ class FinanceCart extends BaseWidget
 
 
 
-        // $active = 0.00;
-        foreach( WarehouseProduction::all() as $production) {
-            $active += $production->price;
-
+        $productionActive = 0.00;
+        $productionSale = 0.00;
+        foreach (WarehouseProduction::all() as $production) {
+            $productionActive += $production->price;
+            $productionSale += $production->production->price;
         }
-
+        // $active = 0.00;
+        $productionSale = number_format( $productionSale, 2, '.', '');
+        $productionActive = number_format($productionActive, 2, '.', '');
 
 
         $datas = [
-            'total' => $debet,
+            //'total' => $debet,
             'materialTotal' => $materialTotal,
             'obligation' => $obligation,
             'active' => $active,
