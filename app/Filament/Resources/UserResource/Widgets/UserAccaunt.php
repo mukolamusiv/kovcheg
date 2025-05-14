@@ -8,11 +8,11 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class UserAccaunt extends BaseWidget
 {
 
-    private $account;
+    private $user;
 
-    public function mount($account)
+    public function mount($user)
     {
-        $this->account = $account;
+        $this->user = $user;
         //$this->calculate($record);
     }
 
