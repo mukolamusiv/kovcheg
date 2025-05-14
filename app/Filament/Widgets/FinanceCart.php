@@ -53,10 +53,20 @@ class FinanceCart extends BaseWidget
 
         // зобовязання перед постачальниками
         $obligation = 0.00;
-        foreach (Account::where('account_type','посив')->get() as $account_type) {
+        foreach (Account::where('account_type','пасив')->get() as $account_type) {
             $obligation += $account_type->quantity * $account_type->price;
         }
         $obligation = number_format($obligation, 2, '.', '');
+
+
+        // зобовязання клієнтів постачальниками
+        $obligation = 0.00;
+        foreach (Account::where('account_type','актив')->get() as $account_type) {
+            $obligation += $account_type->quantity * $account_type->price;
+        }
+        $obligation = number_format($obligation, 2, '.', '');
+
+
 
         $datas = [
             'total' => $debet,
