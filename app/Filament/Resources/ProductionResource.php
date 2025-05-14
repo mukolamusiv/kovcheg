@@ -179,15 +179,14 @@ class ProductionResource extends Resource
     {
         return $table
             ->columns([
-
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Назва виробу')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Замовник')
                     ->searchable()
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Назва виробу')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Статус')
                     ->color(function ($state) {
