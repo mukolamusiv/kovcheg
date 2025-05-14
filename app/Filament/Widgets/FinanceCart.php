@@ -96,7 +96,7 @@ class FinanceCart extends BaseWidget
             'active' => $active,
             'productionSale' => $productionSale,
             'productionActive' => $productionActive,
-            'productionSale' => $productionSale,
+            'all' => $all ,
         ];
 
         return $datas;
@@ -118,14 +118,14 @@ class FinanceCart extends BaseWidget
                 ->color('success'),
 
 
-            Stat::make('Вартість готової продукції', $data['materialTotal'].' грн')
-                ->description('Загальна вартість матеріалів на складах')
+            Stat::make('Вартість готової продукції', $data['productionSale'].' грн')
+                ->description('Загальна вартість виробів на складах')
                 ->color('success'),
-            Stat::make('Зобовязання', $data['obligation'].' грн')
+            Stat::make('Зобовязання', $data['productionActive'].' грн')
                 ->description('Наші зобовязання перед постачальниками')
                 ->color('danger'),
-            Stat::make('Очікування', $data['active'].' грн')
-                ->description('Зобовязання клієнтів перед нами')
+            Stat::make('Чистий дохід', $data['all'].' грн')
+                ->description('Усього')
                 ->color('success'),
         ];
 
