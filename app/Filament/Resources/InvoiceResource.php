@@ -70,7 +70,6 @@ class InvoiceResource extends Resource
                                         'повернення'      => 'повернення',
                                         'списання'      => 'Списання',
                                     ])
-                                    ->default('продаж')
                                     ->required()
                                     ->reactive(),
                                 Select::make('supplier_id')
@@ -97,14 +96,14 @@ class InvoiceResource extends Resource
                     ])
                     ->columnSpanFull(),
 
-                Section::make('Матеріали для постачання')
+                Section::make('Матеріали')
                     ->label('Матеріали')
-                //    ->visible(fn (callable $get) => $get('type') === 'постачання')
+                    ->visible(fn (callable $get) => $get('type') === 'постачання')
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
-                                Forms\Components\Repeater::make('items_supply')
-                                    ->label('Матеріали постачання')
+                                Forms\Components\Repeater::make('items')
+                                    ->label('Матеріали')
                                     ->relationship('invoiceItems')
                                     ->schema([
                                         Select::make('material_id')
@@ -137,8 +136,8 @@ class InvoiceResource extends Resource
                            ])
                            ->columnSpan(8),
                         Section::make([
-                                Select::make('warehouse_sale_id')
-                                    ->label('Склад asd')
+                                Select::make('warehouse_id')
+                                    ->label('Склад')
                                     ->relationship('warehouse', 'name')
                                     ->searchable()
                                     ->preload()
@@ -153,11 +152,11 @@ class InvoiceResource extends Resource
 
                 Section::make('Матеріали')
                     ->label('Матеріали')
-     //               ->visible(fn (callable $get) => $get('type') != 'постачання')
+                    ->visible(fn (callable $get) => $get('type') != 'постачання')
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
-                                Forms\Components\Repeater::make('items_sale')
+                                Forms\Components\Repeater::make('items')
                                     ->label('Матеріали')
                                     ->relationship('invoiceItems')
                                     ->schema([
@@ -470,11 +469,9 @@ class InvoiceResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('supplier.name')
                     ->label('Постачальник')
-                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Клієнт')
-                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Користувач')
