@@ -25,7 +25,7 @@ class ViewUser extends ViewRecord
         //dd($this->record->account->balance);
         return [
             UserAccaunt::make(array($this->record->account)),
-            PaySalaryUserWidget::make(array($this->record->account)),
+           // PaySalaryUserWidget::make(array($this->record->account)),
         ];
     }
 }
