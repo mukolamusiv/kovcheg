@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Material;
 use App\Models\WarehouseMaterial;
+use App\Models\WarehouseProduction;
 use Filament\Notifications\Notification;
 
 class MoveInvoiceService
@@ -26,6 +27,7 @@ class MoveInvoiceService
                 $this->cancelMaterialWarehouse($item->material_id, $this->invoice->warehouse_id, $item->quantity, $item->price);
             }
             foreach($this->invoice->invoiceProductionItems as $item){
+                $this->cancelProductionWarehouse($item->production->id, $item->warehouse_id, $item);
                 //$this->cancelMaterialWarehouse($item->production->material_id, $this->invoice->warehouse_id, $item->quantity);
             }
             $this->invoice->status = 'створено';
@@ -54,7 +56,7 @@ class MoveInvoiceService
                 $this->moveMaterialWarehouse($item->material_id, $invoice->warehouse_id, $item->quantity, $item->price);
             }
             foreach($invoice->invoiceProductionItems as $item){
-                //$this->validateMaterialWarehouse($item->production->material_id, $invoice->warehouse_id);
+                $this->moveProductionWarehouse($item->production->id, $item->warehouse_id, $item);
                 //$this->moveMaterialWarehouse($item->production->material_id, $invoice->warehouse_id, $item->quantity);
             }
 
@@ -297,5 +299,60 @@ class MoveInvoiceService
             $materialWarehouseTo->save();
         }
         return true;
+    }
+
+
+
+    private function cancelProductionWarehouse($productionId, $warehouseId, $productionItems)
+    {
+        $warehouseMaterials = WarehouseProduction::where('production_id', $productionId)
+            ->where('warehouse_id', $warehouseId)->get();
+
+        $warehouseMaterial = $warehouseMaterials->first();
+        $warehouseMaterial->quantity -= $productionItems->quantity;
+        if($warehouseMaterial->price < $productionItems->price){
+            $warehouseMaterial->price = $productionItems->price;
+        }
+        $warehouseMaterial->save();
+        Notification::make()
+            ->title('Запаси складу оновлено!')
+            ->body('Матеріал ' . $warehouseMaterial->production->name . ' доданий до складу ')
+            ->icon('heroicon-o-check-circle')
+            ->success()
+            ->send();
+    }
+
+    private function moveProductionWarehouse($productionId, $warehouseId, $productionItems)
+    {
+        $warehouseMaterials = WarehouseProduction::where('production_id', $productionId)
+            ->where('warehouse_id', $warehouseId)->get();
+        if ($warehouseMaterials->count() < 1) {
+            $warehouseCreate = WarehouseProduction::create([
+                'production_id' => $productionId,
+                'warehouse_id' => $warehouseId,
+                'quantity' => $productionItems->quantity,
+                'price' => $productionItems->price,
+            ]);
+            $warehouseCreate->save();
+            Notification::make()
+                ->title('Матеріл доданий до складу!')
+                ->body('Матеріал ' . $warehouseCreate->production->name . ' доданий до складу ')
+                ->icon('heroicon-o-check-circle')
+                ->success()
+                ->send();
+        }else{
+            $warehouseMaterial = $warehouseMaterials->first();
+            $warehouseMaterial->quantity += $productionItems->quantity;
+            if($warehouseMaterial->price < $productionItems->price){
+                $warehouseMaterial->price = $productionItems->price;
+            }
+            $warehouseMaterial->save();
+            Notification::make()
+                ->title('Запаси складу оновлено!')
+                ->body('Матеріал ' . $warehouseMaterial->production->name . ' доданий до складу ')
+                ->icon('heroicon-o-check-circle')
+                ->success()
+                ->send();
+        }
     }
 }
