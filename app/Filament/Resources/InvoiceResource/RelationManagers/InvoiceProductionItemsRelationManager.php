@@ -32,12 +32,12 @@ class InvoiceProductionItemsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('quantity')
             ->columns([
-                Tables\Columns\TextColumn::make('quantity')
-                    ->label('Кількість')
-                    ->sortable()
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('production.name')
                     ->label('Виробництво')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('quantity')
+                    ->label('Кількість')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
