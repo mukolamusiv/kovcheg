@@ -10,6 +10,9 @@ class UserAccaunt extends BaseWidget
 
     public $account;
 
+    protected static ?string $pollingInterval = null;
+
+
     public function mount($account)
     {
         $this->account = $account;
