@@ -32,12 +32,12 @@ class WarehouseProductionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('warehouse_id')
+                Forms\Components\Select::make('warehouse_id')
                     ->label('Склад')
                     ->relationship('warehouse', 'name')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('production_id')
+                Forms\Components\Select::make('production_id')
                     ->label('Готова продукція')
                     ->relationship('production', 'name')
                     ->required()
