@@ -48,6 +48,14 @@ class UserAccaunt extends BaseWidget
             Stat::make('На рахунку ', $this->account->balance),
             Stat::make('Випалатити зарплату ',
                 Action::make('Виплатити зарплату')
+                    ->label('Виплатити зарплату')
+                    ->action(function (array $data) {
+                        // dd($data);
+                        // $this->record->account->balance = $this->record->account->balance - 100;
+                        // $this->record->account->save();
+                        // $this->record->account->refresh();
+                        // dd($this->record);
+                    })
                     ->form([
                         Select::make('account_id')
                             ->label('Виплатити з рахунку')
