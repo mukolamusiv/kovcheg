@@ -41,17 +41,27 @@ class FinanceCart extends BaseWidget
         // $labels = $entries->pluck('month')->toArray();
 
 
-        $materialTotal = 0.00;
+
         // всього матеріалів на складі
+        $materialTotal = 0.00;
         foreach (WarehouseMaterial::all() as $material) {
             $materialTotal  += $material->quantity * $material->price;
         }
-
         $materialTotal = number_format($materialTotal, 2, '.', '');
+
+
+
+        // зобовязання перед постачальниками
+        $obligation = 0.00;
+        foreach (Account::where('account_type','посив')->get() as $account_type) {
+            $obligation += $account_type->quantity * $account_type->price;
+        }
+        $obligation = number_format($obligation, 2, '.', '');
+
         $datas = [
             'total' => $debet,
             'materialTotal' => $materialTotal,
-            'total_decrease' => 21,
+            'obligation' => $obligation,
             'profit' => 3.12,
             'profit_increase' => 3,
         ];
@@ -67,9 +77,8 @@ class FinanceCart extends BaseWidget
             Stat::make('Варість матеріалів', $data['materialTotal'].' грн')
                 ->description('Загальна вартість матеріалів на складах')
                 ->color('success'),
-            Stat::make('Витрати', '21%')
-                ->description('7% increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-down')
+            Stat::make('Зобовязання', $data['obligation'].' грн')
+                ->description('Наші зобовязання перед постачальниками')
                 ->color('danger'),
             Stat::make('Прибуток', '3:12')
                 ->description('3% increase')
