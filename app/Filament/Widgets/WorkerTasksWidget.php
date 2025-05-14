@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Production;
 use App\Models\ProductionStage;
+use App\Services\ProductionService;
 use Filament\Widgets\Widget;
 
 class WorkerTasksWidget extends Widget
@@ -45,22 +46,13 @@ class WorkerTasksWidget extends Widget
     public function startTask($taskId)
     {
         $task = ProductionStage::findOrFail($taskId);
-        if ($task->status === 'pending') {
-            $task->status = 'in_progress';
-            $task->start_date = now();
-            $task->save();
-            $this->dispatch('notify', ['message' => 'Завдання розпочате.']);
-        }
+        ProductionService::startStage($task);
+
     }
 
     public function completeTask($taskId)
     {
         $task = ProductionStage::findOrFail($taskId);
-        if ($task->status === 'in_progress') {
-            $task->status = 'done';
-            $task->end_date = now();
-            $task->save();
-            $this->dispatch('notify', ['message' => 'Завдання завершене.']);
-        }
+        ProductionService::stopStage($task);
     }
 }
