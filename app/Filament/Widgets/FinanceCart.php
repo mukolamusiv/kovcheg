@@ -76,6 +76,14 @@ class FinanceCart extends BaseWidget
         $active = number_format($active, 2, '.', '');
 
 
+        // зобовязання наші перед працівниками
+        $user = 0.00;
+        foreach (Account::where('owner_type', '=', 'App\Models\User')->get() as $account_types) {
+            $user += $account_types->balance;
+        }
+        $user = number_format($user, 2, '.', '');
+
+
 
         $productionActive = 0.00;
         $productionSale = 0.00;
@@ -97,6 +105,7 @@ class FinanceCart extends BaseWidget
             'productionSale' => $productionSale,
             'productionActive' => $productionActive,
             'all' => $all ,
+            'user' => $user,
         ];
 
         return $datas;
@@ -115,6 +124,17 @@ class FinanceCart extends BaseWidget
                 ->color('danger'),
             Stat::make('Очікування', $data['active'].' грн')
                 ->description('Зобовязання клієнтів перед нами')
+                ->color('success'),
+
+
+            Stat::make('Не виплачена зарплата', $data['user'].' грн')
+                ->description('Зарплата працівникам')
+                ->color('success'),
+            Stat::make('Собівартість продукції', $data['productionSale'].' грн')
+                ->description('Собівартість готової продукції')
+                ->color('warning'),
+            Stat::make('Чистий дохід', $data['all'].' грн')
+                ->description('Усього')
                 ->color('success'),
 
 
