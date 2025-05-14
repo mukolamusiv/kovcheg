@@ -55,7 +55,13 @@ class UserAccaunt extends BaseWidget
                             ->required()
                             ->default($this->account->id),
                     ])
-                    ->url('/transactions/create')
+                    ->action(function (array $data) {
+                        dd($data);
+                        // $this->record->account->balance = $this->record->account->balance - 100;
+                        // $this->record->account->save();
+                        // $this->record->account->refresh();
+                        // dd($this->record);
+                    })
                     ->icon('heroicon-o-currency-dollar')
                     ->color('success')
                 ),
