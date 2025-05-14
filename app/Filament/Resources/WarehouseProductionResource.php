@@ -20,7 +20,7 @@ class WarehouseProductionResource extends Resource
 
               //назва ресурсу
    protected static ?string $label = 'Готова продукція';
-   //protected static ?string $pluralLabel = 'Накладні';
+   protected static ?string $pluralLabel = 'Готова продукція';
 
    protected static ?string $navigationLabel = 'Готова продукція';
    protected static ?string $navigationGroup = 'Продажі';
@@ -33,16 +33,22 @@ class WarehouseProductionResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('warehouse_id')
+                    ->label('Склад')
+                    ->relationship('warehouse', 'name')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('production_id')
+                    ->label('Готова продукція')
+                    ->relationship('production', 'name')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('quantity')
+                    ->label('Кількість')
                     ->required()
                     ->numeric()
                     ->default(0),
                 Forms\Components\TextInput::make('price')
+                    ->label('Ціна')
                     ->required()
                     ->numeric()
                     ->default(0)
