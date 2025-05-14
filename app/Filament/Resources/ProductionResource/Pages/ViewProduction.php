@@ -81,6 +81,10 @@ class ViewProduction extends ViewRecord
                                 ->label('Назва')
                                 ->weight('bold')
                                 ->default($record->name),
+                            TextEntry::make('customer')
+                                ->label('Кілєнт')
+                                ->weight('bold')
+                                ->default($record->customer->name),
                         ]),
                     ProductionViewBuilder::configureView($record),
                     $this->getWarehouseInvoice($record),
