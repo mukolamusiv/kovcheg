@@ -47,6 +47,7 @@ class FinanceCart extends BaseWidget
             $materialTotal  += $material->quantity * $material->price;
         }
 
+        $materialTotal = number_format($materialTotal, 2, '.', '');
         $datas = [
             'total' => $debet,
             'materialTotal' => $materialTotal,
