@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Filament\Resources\NResource\Widgets\PaySalaryUserWidget;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Widgets\UserAccaunt;
 use Filament\Actions;
@@ -24,6 +25,7 @@ class ViewUser extends ViewRecord
         //dd($this->record->account->balance);
         return [
             UserAccaunt::make(array($this->record->account)),
+            PaySalaryUserWidget::make(array($this->record->account)),
         ];
     }
 }

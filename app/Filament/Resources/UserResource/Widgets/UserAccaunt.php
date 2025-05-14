@@ -50,35 +50,34 @@ class UserAccaunt extends BaseWidget
            // Stat::make('Total Products', $this->record->production->count()),
                 //->icon('heroicon-o-archive'),
             Stat::make('На рахунку ', $this->account->balance),
-            Stat::make('Випалатити зарплату ',
-            //BAction::make([
-                    Action::make('pay_salary')
-                        ->label('Виплатити зарплату')
-                        ->color('success')
-                        ->icon('heroicon-o-currency-dollar')
-                        ->requiresConfirmation()
-                        ->form([
-                            Select::make('account_id')
-                                ->label('Рахунок')
-                                ->relationship('account', 'name')
-                                ->required(),
-                            Select::make('user_id')
-                                ->label('Співробітник')
-                                ->relationship('user', 'name')
-                                ->required(),
-                            Select::make('amount')
-                                ->label('Сума')
-                                ->required()
-                        ])
-                        ->action(function (array $data) {
-                            //dd($data);
-                            $this->record->account->addObligation($data['amount']);
-                            $this->record->account->syncBalance();
-                            $this->notify('success', 'Зарплата виплачена');
-                        })
-               // ])
+            // Stat::make('Випалатити зарплату ',
+            // //BAction::make([
+            //         Action::make('pay_salary')
+            //             ->label('Виплатити зарплату')
+            //             ->color('success')
+            //             ->icon('heroicon-o-currency-dollar')
+            //             ->requiresConfirmation()
+            //             ->form([
+            //                 Select::make('account_id')
+            //                     ->label('Рахунок')
+            //                     ->relationship('account', 'name')
+            //                     ->required(),
+            //                 Select::make('user_id')
+            //                     ->label('Співробітник')
+            //                     ->relationship('user', 'name')
+            //                     ->required(),
+            //                 Select::make('amount')
+            //                     ->label('Сума')
+            //                     ->required()
+            //             ])
+            //             ->action(function (array $data) {
+            //                 //dd($data);
+            //                 $this->record->account->addObligation($data['amount']);
+            //                 $this->record->account->syncBalance();
+            //                 $this->notify('success', 'Зарплата виплачена');
+            //             })
+            //    // ])
 
-                ),
                 //->icon('heroicon-o-shopping-cart'),
             //Stat::make('Total Transactions', $this->record->transactions->count()),
                 //->icon('heroicon-o-currency-dollar'),
