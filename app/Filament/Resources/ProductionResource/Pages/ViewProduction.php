@@ -809,7 +809,7 @@ class ViewProduction extends ViewRecord
             $invoiceItemsOn [] = Section::make('Виріб - '.$items->production->name)
                 ->label($items->production->name)
                 ->columnSpan(12)
-                ->columns(5)
+                ->columns(6)
                 ->schema([
                     //dd($items->material->getStockInWarehouse($invoices->warehouse_id)),
                     TextEntry::make('quantity'.$items->id)
@@ -819,7 +819,8 @@ class ViewProduction extends ViewRecord
                     //     ->default($items->material->getStockInWarehouse($invoices->warehouse_id))
                     //     ->label('Кількість на складі'),
                     TextEntry::make('prices')->default($items->production->price/$items->quantity)->label('Собівартість за одицю')->hidden(fn () => auth()->user()->role !== 'admin'),
-                    TextEntry::make('totals')->default($items->total)->label('Ціна'),
+                    TextEntry::make('prices')->default($items->production->price)->label('Собівартість загальна')->hidden(fn () => auth()->user()->role !== 'admin'),
+                    TextEntry::make('totals')->default($items->total)->label('Ціна за все'),
                     TextEntry::make('incomes')->default($items->total-$items->production->price)
                         ->label('Дохід')
                         ->hidden(fn () => auth()->user()->role !== 'admin'),
