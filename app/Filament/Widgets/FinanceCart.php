@@ -90,7 +90,7 @@ class FinanceCart extends BaseWidget
             Stat::make('Зобовязання', $data['obligation'].' грн')
                 ->description('Наші зобовязання перед постачальниками')
                 ->color('danger'),
-            Stat::make('Прибуток', $data['active'].' грн')
+            Stat::make('Очікування', $data['active'].' грн')
                 ->description('Зобовязання клієнтів перед нами')
                 ->color('success'),
         ];
