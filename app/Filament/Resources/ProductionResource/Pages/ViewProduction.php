@@ -818,7 +818,7 @@ class ViewProduction extends ViewRecord
                     // TextEntry::make('warehouse_id'.$items->id)
                     //     ->default($items->material->getStockInWarehouse($invoices->warehouse_id))
                     //     ->label('Кількість на складі'),
-                    TextEntry::make('prices')->default($items->price)->label('Собівартість за одицю')->hidden(fn () => auth()->user()->role !== 'admin'),
+                    TextEntry::make('prices')->default($items->production->price)->label('Собівартість за одицю')->hidden(fn () => auth()->user()->role !== 'admin'),
                     TextEntry::make('totals')->default($items->total)->label('Ціна'),
                     TextEntry::make('incomes')->default($items->price)
                         ->label('Дохід')
