@@ -73,7 +73,7 @@ class ProductionViewBuilder
                     ->label('Кількість')
                     ->required()
                     ->numeric()
-                    ->minValue(1),
+                    ->minValue(0.01),
                 TextInput::make('description')
                     ->label('Опис')
                     ->nullable(),
