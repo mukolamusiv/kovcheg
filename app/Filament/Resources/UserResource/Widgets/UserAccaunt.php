@@ -30,7 +30,7 @@ class UserAccaunt extends BaseWidget
 
         //dd($balance);
 
-        dd($this,$this->account);
+        dd($this->account->balance);
         return [
            // Stat::make('Total Products', $this->record->production->count()),
                 //->icon('heroicon-o-archive'),
