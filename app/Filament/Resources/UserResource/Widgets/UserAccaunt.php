@@ -16,6 +16,12 @@ class UserAccaunt extends BaseWidget
         //$this->calculate($record);
     }
 
+    public function account($account)
+    {
+        $this->account = $account;
+        return $this;
+    }
+
 
     protected function getStats(): array
     {
