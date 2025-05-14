@@ -64,7 +64,7 @@ class FinanceCart extends BaseWidget
         $data = $this->getData();
 
         $total = [
-            Stat::make('Варість матеріалів', $data['materialTotal'])
+            Stat::make('Варість матеріалів', $data['materialTotal'].' грн')
                 ->description('Загальна вартість матеріалів на складах')
                 ->color('success'),
             Stat::make('Витрати', '21%')
