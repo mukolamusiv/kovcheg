@@ -7,6 +7,7 @@ use Filament\Infolists\Components\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Actions;
+use Filament\Actions\Action as FilamentActionsAction;
 use Filament\Forms\Components\Actions\Action as ActionsAction;
 
 class UserAccaunt extends BaseWidget
@@ -49,14 +50,10 @@ class UserAccaunt extends BaseWidget
                 //->icon('heroicon-o-archive'),
             Stat::make('На рахунку ', $this->account->balance),
             Stat::make('Випалатити зарплату ',
-                ActionsAction::make('Виплатити зарплату')
+                FilamentActionsAction::make('Виплатити зарплату')
                     ->label('Виплатити зарплату')
                     ->action(function (array $data) {
-                        // dd($data);
-                        // $this->record->account->balance = $this->record->account->balance - 100;
-                        // $this->record->account->save();
-                        // $this->record->account->refresh();
-                        // dd($this->record);
+
                     })
                     ->form([
                         Select::make('account_id')
@@ -65,13 +62,7 @@ class UserAccaunt extends BaseWidget
                             ->required()
                             ->default($this->account->id),
                     ])
-                    // ->action(function (array $data) {
-                    //     dd($data);
-                    //     // $this->record->account->balance = $this->record->account->balance - 100;
-                    //     // $this->record->account->save();
-                    //     // $this->record->account->refresh();
-                    //     // dd($this->record);
-                    // })
+
                     ->icon('heroicon-o-currency-dollar')
                     ->color('success')
                 ),
