@@ -932,7 +932,7 @@ class ViewProduction extends ViewRecord
                         TextEntry::make('warehouse_id'.$items->id)
                             ->default($items->material->getStockInWarehouse($invoices->warehouse_id))
                             ->label('Кількість на складі'),
-                        TextEntry::make('price')->default($items->price)->label('Ціна'),
+                        TextEntry::make('prices')->default($items->price)->label('Ціна'),
                         TextEntry::make('total')->default($items->total)->label('Сума'),
                         // BAction::make([
 
