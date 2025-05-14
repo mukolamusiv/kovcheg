@@ -624,11 +624,14 @@ class InvoiceService
             'warehouse_id' => $data['warehouse_id'],
         ]);
         $money = 0.00;
-        if(isset($data['supply_items'])){
-            $data['items'] = $data['supply_items'];
-        }
+        // if(isset($data['supply_items'])){
+        //     $data['items'] = $data['supply_items'];
+        // }
+
+        //items_supply
+
         // Додати позиції до накладної
-        foreach ($data['items'] as $item) {
+        foreach ($data['items_supply'] as $item) {
             // Перевірка наявності матеріалу на складі
             $material = \App\Models\Material::find($item['material_id']);
             if (!$material) {
@@ -642,17 +645,25 @@ class InvoiceService
             }
 
             $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
+            $money += $add;
+        }
 
-            // if(!isset($item['price'])){
-            //     $item['price'] = $material->getPriceMaterial($data['warehouse_id']);
-            // }
 
-            // $invoice->invoiceItems()->create([
-            //     'material_id' => $item['material_id'],
-            //     'quantity' => $item['quantity'],
-            //     'price' => $item['price'],
-            //     'total' => $item['price'] * $item['quantity'],
-            // ]);
+         // Додати позиції до накладної
+         foreach ($data['items_sale'] as $item) {
+            // Перевірка наявності матеріалу на складі
+            $material = \App\Models\Material::find($item['material_id']);
+            if (!$material) {
+                Notification::make()
+                    ->title('Помилка при додаванні позиції!')
+                    ->body('Матеріал не знайдено')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                continue;
+            }
+
+            $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
             $money += $add;
         }
 

@@ -97,13 +97,13 @@ class InvoiceResource extends Resource
                     ])
                     ->columnSpanFull(),
 
-                Section::make('Матеріали')
+                Section::make('Матеріали для постачання')
                     ->label('Матеріали')
                     ->visible(fn (callable $get) => $get('type') === 'постачання')
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
-                                Forms\Components\Repeater::make('items')
+                                Forms\Components\Repeater::make('items_supply')
                                     ->label('Матеріали')
                                     ->relationship('invoiceItems')
                                     ->schema([
@@ -157,7 +157,7 @@ class InvoiceResource extends Resource
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
-                                Forms\Components\Repeater::make('supply_items')
+                                Forms\Components\Repeater::make('items_sale')
                                     ->label('Матеріали')
                                     ->relationship('invoiceItems')
                                     ->schema([
