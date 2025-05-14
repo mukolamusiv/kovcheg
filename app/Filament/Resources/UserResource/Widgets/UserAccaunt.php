@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Widgets;
 
+use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -45,9 +46,19 @@ class UserAccaunt extends BaseWidget
            // Stat::make('Total Products', $this->record->production->count()),
                 //->icon('heroicon-o-archive'),
             Stat::make('На рахунку ', $this->account->balance),
-            Stat::make('Випалатити зарплату ', Action::make('Виплатити зарплату')
-                ->url('/transactions/create')
-                ->icon('heroicon-o-currency-dollar')),
+            Stat::make('Випалатити зарплату ',
+                Action::make('Виплатити зарплату')
+                    ->form([
+                        Select::make('account_id')
+                            ->label('Виплатити з рахунку')
+                            ->options($this->account->where('owner_type', '=', null)->pluck('name', 'id'))
+                            ->required()
+                            ->default($this->account->id),
+                    ])
+                    ->url('/transactions/create')
+                    ->icon('heroicon-o-currency-dollar')
+                    ->color('success')
+                ),
                 //->icon('heroicon-o-shopping-cart'),
             //Stat::make('Total Transactions', $this->record->transactions->count()),
                 //->icon('heroicon-o-currency-dollar'),
