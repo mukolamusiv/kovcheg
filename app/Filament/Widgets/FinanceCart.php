@@ -72,7 +72,7 @@ class FinanceCart extends BaseWidget
             'total' => $debet,
             'materialTotal' => $materialTotal,
             'obligation' => $obligation,
-            'profit' => 3.12,
+            'active' => $active,
             'profit_increase' => 3,
         ];
 
@@ -90,9 +90,8 @@ class FinanceCart extends BaseWidget
             Stat::make('Зобовязання', $data['obligation'].' грн')
                 ->description('Наші зобовязання перед постачальниками')
                 ->color('danger'),
-            Stat::make('Прибуток', '3:12')
-                ->description('3% increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
+            Stat::make('Прибуток', $data['active'].' грн')
+                ->description('Зобовязання клієнтів перед нами')
                 ->color('success'),
         ];
 
