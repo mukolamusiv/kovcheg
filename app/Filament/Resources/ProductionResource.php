@@ -188,12 +188,22 @@ class ProductionResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Статус')
+                    ->color(function ($state) {
+                        return match ($state) {
+                            'створено' => 'blue',
+                            'в роботі' => 'yellow',
+                            'виготовлено' => 'green',
+                            'скасовано' => 'red',
+                            default => 'gray',
+                        };
+                    })
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Тип')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pay')
                     ->label('Оплата')
+                    ->hidden(true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Замовник')

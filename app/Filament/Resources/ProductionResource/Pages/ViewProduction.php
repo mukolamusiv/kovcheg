@@ -82,9 +82,8 @@ class ViewProduction extends ViewRecord
                                 ->weight('bold')
                                 ->default($record->name),
                             TextEntry::make('customer.name')
-                                ->label('Кілєнт')
-                                ->weight('bold')
-                                ->default($record->customer->name),
+                                ->label('Клієнт')
+                                ->weight('bold'),
                         ]),
                     ProductionViewBuilder::configureView($record),
                     $this->getWarehouseInvoice($record),
