@@ -6,6 +6,8 @@ use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Actions;
+use Filament\Forms\Components\Actions\Action as ActionsAction;
 
 class UserAccaunt extends BaseWidget
 {
@@ -47,7 +49,7 @@ class UserAccaunt extends BaseWidget
                 //->icon('heroicon-o-archive'),
             Stat::make('На рахунку ', $this->account->balance),
             Stat::make('Випалатити зарплату ',
-                Action::make('Виплатити зарплату')
+                ActionsAction::make('Виплатити зарплату')
                     ->label('Виплатити зарплату')
                     ->action(function (array $data) {
                         // dd($data);
