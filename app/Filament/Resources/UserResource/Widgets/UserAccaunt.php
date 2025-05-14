@@ -34,7 +34,7 @@ class UserAccaunt extends BaseWidget
         return [
            // Stat::make('Total Products', $this->record->production->count()),
                 //->icon('heroicon-o-archive'),
-            Stat::make('На рахунку', $this->account->balance)
+            Stat::make('На рахунку', $this->account)
                 ->description('32k increase'),
                 //->icon('heroicon-o-shopping-cart'),
             //Stat::make('Total Transactions', $this->record->transactions->count()),
