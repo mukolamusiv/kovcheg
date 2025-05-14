@@ -73,6 +73,15 @@ class ViewProduction extends ViewRecord
         return $infolist
                 ->columns(12)
                 ->schema([
+                    Fieldset::make('info')
+                        ->label('Виробництво')
+                        ->columns(12)
+                        ->schema([
+                            TextEntry::make('title')
+                                ->label('Назва')
+                                ->weight('bold')
+                                ->default($record->name),
+                        ]),
                     ProductionViewBuilder::configureView($record),
                     $this->getWarehouseInvoice($record),
                     $this->getInvoices($record),
