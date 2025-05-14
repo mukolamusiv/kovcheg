@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Account;
 use App\Models\TransactionEntry;
+use App\Models\WarehouseMaterial;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -38,9 +39,17 @@ class FinanceCart extends BaseWidget
 
         //dd($debet, $credit);
         // $labels = $entries->pluck('month')->toArray();
+
+
+        $materialTotal = 0.00;
+        // всього матеріалів на складі
+        foreach (WarehouseMaterial::all() as $material) {
+            $materialTotal  += $material->quantity * $material->price;
+        }
+
         $datas = [
             'total' => $debet,
-            'total_increase' => 32,
+            'materialTotal' => $materialTotal,
             'total_decrease' => 21,
             'profit' => 3.12,
             'profit_increase' => 3,
@@ -54,9 +63,8 @@ class FinanceCart extends BaseWidget
         $data = $this->getData();
 
         $total = [
-            Stat::make('Дохід', $data['total'])
-                ->description('32k increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
+            Stat::make('Варість матеріалів', $data['materialTotal'])
+                ->description('Загальна вартість матеріалів на складах')
                 ->color('success'),
             Stat::make('Витрати', '21%')
                 ->description('7% increase')
