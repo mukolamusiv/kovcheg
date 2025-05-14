@@ -29,6 +29,7 @@ class StockAndFinanceChart extends ChartWidget implements HasForms
     {
         $accounts = Account::query()
             ->select('id', 'name')
+            ->where('owner_type', null)
             ->orderBy('name')
             ->get();
 
