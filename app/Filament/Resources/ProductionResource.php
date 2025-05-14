@@ -183,9 +183,11 @@ class ProductionResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Назва виробу')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->label('Опис')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('customer.name')
+                    ->label('Замовник')
+                    ->searchable()
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Статус')
                     ->color(function ($state) {
@@ -205,11 +207,10 @@ class ProductionResource extends Resource
                     ->label('Оплата')
                     ->hidden(true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('customer.name')
-                    ->label('Замовник')
-                    ->searchable()
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Опис')
+                    ->searchable(),
+
                 // Tables\Columns\TextColumn::make('user_id')
                 //     ->numeric()
                 //     ->sortable(),
