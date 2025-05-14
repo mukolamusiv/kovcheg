@@ -137,7 +137,7 @@ class InvoiceResource extends Resource
                            ])
                            ->columnSpan(8),
                         Section::make([
-                                Select::make('warehouse_id')
+                                Select::make('warehouse_sale_id')
                                     ->label('Склад')
                                     ->relationship('warehouse', 'name')
                                     ->searchable()
