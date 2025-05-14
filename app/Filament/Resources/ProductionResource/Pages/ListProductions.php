@@ -22,7 +22,7 @@ class ListProductions extends ListRecords
     {
         $array = [
             'Створені' => Tab::make()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', '=', 'створені')),
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', '=', 'створено')),
             'В роботі' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('status', '=', 'в роботі')),
             'Виготовлені' => Tab::make()
