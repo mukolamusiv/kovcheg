@@ -3,13 +3,22 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Account;
+use App\Models\Invoice;
 use App\Models\TransactionEntry;
 use App\Models\WarehouseMaterial;
+use App\Models\WarehouseProduction;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class FinanceCart extends BaseWidget
 {
+
+
+
+    public static function canView(): bool
+    {
+        return auth()->user()->role === 'admin'; // обмеження на працівника
+    }
 
 
     protected function getData(): array
@@ -68,6 +77,14 @@ class FinanceCart extends BaseWidget
 
 
 
+        // $active = 0.00;
+        foreach( WarehouseProduction::all() as $production) {
+            $active += $production->price;
+
+        }
+
+
+
         $datas = [
             'total' => $debet,
             'materialTotal' => $materialTotal,
@@ -85,6 +102,17 @@ class FinanceCart extends BaseWidget
 
         $total = [
             Stat::make('Варість матеріалів', $data['materialTotal'].' грн')
+                ->description('Загальна вартість матеріалів на складах')
+                ->color('success'),
+            Stat::make('Зобовязання', $data['obligation'].' грн')
+                ->description('Наші зобовязання перед постачальниками')
+                ->color('danger'),
+            Stat::make('Очікування', $data['active'].' грн')
+                ->description('Зобовязання клієнтів перед нами')
+                ->color('success'),
+
+
+            Stat::make('Вартість готової продукції', $data['materialTotal'].' грн')
                 ->description('Загальна вартість матеріалів на складах')
                 ->color('success'),
             Stat::make('Зобовязання', $data['obligation'].' грн')
