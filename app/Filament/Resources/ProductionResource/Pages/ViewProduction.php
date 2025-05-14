@@ -820,7 +820,7 @@ class ViewProduction extends ViewRecord
                     //     ->label('Кількість на складі'),
                     TextEntry::make('price')->default($items->price)->label('Собівартість'),
                     TextEntry::make('totals')->default($items->total)->label('Ціна'),
-                    TextEntry::make('income')->default($items->total-$items->price)->label('Дохід')->hidden(fn () => auth()->user->role !== 'admin'),
+                    TextEntry::make('income')->default($items->total-$items->price)->label('Дохід')->hidden(fn () => auth()->user()->role !== 'admin'),
                     ImageEntry::make('photo')
                         ->defaultImageUrl($items->production->image)
                         ->label('Зображення')
