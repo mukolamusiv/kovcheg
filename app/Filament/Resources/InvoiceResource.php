@@ -104,7 +104,7 @@ class InvoiceResource extends Resource
                     ->schema([
                             Section::make([
                                 Forms\Components\Repeater::make('items_supply')
-                                    ->label('Матеріали')
+                                    ->label('Матеріали постачання')
                                     ->relationship('invoiceItems')
                                     ->schema([
                                         Select::make('material_id')
