@@ -3,10 +3,11 @@
 namespace App\Filament\Resources\UserResource\Widgets;
 
 use Filament\Forms\Components\Select;
-use Filament\Infolists\Components\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Actions;
+use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\Actions as BAction;
 use Filament\Actions\Action as FilamentActionsAction;
 use Filament\Forms\Components\Actions\Action as ActionsAction;
 
@@ -50,21 +51,33 @@ class UserAccaunt extends BaseWidget
                 //->icon('heroicon-o-archive'),
             Stat::make('На рахунку ', $this->account->balance),
             Stat::make('Випалатити зарплату ',
-                FilamentActionsAction::make('Виплатити зарплату')
-                    ->label('Виплатити зарплату')
-                    ->action(function (array $data) {
+            BAction::make([
+                    Action::make('pay_salary')
+                        ->label('Виплатити зарплату')
+                        ->color('success')
+                        ->icon('heroicon-o-currency-dollar')
+                        ->requiresConfirmation()
+                        ->form([
+                            Select::make('account_id')
+                                ->label('Рахунок')
+                                ->relationship('account', 'name')
+                                ->required(),
+                            Select::make('user_id')
+                                ->label('Співробітник')
+                                ->relationship('user', 'name')
+                                ->required(),
+                            Select::make('amount')
+                                ->label('Сума')
+                                ->required()
+                        ])
+                        ->action(function (array $data) {
+                            //dd($data);
+                            $this->record->account->addObligation($data['amount']);
+                            $this->record->account->syncBalance();
+                            $this->notify('success', 'Зарплата виплачена');
+                        })
+                ])
 
-                    })
-                    ->form([
-                        Select::make('account_id')
-                            ->label('Виплатити з рахунку')
-                            ->options($this->account->where('owner_type', '=', null)->pluck('name', 'id'))
-                            ->required()
-                            ->default($this->account->id),
-                    ])
-
-                    ->icon('heroicon-o-currency-dollar')
-                    ->color('success')
                 ),
                 //->icon('heroicon-o-shopping-cart'),
             //Stat::make('Total Transactions', $this->record->transactions->count()),
