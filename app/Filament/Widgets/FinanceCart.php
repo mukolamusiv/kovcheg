@@ -61,7 +61,7 @@ class FinanceCart extends BaseWidget
 
         // зобовязання клієнтів постачальниками
         $active = 0.00;
-        foreach (Account::where('account_type','=','актив')->get() as $account_type) {
+        foreach (Account::all() as $account_type) {
             $active += $account_type->quantity * $account_type->price;
         }
         $active = number_format($obligation, 2, '.', '');
