@@ -62,15 +62,13 @@ class WarehouseProductionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('warehouse_id')
+                Tables\Columns\TextColumn::make('warehouse.name')
                     ->label('Склад')
-                    ->relationship('warehouse', 'name')
                     ->sortable()
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('production_id')
+                Tables\Columns\TextColumn::make('production.name')
                     ->label('Готова продукція')
-                    ->relationship('production', 'name')
                     ->sortable()
                     ->searchable()
                     ->numeric()
