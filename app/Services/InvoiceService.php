@@ -624,6 +624,9 @@ class InvoiceService
             'warehouse_id' => $data['warehouse_id'],
         ]);
         $money = 0.00;
+        if(isset($data['supply_items'])){
+            $data['items'] = $data['supply_items'];
+        }
         // Додати позиції до накладної
         foreach ($data['items'] as $item) {
             // Перевірка наявності матеріалу на складі

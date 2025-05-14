@@ -77,14 +77,14 @@ class InvoiceResource extends Resource
                                     ->label('Постачальник')
                                     ->relationship('supplier', 'name')
                                     ->searchable()
-                                    ->preload(),
-                                    //->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
+                                    ->preload()
+                                    ->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
                                 Select::make('customer_id')
                                     ->label('Клієнт')
                                     ->relationship('customer', 'name')
                                     ->searchable()
                                     ->preload()
-                                    //->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення'),
+                                    ->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення'),
                             ]),
                             Section::make([
                                Textarea::make('notes')
@@ -157,7 +157,7 @@ class InvoiceResource extends Resource
                     ->description('Введіть матеріали до накладної')
                     ->schema([
                             Section::make([
-                                Forms\Components\Repeater::make('items')
+                                Forms\Components\Repeater::make('supply_items')
                                     ->label('Матеріали')
                                     ->relationship('invoiceItems')
                                     ->schema([
