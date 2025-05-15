@@ -334,7 +334,7 @@ class InvoiceResource extends Resource
                 // //     ])
                 // //     ->columnSpanFull(),
 
-                Section::make('production')
+                Section::make('Виробництво')
                     ->label('Вироби')
                     ->visible(true)
                     //->visible(fn (callable $get) => $get('type') === 'продаж' || $get('type') === 'повернення' || $get('type') === 'переміщення')
