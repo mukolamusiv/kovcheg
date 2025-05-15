@@ -346,7 +346,7 @@ class InvoiceResource extends Resource
                                     ->schema([
                                         Select::make('product_id')
                                             ->label('Готова продукція на скаладі')
-                                            ->options(\App\Models\WarehouseProduction::all()->pluck('name', 'id'))
+                                            ->options(\App\Models\WarehouseProduction::with('production')->get()->pluck('production.name', 'id'))
                                             ->searchable()
                                             ->preload()
                                             ->columnSpan(6)
