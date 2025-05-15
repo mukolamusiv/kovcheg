@@ -83,7 +83,7 @@ class ProductionViewBuilder
             })
 
         ]);
-        dd($productionMaterials);
+      //  dd($productionMaterials);
         foreach ($productionMaterials as $material) {
             //dd($material->material->name);
             if(is_null($material->material)){
