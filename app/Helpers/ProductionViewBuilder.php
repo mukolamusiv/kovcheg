@@ -85,7 +85,7 @@ class ProductionViewBuilder
         ]);
         foreach ($productionMaterials as $material) {
             //dd($material->material->name);
-            if( $material->material->name == null){
+            if(is_null($material->material->name)){
                 dd($material->material);
             }
             $materialTitle = 'Матеріал - ' . $material->material->name;
