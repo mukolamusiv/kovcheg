@@ -85,7 +85,11 @@ class ProductionViewBuilder
         ]);
         foreach ($productionMaterials as $material) {
             //dd($material->material->name);
-            $materials[] = Fieldset::make('Матеріал - ' . $material->material->name ?? 'Матеріал - ')
+            if( $material->material->name == null){
+                dd($material->material);
+            }
+            $materialTitle = 'Матеріал - ' . $material->material->name;
+            $materials[] = Fieldset::make('Матеріал - ' . $material->material->name)
                     //->collapsed($material->date_writing_off !== null)
                     //->description($material->date_writing_off ? 'Списано ' . $material->quantity . ' одиниць' : 'Не списано')
                     ->columnSpanFull()
