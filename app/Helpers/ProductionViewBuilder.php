@@ -86,9 +86,9 @@ class ProductionViewBuilder
       //  dd($productionMaterials);
         foreach ($productionMaterials as $material) {
             //dd($material->material->name);
-            if(is_null($material->material)){
-               continue;
-                // dd($material, $productionMaterials);
+            if(is_null($material->material )){
+              // continue;
+                 dd($material, $productionMaterials);
             }
             $materialTitle = 'Матеріал - ' . $material->material->name;
             $materials[] = Fieldset::make('Матеріал - ' . $material->material->name)
