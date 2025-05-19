@@ -83,7 +83,14 @@ class ProductionViewBuilder
             })
 
         ]);
+      //  dd($productionMaterials);
         foreach ($productionMaterials as $material) {
+            //dd($material->material->name);
+            if(is_null($material->material )){
+               continue;
+              //   dd($material,$material->material_id ,Material::find($material->material_id));
+            }
+            $materialTitle = 'Матеріал - ' . $material->material->name;
             $materials[] = Fieldset::make('Матеріал - ' . $material->material->name)
                     //->collapsed($material->date_writing_off !== null)
                     //->description($material->date_writing_off ? 'Списано ' . $material->quantity . ' одиниць' : 'Не списано')

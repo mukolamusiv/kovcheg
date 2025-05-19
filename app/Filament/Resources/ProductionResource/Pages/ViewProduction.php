@@ -910,6 +910,10 @@ class ViewProduction extends ViewRecord
            // dd($invoices, $record->invoice_off);
             $invoiceItemsOff = [];
             foreach($invoices->invoiceItems as $items){
+                if(is_null($items->material )){
+                    continue;
+                   //   dd($material,$material->material_id ,Material::find($material->material_id));
+                 }
                $invoiceItemsOff [] = Section::make('Матеріал - '.$items->material->name)
                     ->label($items->material->name)
                     ->headerActions([
