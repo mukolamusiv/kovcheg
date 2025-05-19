@@ -334,6 +334,12 @@ class InvoiceResource extends Resource
                 // //     ])
                 // //     ->columnSpanFull(),
 
+
+
+
+
+
+
                 Section::make('Виробництво')
                     ->label('Вироби')
                     ->visible(true)

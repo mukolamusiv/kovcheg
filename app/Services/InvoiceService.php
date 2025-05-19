@@ -631,7 +631,7 @@ class InvoiceService
         //items_supply
 
         // Додати позиції до накладної
-        foreach ($data['items_supply'] as $item) {
+        foreach ($data['items_customer'] as $item) {
             // Перевірка наявності матеріалу на складі
             $material = \App\Models\Material::find($item['material_id']);
             if (!$material) {
@@ -650,7 +650,7 @@ class InvoiceService
 
 
          // Додати позиції до накладної
-         foreach ($data['items_sale'] as $item) {
+         foreach ($data['items_supliner'] as $item) {
             // Перевірка наявності матеріалу на складі
             $material = \App\Models\Material::find($item['material_id']);
             if (!$material) {
@@ -665,6 +665,25 @@ class InvoiceService
 
             $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
             $money += $add;
+        }
+
+
+        foreach($data['productions'] as $item){
+            $production = Production::find($item['production_id']);
+            if (!$production) {
+                Notification::make()
+                    ->title('Помилка при додаванні позиції!')
+                    ->body('Продукція не знайдена')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                continue;
+            }
+            // Перевірка наявності матеріалу на складі
+
+            $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
+            $money += $add;
+
         }
 
         // $data['discount'] - у відсотках
