@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\Invoice;
+use App\Models\InvoiceProductionItem;
 use App\Models\Production;
 use App\Models\Transaction;
 use App\Models\WarehouseMaterial;
+use App\Models\WarehouseProduction;
 use Filament\Notifications\Notification;
 use Illuminate\Validation\Rules\In;
 
@@ -669,19 +671,30 @@ class InvoiceService
 
 
         foreach($data['productions'] as $item){
-            $production = Production::find($item['production_id']);
-            if (!$production) {
+            $productionWarehouse = WarehouseProduction::find($item['product_id']);
+            if (!$productionWarehouse) {
                 Notification::make()
-                    ->title('Помилка при додаванні позиції!')
-                    ->body('Продукція не знайдена')
+                    ->title('Помилка при додаванні продукту!')
+                    ->body('Продукт не знайдений на складі')
                     ->icon('heroicon-o-x-circle')
                     ->danger()
                     ->send();
                 continue;
             }
+
+            if ($productionWarehouse->quantity < $item['quantity'] and $invoice->type == 'продаж') {
+                Notification::make()
+                    ->title('Не достатньо продукту на складі!')
+                    ->body('На скалді тільки '.$productionWarehouse->quantity.' одиниць')
+                    ->icon('heroicon-o-x-circle')
+                    ->danger()
+                    ->send();
+                continue;
+            }
+            $add = InvoiceService::addProductionToInvoice($invoice, $productionWarehouse, $item);
             // Перевірка наявності матеріалу на складі
 
-            $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
+           // $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
             $money += $add;
 
         }
@@ -701,6 +714,21 @@ class InvoiceService
         //dd($money,$invoice);
         return $invoice;
         });
+    }
+
+
+    public static function addProductionToInvoice($invoice, $productionWarehouse, $data)
+    {
+        $productInvoice = InvoiceProductionItem::create([
+            'invoice_id' => $invoice->id,
+            'warehouse_productions_id' => $data['product_id'],
+            'quantity' => $data['quantity'],
+            'price' => $productionWarehouse->price,
+            'total' => $data['quantity'] * $productionWarehouse->price,
+            'production_id' => $productionWarehouse->production_id,
+        ]);
+        $productInvoice->save();
+        return $productInvoice->total;
     }
 
 
