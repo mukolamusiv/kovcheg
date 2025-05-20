@@ -499,7 +499,7 @@ class Production extends Model
             $this->productionMaterials()->create([
                 'material_id' => $material->id, // ID матеріалу
                 'warehouse_id' => $warehouse->id, // ID складу
-                'quantity' => $quantity, // Кількість матеріалу
+                'quantity' => $quantity , // Кількість матеріалу
                 'price' => $material->getTotalValueInWarehouse($warehouse->id), // Ціна матеріалу
                 'warehouse_id' => $warehouse->id, // ID складу
                 'description' => $description ?? null, // Опис матеріалу
