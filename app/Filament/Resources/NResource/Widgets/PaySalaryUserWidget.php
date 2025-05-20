@@ -15,6 +15,8 @@ class PaySalaryUserWidget extends Widget
     protected static string $view = 'filament.resources.n-resource.widgets.pay-salary-user-widget';
 
 
+    public $isModalOpen = false;
+
     public $account;
 
     protected static ?string $pollingInterval = null;
@@ -26,33 +28,16 @@ class PaySalaryUserWidget extends Widget
         //$this->calculate($record);
     }
 
-    protected function getActions(): array
+    public function getViewData(): array
     {
-        return [
-            Action::make('pay_salary')
-                ->label('Виплатити зарплату')
-                ->icon('heroicon-o-currency-dollar')
-                ->color('success')
-                ->form([
-                    Select::make('account_id')
-                        ->label('Рахунок')
-                        ->relationship('account', 'name')
-                        ->searchable()
-                        ->required(),
-                    Select::make('user_id')
-                        ->label('Співробітник')
-                        ->relationship('user', 'name')
-                        ->searchable()
-                        ->required(),
-                    TextInput::make('amount')
-                        ->label('Сума')
-                        ->numeric()
-                        ->required(),
-                ])
-                ->action(function (array $data): void {
+        $userId = auth()->id();
 
-                    dd($data);
-                }),
+        return [
+            'account' => $this->account,
+            'userId' => $userId,
+            'balance' => $this->account->balance,
+            'salary' => $this->account->salary,
+            'wallets' => Account::where('owner_type', null)->get(),
         ];
     }
 }
