@@ -30,7 +30,7 @@ class PaySalaryUserWidget extends Widget
                 // Якщо баланс менший за зарплату, не виплачувати
                 return;
             }
-            $account->balance -= $account->salary;
+          //  $account->balance -= $account->salary;
             $account->save();
         }
 
