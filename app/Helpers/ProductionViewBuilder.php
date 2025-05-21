@@ -994,8 +994,8 @@ class ProductionViewBuilder
                                         TextInput::make('paid_worker')
                                             ->label('Оплата працівнику')
                                             ->required()
-                                            ->hidden(auth()->id() !== $stage->user_id)
-                                            ->visible(auth()->user()->role === 'admin')
+                                            //->hidden(auth()->id() !== $stage->user_id)
+                                            //->visible(auth()->user()->role === 'admin')
                                             ->helperText('Оплата працівнику за виконану роботу')
                                             ->default($stage->paid_worker)
                                             ->numeric(),
