@@ -645,6 +645,9 @@ class InvoiceService
                     ->send();
                 continue;
             }
+            if(!isset($item['price'])){
+                $item['price'] = $material->price;
+            }
 
             $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
             $money += $add;
