@@ -553,6 +553,45 @@ class ProductionViewBuilder
                 ->label('Ширина плечей')
                 ->numeric()
                 ->default($record->productionSizes->shoulder ?? null),
+            TextInput::make('neck')
+                ->label('Обхват шиї')
+                ->numeric()
+                ->default($record->productionSizes->neck ?? null),
+            TextInput::make('front')
+                ->label('Перід')
+                ->numeric()
+                ->default($record->productionSizes->front ?? null),
+            TextInput::make('epitrachelion')
+                ->label('Епитрахиля')
+                ->numeric()
+                ->default($record->productionSizes->epitrachelion ?? null),
+            TextInput::make('abdomen_volume')
+                ->label('Об\'єм живота')
+                ->numeric()
+                ->default($record->productionSizes->abdomen_volume ?? null),
+            TextInput::make('height')
+                ->label('Ріст')
+                ->numeric()
+                ->default($record->productionSizes->height ?? null),
+            TextInput::make('floor_height')
+                ->label('Ріст до підлоги')
+                ->numeric()
+                ->default($record->productionSizes->floor_height ?? null),
+            TextInput::make('chest_volume')
+                ->label('Об\'єм грудей')
+                ->numeric()
+                ->default($record->productionSizes->chest_volume ?? null),
+            TextInput::make('cuffs')
+                ->label('Нарукавники')
+                ->boolean()
+                ->default($record->productionSizes->cuffs ?? null),
+            Textarea::make('awards')
+                ->label('Нагороди')
+                ->default($record->productionSizes->awards ?? null),
+            TextInput::make('sticharion')
+                ->label('Стихар')
+                ->boolean()
+                ->default($record->productionSizes->sticharion ?? null),
             Textarea::make('comment')
                 ->label('Коментар')
                 ->default($record->productionSizes->comment ?? null),
@@ -573,6 +612,16 @@ class ProductionViewBuilder
             $productionSize->sleeve = $data['sleeve'];
             $productionSize->shoulder = $data['shoulder'];
             $productionSize->comment = $data['comment'];
+            $productionSize->neck = $data['neck'];
+            $productionSize->front = $data['front'];
+            $productionSize->epitrachelion = $data['epitrachelion'];
+            $productionSize->abdomen_volume = $data['abdomen_volume'];
+            $productionSize->height = $data['height'];
+            $productionSize->floor_height = $data['floor_height'];
+            $productionSize->chest_volume = $data['chest_volume'];
+            $productionSize->cuffs = $data['cuffs'];
+            $productionSize->awards = $data['awards'];
+            $productionSize->sticharion = $data['sticharion'];
 
             try {
                 if ($productionSize->save()) {
