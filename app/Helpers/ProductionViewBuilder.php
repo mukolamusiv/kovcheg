@@ -713,16 +713,16 @@ class ProductionViewBuilder
                     ->default($record->productionSizes->chest_volume ?? '-'),
 
                 TextEntry::make('cuffs')
-                    ->label('Нарукавники')
-                    ->default($record->productionSizes->cuffs ? 'Так' : 'Ні'),
+                    ->label('Нарукавники'),
+                    //->default($record->productionSizes->cuffs ? 'Так' : 'Ні'),
 
                 TextEntry::make('awards')
                     ->label('Нагороди')
                     ->default($record->productionSizes->awards ?? '-'),
 
                 TextEntry::make('sticharion')
-                    ->label('Стихар')
-                    ->default($record->productionSizes->sticharion ? 'Так' : 'Ні'),
+                    ->label('Стихар'),
+                    //->default($record->productionSizes->sticharion ? 'Так' : 'Ні'),
 
                 TextEntry::make('comment')
                     ->label('Коментар')
