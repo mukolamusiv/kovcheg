@@ -605,24 +605,24 @@ class ProductionViewBuilder
               //  $productionSize->customer_id = $record->customer_id;
             }
 
-            $productionSize->throat = $data['throat'];
-            $productionSize->redistribution = $data['redistribution'];
-            $productionSize->behind = $data['behind'];
-            $productionSize->hips = $data['hips'];
-            $productionSize->length = $data['length'];
-            $productionSize->sleeve = $data['sleeve'];
-            $productionSize->shoulder = $data['shoulder'];
-            $productionSize->comment = $data['comment'];
-            $productionSize->neck = $data['neck'];
-            $productionSize->front = $data['front'];
-            $productionSize->epitrachelion = $data['epitrachelion'];
-            $productionSize->abdomen_volume = $data['abdomen_volume'];
-            $productionSize->height = $data['height'];
-            $productionSize->floor_height = $data['floor_height'];
-            $productionSize->chest_volume = $data['chest_volume'];
-            $productionSize->cuffs = $data['cuffs'];
-            $productionSize->awards = $data['awards'];
-            $productionSize->sticharion = $data['sticharion'];
+            $productionSize->throat = $data['throat'] ?? 0;
+            $productionSize->redistribution = $data['redistribution'] ?? 0;
+            $productionSize->behind = $data['behind'] ?? 0;
+            $productionSize->hips = $data['hips'] ?? 0;
+            $productionSize->length = $data['length'] ?? 0;
+            $productionSize->sleeve = $data['sleeve'] ?? 0;
+            $productionSize->shoulder = $data['shoulder'] ?? 0;
+            $productionSize->comment = $data['comment'] ?? '';
+            $productionSize->neck = $data['neck'] ?? 0;
+            $productionSize->front = $data['front'] ?? 0;
+            $productionSize->epitrachelion = $data['epitrachelion'] ?? 0;
+            $productionSize->abdomen_volume = $data['abdomen_volume'] ?? 0;
+            $productionSize->height = $data['height'] ?? 0;
+            $productionSize->floor_height = $data['floor_height'] ?? 0;
+            $productionSize->chest_volume = $data['chest_volume'] ?? 0;
+            $productionSize->cuffs = $data['cuffs'] ?? 0;
+            $productionSize->awards = $data['awards'] ?? '';
+            $productionSize->sticharion = $data['sticharion'] ?? 0;
 
             try {
                 if ($productionSize->save()) {
