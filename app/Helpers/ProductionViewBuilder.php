@@ -30,6 +30,7 @@ use Filament\Infolists\Components\Fieldset;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Closure;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\Actions\Action;
@@ -581,14 +582,14 @@ class ProductionViewBuilder
                 ->label('Об\'єм грудей')
                 ->numeric()
                 ->default($record->productionSizes->chest_volume ?? null),
-            TextInput::make('cuffs')
+            Checkbox::make('cuffs')
                 ->label('Нарукавники')
                 ->boolean()
                 ->default($record->productionSizes->cuffs ?? null),
             Textarea::make('awards')
                 ->label('Нагороди')
                 ->default($record->productionSizes->awards ?? null),
-            TextInput::make('sticharion')
+            Checkbox::make('sticharion')
                 ->label('Стихар')
                 ->boolean()
                 ->default($record->productionSizes->sticharion ?? null),
