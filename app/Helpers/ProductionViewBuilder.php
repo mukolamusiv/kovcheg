@@ -684,6 +684,46 @@ class ProductionViewBuilder
                     ->label('Ширина плечей')
                     ->default($record->productionSizes->shoulder ?? '-'),
 
+                TextEntry::make('neck')
+                    ->label('Обхват шиї')
+                    ->default($record->productionSizes->neck ?? '-'),
+
+                TextEntry::make('front')
+                    ->label('Перід')
+                    ->default($record->productionSizes->front ?? '-'),
+
+                TextEntry::make('epitrachelion')
+                    ->label('Епитрахиля')
+                    ->default($record->productionSizes->epitrachelion ?? '-'),
+
+                TextEntry::make('abdomen_volume')
+                    ->label('Об\'єм живота')
+                    ->default($record->productionSizes->abdomen_volume ?? '-'),
+
+                TextEntry::make('height')
+                    ->label('Ріст')
+                    ->default($record->productionSizes->height ?? '-'),
+
+                TextEntry::make('floor_height')
+                    ->label('Ріст до підлоги')
+                    ->default($record->productionSizes->floor_height ?? '-'),
+
+                TextEntry::make('chest_volume')
+                    ->label('Об\'єм грудей')
+                    ->default($record->productionSizes->chest_volume ?? '-'),
+
+                TextEntry::make('cuffs')
+                    ->label('Нарукавники')
+                    ->default($record->productionSizes->cuffs ? 'Так' : 'Ні'),
+
+                TextEntry::make('awards')
+                    ->label('Нагороди')
+                    ->default($record->productionSizes->awards ?? '-'),
+
+                TextEntry::make('sticharion')
+                    ->label('Стихар')
+                    ->default($record->productionSizes->sticharion ? 'Так' : 'Ні'),
+
                 TextEntry::make('comment')
                     ->label('Коментар')
                     ->default($record->productionSizes->comment ?? '-'),
