@@ -606,24 +606,24 @@ class ProductionViewBuilder
                 //$productionSize->customer_id = $record->customer_id;
             }
 
-            $productionSize->throat = $data['throat'] ?? 0;
-            $productionSize->redistribution = $data['redistribution'] ?? 0;
-            $productionSize->behind = $data['behind'] ?? 0;
-            $productionSize->hips = $data['hips'] ?? 0;
-            $productionSize->length = $data['length'] ?? 0;
-            $productionSize->sleeve = $data['sleeve'] ?? 0;
-            $productionSize->shoulder = $data['shoulder'] ?? 0;
-            $productionSize->comment = $data['comment'] ?? '';
-            $productionSize->neck = $data['neck'] ?? 0;
-            $productionSize->front = $data['front'] ?? 0;
-            $productionSize->epitrachelion = $data['epitrachelion'] ?? 0;
-            $productionSize->abdomen_volume = $data['abdomen_volume'] ?? 0;
-            $productionSize->height = $data['height'] ?? 0;
-            $productionSize->floor_height = $data['floor_height'] ?? 0;
-            $productionSize->chest_volume = $data['chest_volume'] ?? 0;
-            $productionSize->cuffs = $data['cuffs'] ?? 0;
-            $productionSize->awards = $data['awards'] ?? '';
-            $productionSize->sticharion = $data['sticharion'] ?? 0;
+            $productionSize->throat = $data['throat'] ?? null;
+            $productionSize->redistribution = $data['redistribution'] ?? null;
+            $productionSize->behind = $data['behind'] ?? null;
+            $productionSize->hips = $data['hips'] ?? null;
+            $productionSize->length = $data['length'] ?? null;
+            $productionSize->sleeve = $data['sleeve'] ?? null;
+            $productionSize->shoulder = $data['shoulder'] ?? null;
+            $productionSize->comment = $data['comment'] ?? null;
+            $productionSize->neck = $data['neck'] ?? null;
+            $productionSize->front = $data['front'] ?? null;
+            $productionSize->epitrachelion = $data['epitrachelion'] ?? null;
+            $productionSize->abdomen_volume = $data['abdomen_volume'] ?? null;
+            $productionSize->height = $data['height'] ?? null;
+            $productionSize->floor_height = $data['floor_height'] ?? null;
+            $productionSize->chest_volume = $data['chest_volume'] ?? null;
+            $productionSize->cuffs = $data['cuffs'] ?? null;
+            $productionSize->awards = $data['awards'] ?? null;
+            $productionSize->sticharion = $data['sticharion'] ?? null;
 
             try {
                 if ($productionSize->save()) {
