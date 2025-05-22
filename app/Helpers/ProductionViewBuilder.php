@@ -584,14 +584,14 @@ class ProductionViewBuilder
                 ->default($record->productionSizes->chest_volume ?? null),
             Checkbox::make('cuffs')
                 ->label('Нарукавники')
-                ->boolean()
+                //->boolean()
                 ->default($record->productionSizes->cuffs ?? null),
             Textarea::make('awards')
                 ->label('Нагороди')
                 ->default($record->productionSizes->awards ?? null),
             Checkbox::make('sticharion')
                 ->label('Стихар')
-                ->boolean()
+                //->boolean()
                 ->default($record->productionSizes->sticharion ?? null),
             Textarea::make('comment')
                 ->label('Коментар')
