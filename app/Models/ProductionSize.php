@@ -20,6 +20,16 @@ class ProductionSize extends Model
         'sleeve',
         'shoulder',
         'comment',
+        'neck',
+        'front',
+        'epitrachelion',
+        'abdomen_volume',
+        'height',
+        'floor_height',
+        'chest_volume',
+        'cuffs',
+        'awards',
+        'sticharion',
     ];
 
 }
