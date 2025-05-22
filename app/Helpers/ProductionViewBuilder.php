@@ -603,7 +603,7 @@ class ProductionViewBuilder
             if (!$productionSize) {
                 $productionSize = new ProductionSize();
                 $productionSize->production_id = $record->id;
-              //  $productionSize->customer_id = $record->customer_id;
+                //$productionSize->customer_id = $record->customer_id;
             }
 
             $productionSize->throat = $data['throat'] ?? 0;
