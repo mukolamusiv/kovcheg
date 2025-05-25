@@ -18,18 +18,4 @@ class ListWarehouses extends ListRecords
         ];
     }
 
-    public function getHeaderWidgets(): array
-    {
-       // $data = $this->record->warehouseMaterials()
-         //   ->selectRaw('SUM(quantity * price) as sum, COUNT(*) as count')
-           // ->first();
-
-        dd($this);
-
-        //dd($this->record->account->balance);
-        return [
-          //  UserAccaunt::make(array($this->record->account)),
-            CountMaterials::make(),
-        ];
-    }
 }
