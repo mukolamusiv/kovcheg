@@ -266,11 +266,11 @@ class MoveInvoiceService
         $materialWarehouse = $this->getMaterialWarehouse($materialId, $warehouseId, $quantity, $price);
         if ($this->invoice->type == 'постачання') {
            // dd('asdasd');
-            $materialWarehouse->quantity -= $quantity;
+            $materialWarehouse->quantity += $quantity;
             $materialWarehouse->save();
         }
         if ($this->invoice->type == 'продаж') {
-            $materialWarehouse->quantity += $quantity;
+            $materialWarehouse->quantity -= $quantity;
             //dd($materialWarehouse,$quantity);
             $materialWarehouse->save();
         }
@@ -279,12 +279,12 @@ class MoveInvoiceService
             if ($this->invoice->customer_id == null) {
                 throw new \Exception('Отримувач не вказаний');
             }
-            $materialWarehouse->quantity -= $quantity;
+            $materialWarehouse->quantity += $quantity;
             $materialWarehouse->save();
         }
         if($this->invoice->type == 'списання'){
            // dd('asdasd');
-            $materialWarehouse->quantity += $quantity;
+            $materialWarehouse->quantity -= $quantity;
             $materialWarehouse->save();
         }
         if($this->invoice->type == 'переміщення'){
@@ -346,6 +346,22 @@ class MoveInvoiceService
                 ->send();
         }else{
             $warehouseMaterial = $warehouseMaterials->first();
+            if ($this->invoice->type == 'продаж') {
+                $warehouseMaterial->quantity -= $productionItems->quantity;
+                //dd($materialWarehouse,$quantity);
+            }
+            if ($this->invoice->type == 'постачання') {
+                $warehouseMaterial->quantity += $productionItems->quantity;
+                //dd($materialWarehouse,$quantity);
+            }
+            if ($this->invoice->type == 'переміщення') {
+                //$warehouseMaterial->quantity += $productionItems->quantity;
+                //dd($materialWarehouse,$quantity);
+            }
+            if ($this->invoice->type == 'списання') {
+                $warehouseMaterial->quantity -= $productionItems->quantity;
+                //dd($materialWarehouse,$quantity);
+            }
             $warehouseMaterial->quantity += $productionItems->quantity;
             if($warehouseMaterial->price < $productionItems->price){
                 $warehouseMaterial->price = $productionItems->price;

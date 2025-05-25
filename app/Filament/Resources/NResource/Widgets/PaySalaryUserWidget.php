@@ -9,7 +9,9 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use App\Models\Account;
+use App\Models\Transaction;
 use App\Models\User;
+use Filament\Notifications\Notification;
 
 class PaySalaryUserWidget extends Widget
 {
@@ -29,8 +31,75 @@ class PaySalaryUserWidget extends Widget
             if($account->balance < $account->salary) {
                 // Якщо баланс менший за зарплату, не виплачувати
                 return;
+
+
             }
-          //  $account->balance -= $account->salary;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Перевірка, чи сума платежу не менше нуля
+        if ($payment <= 0) {
+            Notification::make()
+                ->title('Помилка при проведенні оплати!')
+                ->body('Сума платежу повинна бути більше нуля')
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->send();
+            return;
+        }
+        // Перевірка, чи рахунок існує
+        if (!$account) {
+            Notification::make()
+                ->title('Помилка при проведенні оплати!')
+                ->body('Рахунок не знайдено')
+                ->icon('heroicon-o-x-circle')
+                ->danger()
+                ->send();
+            return;
+        }
+        if($invoice->type == 'продаж'){
+            $payer = $invoice->customer->account; // ID рахунку клієнта
+            $receiver = $account; // ID рахунку компанії
+            $description = 'Оплата клієнтом згідно накладної №'.$invoice->invoice_number; // Опис транзакції
+        }
+        if($invoice->type == 'постачання'){
+            $payer = $account; // ID рахунку платника
+            $receiver = $invoice->supplier->account; // ID рахунку постачальника
+            $description = 'Оплата постачальнику згідно накладної №'.$invoice->invoice_number; // Опис транзакції
+        }
+        //dd($payer, $receiver, $description);
+        $transaction = Transaction::makingPayment(
+            $invoice,
+            $payer,
+            $receiver,
+            $payment,
+            $description
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
             $account->save();
         }
 
