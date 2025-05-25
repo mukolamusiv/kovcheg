@@ -21,14 +21,20 @@ class ViewWarehouse extends ViewRecord
 
     public function getHeaderWidgets(): array
     {
-       $data = $this->record->warehouseMaterials;
+        $materials = $this->record->warehouseMaterials;
 
-        dd($data);
+        $totalQuantity = $materials->sum('quantity');
+        $totalCost = $materials->sum(function ($material) {
+            return $material->quantity * $material->price;
+        });
 
-        //dd($this->record->account->balance);
-        return [
-          //  UserAccaunt::make(array($this->record->account)),
-            CountMaterials::make(),
-        ];
+        // dd([
+        //     'totalQuantity' => $totalQuantity,
+        //     'totalCost' => $totalCost,
+        // ]);
+
+    return [
+        CountMaterials::make($totalQuantity, $totalCost),
+    ];
     }
 }
