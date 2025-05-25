@@ -156,6 +156,9 @@ class WarehouseMaterialResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('material.category_id')
+                    ->label('Категорія')
+                    ->relationship('material.category', 'name'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
