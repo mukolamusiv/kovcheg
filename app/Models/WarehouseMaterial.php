@@ -17,6 +17,7 @@ class WarehouseMaterial extends Model
         return $this->belongsTo(Material::class);
     }
 
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);

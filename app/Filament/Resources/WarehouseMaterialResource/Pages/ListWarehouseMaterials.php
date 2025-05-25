@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\WarehouseMaterialResource\Pages;
 
 use App\Filament\Resources\WarehouseMaterialResource;
+use App\Filament\Widgets\CountMaterials;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -16,4 +17,5 @@ class ListWarehouseMaterials extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
 }
