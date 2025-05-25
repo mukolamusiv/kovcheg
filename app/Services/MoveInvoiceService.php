@@ -309,7 +309,28 @@ class MoveInvoiceService
             ->where('warehouse_id', $warehouseId)->get();
 
         $warehouseMaterial = $warehouseMaterials->first();
-        $warehouseMaterial->quantity -= $productionItems->quantity;
+      //  $warehouseMaterial->quantity -= $productionItems->quantity;
+
+        if ($this->invoice->type == 'продаж') {
+            $warehouseMaterial->quantity += $productionItems->quantity;
+            $warehouseMaterial->save();
+            //dd($materialWarehouse,$quantity);
+        }
+        if ($this->invoice->type == 'постачання') {
+            $warehouseMaterial->quantity -= $productionItems->quantity;
+            $warehouseMaterial->save();
+            //dd($materialWarehouse,$quantity);
+        }
+        if ($this->invoice->type == 'переміщення') {
+            //$warehouseMaterial->quantity += $productionItems->quantity;
+            //dd($materialWarehouse,$quantity);
+        }
+        if ($this->invoice->type == 'списання') {
+            $warehouseMaterial->quantity += $productionItems->quantity;
+            $warehouseMaterial->save();
+            //dd($materialWarehouse,$quantity);
+        }
+
         if($warehouseMaterial->price < $productionItems->price){
             $warehouseMaterial->price = $productionItems->price;
         }
