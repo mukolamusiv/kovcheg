@@ -56,7 +56,7 @@ class MaterialsRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total')
                     ->label('Всього')
-                    ->getStateUsing(fn ($record) => $record->quantity * $record->price.'.00')
+                    ->getStateUsing(fn ($record) => $record->quantity * $record->price)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('material.category.name')
                     ->label('Категорія')
