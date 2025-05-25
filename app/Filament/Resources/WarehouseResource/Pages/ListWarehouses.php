@@ -20,11 +20,11 @@ class ListWarehouses extends ListRecords
 
     public function getHeaderWidgets(): array
     {
-        $data = $this->record->warehouseMaterials()
-            ->selectRaw('SUM(quantity * price) as sum, COUNT(*) as count')
-            ->first();
+       // $data = $this->record->warehouseMaterials()
+         //   ->selectRaw('SUM(quantity * price) as sum, COUNT(*) as count')
+           // ->first();
 
-        dd($data);
+        dd($this);
 
         //dd($this->record->account->balance);
         return [
