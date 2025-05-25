@@ -16,10 +16,10 @@ class CountMaterials extends BaseWidget
 
     protected static ?string $pollingInterval = null;
 
-    public function mount($sum, $count)
+    public function mount($data)
     {
-        $this->sum = $sum;
-        $this->count = $count;
+        $this->sum = $data['sum'] ?? 0;
+        $this->count = $data['count'] ?? 0;
         // $this->sum = \App\Models\Material::sum('quantity');
         // $this->count = \App\Models\Material::count();
     }
