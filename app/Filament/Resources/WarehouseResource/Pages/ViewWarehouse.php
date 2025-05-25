@@ -33,11 +33,11 @@ class ViewWarehouse extends ViewRecord
         //     'totalCost' => $totalCost,
         // ]);
 
-    return [
-        CountMaterials::make([
-            'sum' => $totalCost,
-            'count' => $totalQuantity,
-        ]),
-    ];
+        return [
+            CountMaterials::make([
+                'sum' => $totalCost,
+                'count' => $totalQuantity,
+            ]),
+        ];
     }
 }

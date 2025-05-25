@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -98,9 +99,18 @@ class WarehouseMaterialResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->groups([
+            Group::make('material.category.name')
+                ->label('Категорія')
+                ->collapsible(),
+        ])
             ->columns([
                 Tables\Columns\TextColumn::make('material.barcode')
                     ->label('Штрих-код')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('material.category.name')
+                    ->label('Категорія')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('warehouse.name')
