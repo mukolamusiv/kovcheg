@@ -16,7 +16,7 @@ class CountMaterials extends BaseWidget
 
     protected static ?string $pollingInterval = null;
 
-    public function mount($data = []): void
+    public function mount($data): void
     {
         $this->sum = $data['sum'] ?? 0;
         $this->count = $data['count'] ?? 0;
