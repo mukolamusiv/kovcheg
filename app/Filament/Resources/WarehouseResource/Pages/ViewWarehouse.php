@@ -22,8 +22,7 @@ class ViewWarehouse extends ViewRecord
     public function getHeaderWidgets(): array
     {
        $data = $this->record->warehouseMaterials()
-           ->selectRaw('SUM(quantity * price) as sum, COUNT(*) as count')
-           ->first();
+           ->selectRaw('SUM(quantity * price) as sum, COUNT(*) as count');
 
         dd($data);
 
