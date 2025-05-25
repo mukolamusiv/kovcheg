@@ -624,6 +624,7 @@ class InvoiceService
             'status' => 'створено',
             'payment_status' => 'не оплачено',
             'warehouse_id' => $data['warehouse_id'],
+            'warehouse_to_id' => $data['warehouse_to_id'] ?? null,
         ]);
         $money = 0.00;
         // if(isset($data['supply_items'])){
@@ -666,6 +667,9 @@ class InvoiceService
                     ->danger()
                     ->send();
                 continue;
+            }
+            if(!isset($item['price'])){
+                $item['price'] = $material->price;
             }
 
             $add = InvoiceService::addMaterialToInvoice($invoice, $item['material_id'], $item['quantity'], $item['price'], true, $data['warehouse_id']);
