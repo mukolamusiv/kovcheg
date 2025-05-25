@@ -339,8 +339,8 @@ class MoveInvoiceService
             $productionItems->warehouse_productions_id = $warehouseCreate->id;
             $productionItems->save();
             Notification::make()
-                ->title('Матеріл доданий до складу!')
-                ->body('Матеріал ' . $warehouseCreate->production->name . ' доданий до складу ')
+                ->title('Виріб доданий до складу!')
+                ->body('Виріб ' . $warehouseCreate->production->name . ' доданий до складу ')
                 ->icon('heroicon-o-check-circle')
                 ->success()
                 ->send();
@@ -348,10 +348,12 @@ class MoveInvoiceService
             $warehouseMaterial = $warehouseMaterials->first();
             if ($this->invoice->type == 'продаж') {
                 $warehouseMaterial->quantity -= $productionItems->quantity;
+                $warehouseMaterial->save();
                 //dd($materialWarehouse,$quantity);
             }
             if ($this->invoice->type == 'постачання') {
                 $warehouseMaterial->quantity += $productionItems->quantity;
+                $warehouseMaterial->save();
                 //dd($materialWarehouse,$quantity);
             }
             if ($this->invoice->type == 'переміщення') {
@@ -360,6 +362,7 @@ class MoveInvoiceService
             }
             if ($this->invoice->type == 'списання') {
                 $warehouseMaterial->quantity -= $productionItems->quantity;
+                $warehouseMaterial->save();
                 //dd($materialWarehouse,$quantity);
             }
             $warehouseMaterial->quantity += $productionItems->quantity;
