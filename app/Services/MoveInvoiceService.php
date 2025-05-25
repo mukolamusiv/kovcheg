@@ -368,6 +368,7 @@ class MoveInvoiceService
         }else{
             $warehouseMaterial = $warehouseMaterials->first();
             if ($this->invoice->type == 'продаж') {
+               // dd('asdasd' , $productionItems->quantity, $warehouseMaterial->quantity);
                 $warehouseMaterial->quantity -= $productionItems->quantity;
                 $warehouseMaterial->save();
                 //dd($materialWarehouse,$quantity);
@@ -386,7 +387,7 @@ class MoveInvoiceService
                 $warehouseMaterial->save();
                 //dd($materialWarehouse,$quantity);
             }
-            $warehouseMaterial->quantity += $productionItems->quantity;
+            //$warehouseMaterial->quantity += $productionItems->quantity;
             if($warehouseMaterial->price < $productionItems->price){
                 $warehouseMaterial->price = $productionItems->price;
             }
