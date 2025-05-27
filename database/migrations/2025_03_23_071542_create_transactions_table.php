@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->id();
             $table->string('reference_number')->unique(); //номер транзакції
-            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete(); //номер накладної
+            $table->foreignId('invoice_id')->nullable()->constrained()->cascadeOnDelete(); //номер накладної
             $table->string('description')->nullable();
             $table->date('transaction_date');
             $table->enum('status', ['створено', 'проведено', 'скасовано'])->default('створено');

@@ -21,18 +21,22 @@ class PaySalaryUserWidget extends Widget
     //public $isModalOpen = true;
 
     public $account;
+    public $payment;
+    public $description;
+    public $payer;
+    public $sum = 0;
 
 
     public function paySalary($userId)
     {
         $account = User::find($userId)->account;
 
+        dd($account, $userId);
+
         if ($account) {
             if($account->balance < $account->salary) {
                 // Якщо баланс менший за зарплату, не виплачувати
                 return;
-
-
             }
 
 
@@ -50,7 +54,7 @@ class PaySalaryUserWidget extends Widget
 
 
         // Перевірка, чи сума платежу не менше нуля
-        if ($payment <= 0) {
+        if ($account <= 0) {
             Notification::make()
                 ->title('Помилка при проведенні оплати!')
                 ->body('Сума платежу повинна бути більше нуля')
@@ -69,24 +73,24 @@ class PaySalaryUserWidget extends Widget
                 ->send();
             return;
         }
-        if($invoice->type == 'продаж'){
-            $payer = $invoice->customer->account; // ID рахунку клієнта
-            $receiver = $account; // ID рахунку компанії
-            $description = 'Оплата клієнтом згідно накладної №'.$invoice->invoice_number; // Опис транзакції
-        }
-        if($invoice->type == 'постачання'){
-            $payer = $account; // ID рахунку платника
-            $receiver = $invoice->supplier->account; // ID рахунку постачальника
-            $description = 'Оплата постачальнику згідно накладної №'.$invoice->invoice_number; // Опис транзакції
-        }
+        // if($invoice->type == 'продаж'){
+        //     $payer = $invoice->customer->account; // ID рахунку клієнта
+        //     $receiver = $account; // ID рахунку компанії
+        //     $description = 'Оплата клієнтом згідно накладної №'.$invoice->invoice_number; // Опис транзакції
+        // }
+        // if($invoice->type == 'постачання'){
+        //     $payer = $account; // ID рахунку платника
+        //     $receiver = $invoice->supplier->account; // ID рахунку постачальника
+        //     $description = 'Оплата постачальнику згідно накладної №'.$invoice->invoice_number; // Опис транзакції
+        // }
         //dd($payer, $receiver, $description);
-        $transaction = Transaction::makingPayment(
-            $invoice,
-            $payer,
-            $receiver,
-            $payment,
-            $description
-        );
+        // $transaction = Transaction::makingPaymentUser(
+        //     $invoice,
+        //     $payer,
+        //     $receiver,
+        //     $payment,
+        //     $description
+        // );
 
 
 

@@ -117,13 +117,13 @@ class Transaction extends Model
 
             // Створення транзакції
             $transaction = new self();
-            $transaction->reference_number = 'TXN-' . now()->format('YmdHis') . '-' . uniqid();
-            $transaction->description = $description ?? 'Оплата за накладну: ' . $invoice->invoice_number;
+            $transaction->reference_number = 'SAL-' . now()->format('YmdHis') . '-' . uniqid();
+            $transaction->description = $description ?? 'Виплата заробітньої плати: ' . $user->name;
             $transaction->transaction_date = now();
             $transaction->status = 'проведено';
             $transaction->user_id = auth()->id();
             // $transaction->customer_id = $customer->id;
-            $transaction->invoice_id = $user->id;
+           // $transaction->invoice_id = $user->id;
             $transaction->save();
 
             // Створення двох записів TransactionEntry
