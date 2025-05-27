@@ -45,11 +45,14 @@ class Account extends Model
         if($this->owner_type == 'App\Models\User'){
            $user = User::find($this->owner_id);
            $paidUser = $user->production_stages_total();
+           $this->balance = $paidUser - $balans;
+        }else{
+            $this->balance = $balans;
         }
         if($this->account_type == 'актив'){
 
         }
-        $this->balance = $balans ;//- $paidUser;
+////- $paidUser;
         $this->save();
     }
 
