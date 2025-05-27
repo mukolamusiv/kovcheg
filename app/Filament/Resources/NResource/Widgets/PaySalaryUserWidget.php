@@ -56,7 +56,7 @@ class PaySalaryUserWidget extends Widget
 
 
         // Перевірка, чи сума платежу не менше нуля
-        if ($account <= 0) {
+        if ($this->amount <= 0) {
             Notification::make()
                 ->title('Помилка при проведенні оплати!')
                 ->body('Сума платежу повинна бути більше нуля')
@@ -86,26 +86,15 @@ class PaySalaryUserWidget extends Widget
         //     $description = 'Оплата постачальнику згідно накладної №'.$invoice->invoice_number; // Опис транзакції
         // }
        // dd($payer, $receiver, $description);
-       $data_last = $account->transactionEntries->last();
+        $data_last = $account->transactionEntries->last();
         $transaction = Transaction::makingPaymentUser(
-            $user,
-            $selectedWallet,
-            $account,
-            $this->amount,
-            'Виплата зарплати користувачу ' . $user->name . ' згідно рахунку №' . $account->id . ' за період ' . now()->format('Y-m-d') . ' - ' . $data_last->created_at->format('Y-m-d')
-        );
-
-
-
-
-
-
-
-
-
-
-
-
+                $user,
+                $selectedWallet,
+                $account,
+                $this->amount,
+                'Виплата зарплати користувачу ' . $user->name . ' згідно рахунку №' . $account->id . ' за період ' . now()->format('Y-m-d') . ' - ' . $data_last->created_at->format('Y-m-d')
+            );
+            $account->syncBalance();
 
             $account->save();
         }
