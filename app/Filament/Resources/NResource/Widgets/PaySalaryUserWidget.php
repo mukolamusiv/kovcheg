@@ -27,12 +27,12 @@ class PaySalaryUserWidget extends Widget
     public $amount;
 
 
-    public function paySalary($userId, $payerId, $amount)
+    public function paySalary($userId)
     {
         $account = User::find($userId)->account;
-        $payer  = Account::find($payerId);
+        $payer  = Account::find($this->payer);
 
-        dd($account, $userId, $payerId, $amount);
+        dd($account, $userId, $payer, $this->payer, $this->amount, $this);
 
         if ($account) {
             if($account->balance < $account->salary) {
