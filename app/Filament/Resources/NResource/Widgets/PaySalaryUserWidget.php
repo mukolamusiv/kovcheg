@@ -118,7 +118,7 @@ class PaySalaryUserWidget extends Widget
 
     public function mount($account)
     {
-        dd($account);
+        //dd($account);
         $this->account = $account;
         //$this->calculate($record);
     }
@@ -129,7 +129,7 @@ class PaySalaryUserWidget extends Widget
 
         return [
             'account' => $this->account,
-            'userId' => $userId,
+            'userId' => $this->account->owner_id,
             'balance' => $this->account->balance,
             'salary' => $this->account->salary,
             'wallets' => Account::where('owner_type', null)->get(),
