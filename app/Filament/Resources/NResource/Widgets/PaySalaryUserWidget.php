@@ -29,10 +29,11 @@ class PaySalaryUserWidget extends Widget
 
     public function paySalary($userId)
     {
-        $account = User::find($userId)->account;
+        $user = User::find($userId);
+        $account = $user->account;
         $selectedWallet  = Account::find($this->selectedWallet);
 
-        dd($account, $userId, $selectedWallet, $this->selectedWallet, $this->amount, $this);
+        //dd($account, $userId, $selectedWallet, $this->selectedWallet, $this->amount, $this);
 
         if ($account) {
             if($account->balance < $account->salary) {
@@ -84,14 +85,15 @@ class PaySalaryUserWidget extends Widget
         //     $receiver = $invoice->supplier->account; // ID рахунку постачальника
         //     $description = 'Оплата постачальнику згідно накладної №'.$invoice->invoice_number; // Опис транзакції
         // }
-        //dd($payer, $receiver, $description);
-        // $transaction = Transaction::makingPaymentUser(
-        //     $invoice,
-        //     $payer,
-        //     $receiver,
-        //     $payment,
-        //     $description
-        // );
+       // dd($payer, $receiver, $description);
+       $data_last = $account->transactionEntries->last();
+        $transaction = Transaction::makingPaymentUser(
+            $user,
+            $selectedWallet,
+            $account,
+            $this->amount,
+            'Виплата зарплати користувачу ' . $user->name . ' згідно рахунку №' . $account->id . ' за період ' . now()->format('Y-m-d') . ' - ' . $data_last->created_at->format('Y-m-d')
+        );
 
 
 
