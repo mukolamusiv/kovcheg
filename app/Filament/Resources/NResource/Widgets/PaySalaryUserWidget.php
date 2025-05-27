@@ -128,13 +128,15 @@ class PaySalaryUserWidget extends Widget
     public function getViewData(): array
     {
         //$userId = auth()->id();
+        $wallets = Account::where('owner_type', null)->get();
+        $this->selectedWallet = $wallets->first()->id ?? null;
 
         return [
             'account' => $this->account,
             'userId' => $this->account->owner_id,
             'balance' => $this->account->balance,
             'salary' => $this->account->salary,
-            'wallets' => Account::where('owner_type', null)->get(),
+            'wallets' => $wallets,
         ];
     }
 }
