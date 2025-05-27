@@ -87,6 +87,20 @@ class PaySalaryUserWidget extends Widget
         // }
        // dd($payer, $receiver, $description);
         $data_last = $account->transactionEntries->last();
+        dd($data_last);
+        // Перевірка, чи є останній запис у транзакціях
+        if (!$data_last) {
+            Notification::make()
+                ->title('Перша транзакція рахунку!')
+                ->body('Останній запис у транзакціях не знайдено')
+                ->icon('heroicon-o-x-circle')
+                ->warning()
+                ->send();
+        }else{
+            $data_last = $account->created_at;
+        }
+
+        //if()
         $transaction = Transaction::makingPaymentUser(
                 $user,
                 $selectedWallet,
