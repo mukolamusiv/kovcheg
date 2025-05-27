@@ -51,9 +51,9 @@ class WarehouseProductionResource extends Resource
                     ->numeric()
                     ->default(0)
                     ->prefix('$'),
-                Forms\Components\TextInput::make('production.customer.name')
-                    ->label('Замовник')
-                    ->required(),
+                // Forms\Components\TextInput::make('production.customer.name')
+                //     ->label('Замовник')
+                //     ->required(),
                 Forms\Components\TextInput::make('description')
                     ->maxLength(255),
             ]);
@@ -87,6 +87,11 @@ class WarehouseProductionResource extends Resource
                     ->prefix('₴')
                     ->money()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('production.customer.name')
+                    ->label('Замовник')
+                    ->sortable()
+                    ->searchable(),
+                //     ->numeric()
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
