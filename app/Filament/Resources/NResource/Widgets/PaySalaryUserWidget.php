@@ -118,13 +118,14 @@ class PaySalaryUserWidget extends Widget
 
     public function mount($account)
     {
+        dd($account);
         $this->account = $account;
         //$this->calculate($record);
     }
 
     public function getViewData(): array
     {
-        $userId = auth()->id();
+        //$userId = auth()->id();
 
         return [
             'account' => $this->account,
