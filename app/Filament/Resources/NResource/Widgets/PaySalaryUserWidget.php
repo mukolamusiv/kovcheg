@@ -107,7 +107,7 @@ class PaySalaryUserWidget extends Widget
                 $selectedWallet,
                 $account,
                 $this->amount,
-                'Виплата зарплати користувачу ' . $user->name . ' згідно рахунку №' . $account->id . ' за період ' . now()->format('Y-m-d') . ' - ' . $data_last->created_at->format('Y-m-d')
+                'Виплата зарплати користувачу ' . $user->name . ' згідно рахунку №' . $account->id . ' за період ' . now()->format('Y-m-d') . ' - ' . $data_last
             );
             $account->syncBalance();
 
