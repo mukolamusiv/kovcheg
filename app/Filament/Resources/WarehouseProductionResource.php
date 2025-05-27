@@ -51,6 +51,9 @@ class WarehouseProductionResource extends Resource
                     ->numeric()
                     ->default(0)
                     ->prefix('$'),
+                Forms\Components\TextInput::make('production.customer.name')
+                    ->label('Замовник')
+                    ->required(),
                 Forms\Components\TextInput::make('description')
                     ->maxLength(255),
             ]);
