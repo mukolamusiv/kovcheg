@@ -32,7 +32,7 @@ class PaySalaryUserWidget extends Widget
         $account = User::find($userId)->account;
         $selectedWallet  = Account::find($this->selectedWallet);
 
-        dd($account, $userId, $selectedWallet, $this->amount, $this);
+        dd($account, $userId, $selectedWallet, $this->selectedWallet, $this->amount, $this);
 
         if ($account) {
             if($account->balance < $account->salary) {
