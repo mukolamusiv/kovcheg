@@ -17,7 +17,7 @@
                         <form wire:submit.prevent="paySalary({{ $userId }})">
                             <div class="mb-4">
                                 <label for="selectedWallet" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Виплатити з гаманця</label>
-                                <select id="selectedWallet" wire:model="selectedWallet" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300">
+                                <select id="selectedWallet" wire:model="selectedWallet" name="selectedWallet" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300">
                                     @foreach($wallets as $wallet)
                                         <option value="{{ $wallet->id }}">{{ $wallet->name }}</option>
                                     @endforeach
