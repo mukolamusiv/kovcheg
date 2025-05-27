@@ -23,16 +23,16 @@ class PaySalaryUserWidget extends Widget
     public $account;
     public $payment;
     public $description;
-    public $payer;
+    public $selectedWallet;
     public $amount;
 
 
     public function paySalary($userId)
     {
         $account = User::find($userId)->account;
-        $payer  = Account::find($this->payer);
+        $selectedWallet  = Account::find($this->selectedWallet);
 
-        dd($account, $userId, $payer, $this->payer, $this->amount, $this);
+        dd($account, $userId, $selectedWallet, $this->amount, $this);
 
         if ($account) {
             if($account->balance < $account->salary) {
@@ -121,6 +121,7 @@ class PaySalaryUserWidget extends Widget
     {
         //dd($account);
         $this->account = $account;
+        $this->amount = $this->account->balance;
         //$this->calculate($record);
     }
 
