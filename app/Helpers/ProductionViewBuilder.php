@@ -204,12 +204,12 @@ class ProductionViewBuilder
 
                     TextEntry::make($material->price ?? '')
                         ->label('Ціна за одиницю')
-                        ->visible(fn () => auth()->user()->role === 'admin')
+                        ->visible(fn () => auth()->user()->role === 'admin' || auth()->user()->role === 'manager')
                         ->default($material->price)
                         ->prefix('₴'),
                     TextEntry::make($material->price.'total' ?? '')
                         ->label('Загальна вартість')
-                        ->visible(fn () => auth()->user()->role === 'admin')
+                        ->visible(fn () => auth()->user()->role === 'admin'  || auth()->user()->role === 'manager')
                         ->default($material->price * $material->quantity)
                         ->prefix('₴'),
 
@@ -376,7 +376,7 @@ class ProductionViewBuilder
 
                         TextEntry::make('price')
                             ->label('Вартість виробу')
-                            ->visible(fn () => auth()->user()->role === 'admin')
+                            ->visible(fn () => auth()->user()->role === 'admin'  || auth()->user()->role === 'manager')
                             ->prefix('₴'),
 
                         TextEntry::make('production_date')
