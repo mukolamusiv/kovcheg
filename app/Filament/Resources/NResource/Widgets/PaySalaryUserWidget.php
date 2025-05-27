@@ -87,7 +87,7 @@ class PaySalaryUserWidget extends Widget
         // }
        // dd($payer, $receiver, $description);
         $data_last = $account->transactionEntries->last();
-        dd($data_last);
+        //dd($data_last);
         // Перевірка, чи є останній запис у транзакціях
         if (!$data_last) {
             Notification::make()
