@@ -96,8 +96,9 @@ class PaySalaryUserWidget extends Widget
                 ->icon('heroicon-o-x-circle')
                 ->warning()
                 ->send();
+                $data_last = $account->created_at;
         }else{
-            $data_last = $account->created_at;
+            $data_last = $data_last->created_at->format('Y-m-d');
         }
 
         //if()
