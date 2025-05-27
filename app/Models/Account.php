@@ -39,11 +39,17 @@ class Account extends Model
         $debitSum = $this->debitEntries()->sum('amount');
         $creditSum = $this->creditEntries()->sum('amount');
         $paidUser = 0;
+
+        $balans = $debitSum - $creditSum;
+        // Якщо власник - користувач, додаємо його зарплату
         if($this->owner_type == 'App\Models\User'){
            $user = User::find($this->owner_id);
            $paidUser = $user->production_stages_total();
         }
-        $this->balance = $debitSum - $creditSum + $paidUser;
+        if($this->account_type == 'актив'){
+
+        }
+        $this->balance = $balans ;//- $paidUser;
         $this->save();
     }
 
