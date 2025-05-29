@@ -144,6 +144,7 @@ class InvoiceSectionBuilder
                                     ->label('Зарахувати кошти на рахунок')
                                     ->options(Account::all()->pluck('name', 'id'))
                                     ->required()
+                                    ->searchable()
                                     ->placeholder('Виберіть рахунок'),
                                 TextInput::make('amount')
                                     ->label('Сума')
