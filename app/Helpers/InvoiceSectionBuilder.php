@@ -136,7 +136,7 @@ class InvoiceSectionBuilder
                             }),
                         Action::make('pay' . $invoice->id)
                             ->label('Внести оплату')
-                            ->visible(fn () => $invoice->status === 'проведено' and $invoice->type === 'продаж')
+                            ->visible(fn () => $invoice->customer()->exists() and $invoice->status === 'проведено' and $invoice->type === 'продаж')
                             ->icon('heroicon-o-credit-card')
                             ->color('success')
                             ->form([
