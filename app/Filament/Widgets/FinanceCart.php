@@ -109,7 +109,7 @@ class FinanceCart extends BaseWidget
             'user' => $user,
         ];
 
-        if($active < 0){
+        if($active != 0){
             foreach(Account::all() as $account){
                 $account->syncBalance();
                // $account->save();
