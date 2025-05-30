@@ -85,11 +85,11 @@ class Customer extends Model
                 return $transaction->entries;
             })
             ->sum('amount');
-            if($this->id == 5) {
-                //dd($invoicesPaid, $transactionsTotal, $invoicesTotal);
-                dd($invoicesPaid, $transactionsTotal,$this->transactions, $invoicesTotal);
-            }
-        return $invoicesPaid - $transactionsTotal + $invoicesTotal;
+            // if($this->id == 5) {
+            //     //dd($invoicesPaid, $transactionsTotal, $invoicesTotal);
+            //     dd($invoicesPaid, $transactionsTotal,$this->transactions, $invoicesTotal);
+            // }
+        return $invoicesTotal;//$invoicesPaid - $transactionsTotal + $invoicesTotal;
         // Підрахунок суми всіх неоплачених рахунків
         //return $this->invoices()->sum('due');
     }
