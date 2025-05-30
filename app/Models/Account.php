@@ -49,8 +49,10 @@ class Account extends Model
         }else{
             $this->balance = $balans;
         }
-        if($this->account_type == 'актив'){
-
+        if($this->owner_type == 'App\Models\Customer'){
+            $customer = Customer::find($this->owner_id);
+            $paidUser = $customer->calculateOutstandingInvoices();
+            $this->balance = $paidUser - $balans;
         }
 ////- $paidUser;
         $this->save();
