@@ -96,7 +96,7 @@ class Customer extends Model
 
     public function paidInvoices()
     {
-        return $this->invoices()->sum('paid');
+        return $this->invoices()->sum('paid') || 0;
     }
 
 
