@@ -44,7 +44,10 @@ class Account extends Model
         // Якщо власник - користувач, додаємо його зарплату
         if($this->owner_type == 'App\Models\User'){
            $user = User::find($this->owner_id);
-           $paidUser = $user->production_stages_total();
+              // Перевіряємо, чи користувач має метод production_stages_total
+        if(method_exists($user, 'production_stages_total')) {
+            $paidUser = $user->production_stages_total();
+        }
            $this->balance = $paidUser - $balans;
         }else{
             $this->balance = $balans;
