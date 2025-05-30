@@ -87,7 +87,7 @@ class Customer extends Model
             ->sum('amount');
             if($this->id == 4) {
                 //dd($invoicesPaid, $transactionsTotal, $invoicesTotal);
-                dd($invoicesPaid, $transactionsTotal,$this->transactions , $invoicesTotal);
+                dd($invoicesPaid, $transactionsTotal,$this->transactions(), $invoicesTotal);
             }
         return $invoicesPaid - $transactionsTotal + $invoicesTotal;
         // Підрахунок суми всіх неоплачених рахунків
