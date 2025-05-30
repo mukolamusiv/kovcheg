@@ -64,7 +64,7 @@ class Account extends Model
                 $pay = $customer->paidInvoices();
             }
 
-            $bal = $pay - $paidUser;
+            $bal = (float)$pay - (float)$paidUser;
 
             $this->balance = $bal - $balans;// + $paidUser;
             $this->save();
