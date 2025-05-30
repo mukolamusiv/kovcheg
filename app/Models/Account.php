@@ -63,7 +63,7 @@ class Account extends Model
             if ($customer && $customer->paidInvoices() !== null) {
                 $pay = $customer->paidInvoices();
             }
-            $this->balance = $pay - $balans + $paidUser;
+            $this->balance = $balans - $pay + $paidUser;
             $this->save();
             // if($customer->id == 5 ){
             //   //   dd($customer->id, $customer->calculateOutstandingInvoices(), $paidUser, $balans, $this->balance, $debitSum, $creditSum);
