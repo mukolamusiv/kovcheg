@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\TransactionEntry;
 use App\Models\WarehouseMaterial;
 use App\Models\WarehouseProduction;
+use Dompdf\Css\Content\Counters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -107,6 +108,13 @@ class FinanceCart extends BaseWidget
             'all' => $all ,
             'user' => $user,
         ];
+
+        if($active < 0){
+            foreach(Account::all() as $account){
+                $account->syncBalance();
+               // $account->save();
+            }
+        }
 
         return $datas;
     }
