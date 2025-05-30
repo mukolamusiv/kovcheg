@@ -54,7 +54,9 @@ class Account extends Model
         }
         if($this->owner_type == 'App\Models\Customer'){
             $customer = Customer::find($this->owner_id);
-            $paidUser = $customer->calculateOutstandingInvoices();
+            if ($customer && $customer->calculateOutstandingInvoices() !== null) {
+                $paidUser = $customer->calculateOutstandingInvoices();
+            }
             $this->balance = $paidUser - $balans;
         }
 ////- $paidUser;
