@@ -45,7 +45,7 @@ class Account extends Model
         if($this->owner_type == 'App\Models\User'){
            $user = User::find($this->owner_id);
               // Перевіряємо, чи користувач має метод production_stages_total
-        if( $user->production_stages_total() !== null) {
+        if ($user && $user->production_stages_total() !== null) {
             $paidUser = $user->production_stages_total();
         }
            $this->balance = $paidUser - $balans;
