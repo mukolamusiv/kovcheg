@@ -62,7 +62,7 @@ class Account extends Model
 
         if($this->owner_type == 'App\Models\Supplier'){
             $supplier = Supplier::find($this->owner_id);
-            if ($supplier && $supplier->calculateOutstandingInvoices() !== null) {
+            if ($supplier && $supplier->calculateObligations() !== null) {
                 $paidUser = $supplier->calculateObligations();
             }
             $this->balance = $paidUser - $balans;
