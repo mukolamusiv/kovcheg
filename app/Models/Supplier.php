@@ -123,6 +123,7 @@ class Supplier extends Model
                 return $transaction->entries;
             })
             ->sum('amount');
+            dd($invoicesPaid, $transactionsTotal, $invoicesTotal);
         return $invoicesPaid - $transactionsTotal + $invoicesTotal;
     }
 
