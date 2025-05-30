@@ -66,7 +66,7 @@ class Account extends Model
 
             $bal = (float)$pay - (float)$paidUser;
 
-            $this->balance = $bal - $balans;// + $paidUser;
+            $this->balance = $balans - $bal; // Corrected the calculation to subtract $bal from $balans
             $this->save();
             if($customer->id == 4 ){
                 dd($bal, $customer->id, $customer->calculateOutstandingInvoices(), $pay, $paidUser, $balans, $this->balance, $debitSum, $creditSum);
