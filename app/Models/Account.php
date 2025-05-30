@@ -67,9 +67,10 @@ class Account extends Model
             }
 
             if($supplier->id == 4 ){
-                dd($supplier->id, $supplier->calculateObligations(), $paidUser, $balans);
+               // dd($supplier->id, $supplier->calculateObligations(), $paidUser, $balans);
             }
             $this->balance = $paidUser - $balans;
+            $this->save();
         }
 
 ////- $paidUser;
