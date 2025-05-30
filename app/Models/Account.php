@@ -45,9 +45,9 @@ class Account extends Model
         if($this->owner_type == 'App\Models\User'){
            $user = User::find($this->owner_id);
               // Перевіряємо, чи користувач має метод production_stages_total
-        if ($user && $user->production_stages_total() !== null) {
-            $paidUser = $user->production_stages_total();
-        }
+            if ($user && $user->production_stages_total() !== null) {
+                $paidUser = $user->production_stages_total();
+            }
            $this->balance = $paidUser - $balans;
         }else{
             $this->balance = $balans;
@@ -59,6 +59,15 @@ class Account extends Model
             }
             $this->balance = $paidUser - $balans;
         }
+
+        if($this->owner_type == 'App\Models\Supplier'){
+            $supplier = Supplier::find($this->owner_id);
+            if ($supplier && $supplier->calculateOutstandingInvoices() !== null) {
+                $paidUser = $supplier->calculateObligations();
+            }
+            $this->balance = $paidUser - $balans;
+        }
+
 ////- $paidUser;
         $this->save();
     }
