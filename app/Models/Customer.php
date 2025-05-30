@@ -77,7 +77,7 @@ class Customer extends Model
     public function calculateOutstandingInvoices()
     {
         // Підрахунок суми всіх неоплачених рахунків
-        return $this->invoices()->where('status', '!=', 'не оплачено')->sum('due');
+        return $this->invoices()->sum('due');
     }
 
 
