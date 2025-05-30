@@ -76,8 +76,18 @@ class Customer extends Model
 
     public function calculateOutstandingInvoices()
     {
+        $invoicesTotal = $this->invoices()->sum('due');
+        $invoicesPaid = $this->invoices()->sum('paid');
+        $transactionsTotal = $this->transactions()
+            ->with('entries')
+            ->get()
+            ->flatMap(function ($transaction) {
+                return $transaction->entries;
+            })
+            ->sum('amount');
+        return $invoicesPaid - $transactionsTotal + $invoicesTotal;
         // Підрахунок суми всіх неоплачених рахунків
-        return $this->invoices()->sum('due');
+        //return $this->invoices()->sum('due');
     }
 
 
