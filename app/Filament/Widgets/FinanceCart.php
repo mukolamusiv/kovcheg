@@ -89,7 +89,7 @@ class FinanceCart extends BaseWidget
         $productionSale = 0.00;
         foreach (WarehouseProduction::all() as $production) {
             $productionActive += $production->price * $production->quantity;
-            $productionSale += $production->production->price;
+            $productionSale += $production->production->price * $production->quantity;
         }
         // $active = 0.00;
         $productionSale = number_format( $productionSale, 2, '.', '');

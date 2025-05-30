@@ -31,6 +31,8 @@ class Customer extends Model
             ]);
         });
 
+
+
         // Слухаємо подію "updated" для моделі Customer
         static::updated(function ($customer) {
             // Перераховуємо баланс рахунку клієнта на основі його зобов'язань
