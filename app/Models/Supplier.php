@@ -126,4 +126,9 @@ class Supplier extends Model
         return $invoicesPaid - $transactionsTotal + $invoicesTotal;
     }
 
+    public function paidInvoices()
+    {
+        return $this->invoices()->sum('paid');
+    }
+
 }
