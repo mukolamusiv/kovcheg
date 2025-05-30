@@ -123,11 +123,6 @@ class Supplier extends Model
                 return $transaction->entries;
             })
             ->sum('amount');
-            if($this->id == 4) {
-                //dd($invoicesPaid, $transactionsTotal, $invoicesTotal);
-                dd($invoicesPaid, $transactionsTotal, $invoicesTotal);
-            }
-
         return $invoicesPaid - $transactionsTotal + $invoicesTotal;
     }
 
