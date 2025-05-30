@@ -41,6 +41,7 @@ class Account extends Model
         $paidUser = 0;
 
         $balans = $debitSum - $creditSum;
+       // $dd =
         // Якщо власник - користувач, додаємо його зарплату
         if($this->owner_type == 'App\Models\User'){
            $user = User::find($this->owner_id);
@@ -68,7 +69,7 @@ class Account extends Model
             $this->balance = $paidUser - $balans;
             $this->save();
             if($supplier->id == 4 ){
-                dd($supplier->id, $supplier->calculateObligations(), $paidUser, $balans, $this->balance);
+                dd($supplier->id, $supplier->calculateObligations(), $paidUser, $balans, $this->balance, $debitSum, $creditSum);
             }
         }
 
