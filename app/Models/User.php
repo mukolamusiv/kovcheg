@@ -105,7 +105,13 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             ->get()
             ->sum(function ($stage) {
                 //dd($stage->paid_worker, $stage->production);
-                return $stage->paid_worker * $stage->production->quantity;
+                if(!$stage->paid_worker || !$stage->production) {
+                    return 0; // Якщо paid_worker або production відсутні, повертаємо 0
+                }elseif(!$stage->production->quantity) {
+                    return 0; // Якщо quantity відсутня, повертаємо 0
+                }else{
+                    return $stage->paid_worker * $stage->production->quantity;
+                }
             });
     }
 
