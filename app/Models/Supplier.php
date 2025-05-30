@@ -81,7 +81,41 @@ class Supplier extends Model
 
     public function calculateObligations()
     {
+        // /**
+        //  * Обчислити різницю між загальною сумою заборгованості з рахунків-фактур
+        //  * та загальною сумою транзакцій.
+        //  *
+        //  * @return float Розрахована різниця.
+        //  */
+
+        // /**
+        //  * Отримати загальну суму поля 'due' з усіх пов'язаних рахунків-фактур.
+        //  */
+        // $invoicesTotal = $this->invoices()->sum('due');
+
+
+        // /**
+        //  * Обчислити загальну суму поля 'amount' з усіх записів пов'язаних транзакцій.
+        //  * - Завантажити всі пов'язані транзакції разом з їх записами.
+        //  * - Об'єднати записи з усіх транзакцій в одну колекцію.
+        //  * - Підсумувати значення поля 'amount' з усіх записів.
+        //  */
+        // $transactionsTotal = $this->transactions()
+        //     ->with('entries') // Завантажити пов'язані записи 'entries' для кожної транзакції.
+        //     ->get() // Отримати всі транзакції як колекцію.
+        //     ->flatMap(function ($transaction) {
+        //     // Витягнути та об'єднати всі записи з кожної транзакції в одну колекцію.
+        //     return $transaction->entries;
+        //     })
+        //     ->sum('amount'); // Обчислити загальну суму поля 'amount' з усіх записів.
+
+        // /**
+        //  * Повернути різницю між загальною сумою заборгованості з рахунків-фактур
+        //  * та загальною сумою транзакцій.
+        //  */
+        // return $invoicesTotal - $transactionsTotal;
         $invoicesTotal = $this->invoices()->sum('due');
+        $invoicesPaid = $this->invoices()->sum('paid');
         $transactionsTotal = $this->transactions()
             ->with('entries')
             ->get()
@@ -89,7 +123,7 @@ class Supplier extends Model
                 return $transaction->entries;
             })
             ->sum('amount');
-        return $invoicesTotal - $transactionsTotal;
+        return $invoicesPaid - $transactionsTotal + $invoicesTotal;
     }
 
 }
