@@ -68,9 +68,9 @@ class Account extends Model
 
             $this->balance = $balans - $bal; // Corrected the calculation to subtract $bal from $balans
             $this->save();
-            if($customer->id == 4 ){
-               // dd($bal, $customer->id, $customer->calculateOutstandingInvoices(), $pay, $paidUser, $balans, $this->balance, $debitSum, $creditSum);
-            }
+            // if($customer->id == 4 ){
+            //    // dd($bal, $customer->id, $customer->calculateOutstandingInvoices(), $pay, $paidUser, $balans, $this->balance, $debitSum, $creditSum);
+            // }
         }
 
         if($this->owner_type == 'App\Models\Supplier'){
@@ -80,9 +80,9 @@ class Account extends Model
             }
             $this->balance = $paidUser - $balans;
             $this->save();
-            if($supplier->id == 4 ){
-              //  dd($supplier->id, $supplier->calculateObligations(), $paidUser, $balans, $this->balance, $debitSum, $creditSum);
-            }
+            // if($supplier->id == 4 ){
+            //   //  dd($supplier->id, $supplier->calculateObligations(), $paidUser, $balans, $this->balance, $debitSum, $creditSum);
+            // }
         }
 
 ////- $paidUser;
