@@ -57,6 +57,11 @@ class Customer extends Model
         );
     }
 
+    public function transaction_entries()
+    {
+        return $this->hasMany(TransactionEntry::class, 'account_id', 'id');
+    }
+
     public function getBalanceAttribute()
     {
         return $this->account->balance;
