@@ -45,9 +45,6 @@ class InvoicesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('payment_status')->label('Payment Status')->sortable(),
                 Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
                 Tables\Columns\TextColumn::make('notes')->label('Notes')->limit(50),
-                Tables\Columns\TextColumn::make('created_at')->label('Created At')->dateTime()->sortable(),
-                Tables\Columns\TextColumn::make('updated_at')->label('Updated At')->dateTime()->sortable(),
-                Tables\Columns\TextColumn::make('deleted_at')->label('Deleted At')->dateTime()->sortable()->hidden(fn ($record) => !$record->trashed()),
                 Tables\Columns\TextColumn::make('id')
                     ->label('View Invoice')
                     ->url(fn ($record) => route('filament.resources.invoices.view', ['record' => $record->id]))
