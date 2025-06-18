@@ -29,24 +29,26 @@ class InvoicesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('invoice_number')
             ->columns([
-                Tables\Columns\TextColumn::make('invoice_number')->label('Invoice Number')->searchable(),
-                Tables\Columns\TextColumn::make('customer_id')->label('Customer')->sortable(),
-                Tables\Columns\TextColumn::make('user_id')->label('User')->sortable(),
-                Tables\Columns\TextColumn::make('supplier_id')->label('Supplier')->sortable(),
-                Tables\Columns\TextColumn::make('warehouse_id')->label('Warehouse')->sortable(),
-                Tables\Columns\TextColumn::make('invoice_date')->label('Invoice Date')->date()->sortable(),
-                Tables\Columns\TextColumn::make('due_date')->label('Due Date')->date()->sortable(),
-                Tables\Columns\TextColumn::make('total')->label('Total')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('paid')->label('Paid')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('due')->label('Due')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('discount')->label('Discount')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('shipping')->label('Shipping')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('type')->label('Type')->sortable(),
-                Tables\Columns\TextColumn::make('payment_status')->label('Payment Status')->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
-                Tables\Columns\TextColumn::make('notes')->label('Notes')->limit(50),
+                Tables\Columns\TextColumn::make('invoice_number')->label('Номер рахунку')
+                    ->url(fn ($record) => route('filament.administrator.resources.invoices.view', ['record' => $record->id]))
+                    ->searchable(),
+                //Tables\Columns\TextColumn::make('customer_id')->label('Клієнт')->sortable(),
+                Tables\Columns\TextColumn::make('user_id')->label('Користувач')->sortable(),
+                //Tables\Columns\TextColumn::make('supplier_id')->label('Постачальник')->sortable(),
+                Tables\Columns\TextColumn::make('warehouse.name')->label('Склад')->sortable(),
+                Tables\Columns\TextColumn::make('invoice_date')->label('Дата рахунку')->date()->sortable(),
+                Tables\Columns\TextColumn::make('due_date')->label('Термін оплати')->date()->sortable(),
+                Tables\Columns\TextColumn::make('total')->label('Сума')->money('USD')->sortable(),
+                Tables\Columns\TextColumn::make('paid')->label('Оплачено')->money('USD')->sortable(),
+                //Tables\Columns\TextColumn::make('due')->label('Заборгованість')->money('USD')->sortable(),
+                //Tables\Columns\TextColumn::make('discount')->label('Знижка')->money('USD')->sortable(),
+                //Tables\Columns\TextColumn::make('shipping')->label('Доставка')->money('USD')->sortable(),
+                Tables\Columns\TextColumn::make('type')->label('Тип')->sortable(),
+                Tables\Columns\TextColumn::make('payment_status')->label('Статус оплати')->sortable(),
+                Tables\Columns\TextColumn::make('status')->label('Статус')->sortable(),
+                //Tables\Columns\TextColumn::make('notes')->label('Примітки')->limit(50),
                 Tables\Columns\TextColumn::make('id')
-                    ->label('View Invoice')
+                    ->label('Переглянути рахунок')
                     ->url(fn ($record) => route('filament.administrator.resources.invoices.view', ['record' => $record->id]))
                     ->openUrlInNewTab(),
             ])
