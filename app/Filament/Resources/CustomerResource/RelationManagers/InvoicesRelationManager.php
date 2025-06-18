@@ -47,7 +47,7 @@ class InvoicesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('notes')->label('Notes')->limit(50),
                 Tables\Columns\TextColumn::make('id')
                     ->label('View Invoice')
-                    ->url(fn ($record) => route('filament.resources.invoices.view', ['record' => $record->id]))
+                    ->url(fn ($record) => route('filament.administrator.resources.invoices.view', ['record' => $record->id]))
                     ->openUrlInNewTab(),
             ])
             ->filters([
