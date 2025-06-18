@@ -29,7 +29,12 @@ class TransactionsEntriesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('transaction_id')
             ->columns([
-                Tables\Columns\TextColumn::make('transaction_id'),
+                Tables\Columns\TextColumn::make('transaction_id')->label('ID Транзакції'),
+                Tables\Columns\TextColumn::make('account_id')->label('ID Рахунку'),
+                Tables\Columns\TextColumn::make('entry_type')->label('Тип Запису'),
+                Tables\Columns\TextColumn::make('amount')->label('Сума'),
+                Tables\Columns\TextColumn::make('created_at')->label('Дата Створення')->dateTime(),
+                Tables\Columns\TextColumn::make('updated_at')->label('Дата Оновлення')->dateTime(),
             ])
             ->filters([
                 //

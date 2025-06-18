@@ -148,7 +148,7 @@ class CustomerResource extends Resource
     {
         return [
             InvoicesRelationManager::class,
-            TransactionRelationManager::class,
+           // TransactionRelationManager::class,
             TransactionsEntriesRelationManager::class,
         ];
     }
