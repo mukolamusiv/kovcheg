@@ -33,7 +33,7 @@ class InvoicesRelationManager extends RelationManager
                     ->url(fn ($record) => route('filament.administrator.resources.invoices.view', ['record' => $record->id]))
                     ->searchable(),
                 //Tables\Columns\TextColumn::make('customer_id')->label('Клієнт')->sortable(),
-                Tables\Columns\TextColumn::make('user_id')->label('Користувач')->sortable(),
+                Tables\Columns\TextColumn::make('user.name')->label('Користувач')->sortable(),
                 //Tables\Columns\TextColumn::make('supplier_id')->label('Постачальник')->sortable(),
                 Tables\Columns\TextColumn::make('warehouse.name')->label('Склад')->sortable(),
                 Tables\Columns\TextColumn::make('invoice_date')->label('Дата рахунку')->date()->sortable(),
