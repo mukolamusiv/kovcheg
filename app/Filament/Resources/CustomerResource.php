@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerResource\Pages;
 use App\Filament\Resources\CustomerResource\RelationManagers;
 use App\Filament\Resources\CustomerResource\RelationManagers\InvoicesRelationManager;
+use App\Filament\Resources\UserResource\RelationManagers\TransactionRelationManager;
 use App\Models\Customer;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -146,6 +147,7 @@ class CustomerResource extends Resource
     {
         return [
             InvoicesRelationManager::class,
+            TransactionRelationManager::class,
         ];
     }
 
