@@ -52,6 +52,11 @@ class Supplier extends Model
         );
     }
 
+    public function transactionsEntries()
+    {
+        return $this->hasMany(TransactionEntry::class, 'account_id', 'id');
+    }
+
     public function getBalanceAttribute()
     {
         return $this->account->balance;
