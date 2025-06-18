@@ -57,7 +57,7 @@ class Customer extends Model
         );
     }
 
-    public function transactionEntries()
+    public function transactionsEntries()
     {
         return $this->hasMany(TransactionEntry::class, 'account_id', 'id');
     }
