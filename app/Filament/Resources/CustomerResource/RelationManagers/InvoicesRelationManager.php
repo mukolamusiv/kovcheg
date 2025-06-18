@@ -14,6 +14,8 @@ class InvoicesRelationManager extends RelationManager
 {
     protected static string $relationship = 'invoices';
 
+    protected static ?string $recordTitleAttribute = 'Накладні клієнта';
+
     public function form(Form $form): Form
     {
         return $form
