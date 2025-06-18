@@ -32,6 +32,9 @@ class InvoicesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('invoice_number')->label('Номер рахунку')
                     ->url(fn ($record) => route('filament.administrator.resources.invoices.view', ['record' => $record->id]))
                     ->searchable(),
+                Tables\Columns\TextColumn::make('type')->label('Тип')->sortable(),
+                Tables\Columns\TextColumn::make('payment_status')->label('Статус оплати')->sortable(),
+                Tables\Columns\TextColumn::make('status')->label('Статус')->sortable(),
                 //Tables\Columns\TextColumn::make('customer_id')->label('Клієнт')->sortable(),
                 Tables\Columns\TextColumn::make('user.name')->label('Користувач')->sortable(),
                 //Tables\Columns\TextColumn::make('supplier_id')->label('Постачальник')->sortable(),
@@ -43,9 +46,6 @@ class InvoicesRelationManager extends RelationManager
                 //Tables\Columns\TextColumn::make('due')->label('Заборгованість')->money('USD')->sortable(),
                 //Tables\Columns\TextColumn::make('discount')->label('Знижка')->money('USD')->sortable(),
                 //Tables\Columns\TextColumn::make('shipping')->label('Доставка')->money('USD')->sortable(),
-                Tables\Columns\TextColumn::make('type')->label('Тип')->sortable(),
-                Tables\Columns\TextColumn::make('payment_status')->label('Статус оплати')->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Статус')->sortable(),
                 //Tables\Columns\TextColumn::make('notes')->label('Примітки')->limit(50),
                 Tables\Columns\TextColumn::make('id')
                     ->label('Переглянути рахунок')
