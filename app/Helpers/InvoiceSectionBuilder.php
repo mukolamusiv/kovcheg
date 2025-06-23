@@ -150,7 +150,14 @@ class InvoiceSectionBuilder
                                     ->options(Fop::all()->pluck('name', 'id'))
                             ])
                             ->action(function (array $data) use ($invoice): void {
-                               // InvoiceService::addInvoiceDelivery($invoice, $data['shipping']);
+                               $invoice->fop_id = $data['fop_id'];
+                                $invoice->save();
+                                Notification::make()
+                                    ->title('ФОП призначено!')
+                                    ->body('ФОП ' . Fop::find($data['fop_id'])->name . ' призначено для накладної №' . $invoice->invoice_number)
+                                    ->success()
+                                    ->icon('heroicon-o-check-circle')
+                                    ->send();
                             }),
 
 
