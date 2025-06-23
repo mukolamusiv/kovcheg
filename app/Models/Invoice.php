@@ -121,6 +121,12 @@ class Invoice extends Model
     }
 
 
+    public function fop()
+    {
+        return $this->belongsTo(Fop::class);
+    }
+
+
     // Метод для отримання суми, що залишилася до оплати
     public function amount_due()
     {

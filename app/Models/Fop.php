@@ -24,4 +24,10 @@ class Fop extends Model
         'bank_name' => 'string',
         'bank_code' => 'string',
     ];
+
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'fop_id', 'id');
+    }
 }
