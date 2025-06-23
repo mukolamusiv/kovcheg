@@ -7,6 +7,7 @@ namespace App\Helpers;
 use App\Filament\Resources\ProductionResource;
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\Fop;
 use App\Models\Invoice;
 use App\Models\InvoiceProductionItem;
 use App\Models\Material;
@@ -134,6 +135,26 @@ class InvoiceSectionBuilder
                             ->action(function (array $data) use ($invoice): void {
                                 InvoiceService::addInvoiceDelivery($invoice, $data['shipping']);
                             }),
+
+
+
+                        Action::make('add_fop' . $invoice->id)
+                            ->label('Призначити ФОП')
+                            //->visible(fn () => $invoice->status === 'створено')
+                            ->icon('heroicon-o-truck')
+                            ->color('success')
+                            ->form([
+                                Select::make('fop_id')
+                                    ->label('ФОП')
+                                    ->required()
+                                    ->options(Fop::all()->pluck('name', 'id'))
+                            ])
+                            ->action(function (array $data) use ($invoice): void {
+                               // InvoiceService::addInvoiceDelivery($invoice, $data['shipping']);
+                            }),
+
+
+
                         Action::make('pay' . $invoice->id)
                             ->label('Внести оплату')
                             ->visible(fn () => $invoice->customer()->exists() and $invoice->status === 'проведено' and $invoice->type === 'продаж')
