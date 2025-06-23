@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\UserProfilePage;
+use App\Filament\Resources\NResource\Widgets\Income;
 use App\Filament\Resources\NResource\Widgets\UpdateInfo;
 use App\Filament\Widgets\FinanceCart;
 use App\Filament\Widgets\StockAndFinanceChart;
@@ -47,6 +48,7 @@ class AdministratorPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                Income::class,
                 FinanceCart::class,
                 WorkerTasksWidget::class,
                 //Widgets\AccountWidget::class,
