@@ -63,6 +63,10 @@ class WarehouseProductionResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('production.customer.name')
+                    ->label('Замовник')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('warehouse.name')
                     ->label('Склад')
                     ->sortable()
@@ -87,10 +91,7 @@ class WarehouseProductionResource extends Resource
                     ->prefix('₴')
                     ->money()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('production.customer.name')
-                    ->label('Замовник')
-                    ->sortable()
-                    ->searchable(),
+
                 //     ->numeric()
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable(isToggledHiddenByDefault: true)
