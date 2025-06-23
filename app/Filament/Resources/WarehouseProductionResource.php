@@ -67,11 +67,7 @@ class WarehouseProductionResource extends Resource
                     ->label('Замовник')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('warehouse.name')
-                    ->label('Склад')
-                    ->sortable()
-                    ->numeric()
-                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('production.name')
                     ->label('Готова продукція')
                     ->sortable()
@@ -96,6 +92,11 @@ class WarehouseProductionResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('warehouse.name')
+                    ->label('Склад')
+                    ->sortable()
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
