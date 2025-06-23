@@ -68,7 +68,7 @@
                 <div><strong>Адреса:</strong> {{ $fop->address ?? 'м. Львів, вул. Грінченка 12В' }}</div>
                 <div><strong>Р/рахунок:</strong> {{ $fop->iban ?? 'UA243052990000026008011027721' }}</div>
                 <div><strong>в {{ $fop->bank_name ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
-                <div><strong>в {{ $fop->bank_code ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
+                <div><strong>МФО {{ $fop->bank_code ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
                 <div><strong>Тел.:</strong> {{ $fop->phone ?? '+380964668317' }}</div>
             </td>
             <td class="no-border text-right">
@@ -83,13 +83,13 @@
         <tr>
             <td><strong>Одержувач:</strong> {{ $invoice->customer->name ?? '—' }}</td>
         </tr>
-        <tr>
+        {{-- <tr>
             <td>
                 р/р {{ $invoice->customer->bank_account ?? 'UA083052990000026006031003578' }}<br>
                 у банку КБ «ПРИВАТБАНК», м. Дніпропетровськ<br>
                 код за ДРФО {{ $invoice->customer->ipn ?? '—' }}, ІПН {{ $invoice->customer->ipn ?? '—' }}
             </td>
-        </tr>
+        </tr> --}}
     </table>
 
     <table>
@@ -159,6 +159,9 @@
         <div>
             <strong>Відвантажив(ла):</strong> _______________________
         </div>
+        <br>
+        <br>
+        <br>
         <div class="text-right">
             <strong>Отримав(ла):</strong> _______________________
         </div>
