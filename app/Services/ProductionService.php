@@ -359,6 +359,63 @@ class ProductionService
         });
     }
 
+
+
+    /**
+     * @param array $data
+     * @return Invoice
+     */
+    public static function createInvoiceSales(Production $production, array $data): Invoice
+    {
+        return \DB::transaction(function () use ($production, $data) {
+
+            if($production->invoice != null){
+                Notification::make()
+                    ->title('Накладна для продажу створена!')
+                    ->danger()
+                    ->send();
+                return $production->invoice;
+            }
+            $sum = $production->price;
+            if($data['type_price'] == 'у відсотках'){
+                $sum = $production->price*$data['addprice_percent']/100;
+            }
+            if($data['type_price'] == 'у гривнях'){
+                $sum = $production->price + $data['addprice'];
+            }
+
+           // $sum = $data['addprice'];
+            $invoice = Invoice::create([
+                'date'  => now(),
+                'total' => $sum,
+                'paid'  => 0,
+                'warehouse_id' => $data['warehouse_id'] ?? null,
+                'status'    => 'створено',
+                'user_id'   => $production->user_id,
+                'warehouse_to_id' => $data['warehouse_id'] ?? null,
+                'type'  => 'переміщення',
+                'notes' => 'Згенерована автоматично наклада переміщення говтої продукції на склад '. $production->name,
+            ]);
+
+            $invoice->invoiceProductionItems()->create([
+                'production_id' => $production->id,
+                'quantity'=>$production->quantity,
+                //'warehouse_productions_id'=>$data['warehouse_id'],
+                'price'=>$sum/$production->quantity,
+                'total'=>$sum,//*$production->quantity,
+            ]);
+            Notification::make()
+                ->title('Накладна для зарахування виробу створена!')
+                ->success()
+                ->send();
+
+            return $invoice;
+        });
+    }
+
+
+
+
     public static function setInvoiceOff(Production $production)
     {
             return \DB::transaction(function () use ($production) {

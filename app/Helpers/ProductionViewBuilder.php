@@ -974,10 +974,10 @@ class ProductionViewBuilder
                     ->numeric()
                     ->prefix('%')
                     ->visible(fn (Get $get) => $get('type_price') === 'у відсотках'),
-                Select::make('warehouse_id')
-                    ->label('Перемістити на склад')
-                    ->options(Warehouse::pluck('name', 'id'))
-                    ->required(),
+                // Select::make('warehouse_id')
+                //     ->label('Перемістити на склад')
+                //     ->options(Warehouse::pluck('name', 'id'))
+                //     ->required(),
                 Select::make('customer_id')
                     ->label('Кілєнт')
                     ->options(Customer::pluck('name', 'id'))
