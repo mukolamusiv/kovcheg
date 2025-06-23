@@ -34,6 +34,10 @@ class FopResource extends Resource
                     ->tel()
                     ->nullable()
                     ->label('Телефон ФОП'),
+                Forms\Components\TextInput::make('ipn')
+                    ->numeric()
+                    ->nullable()
+                    ->label('Ідентифікаційний код ФОП'),
                 Forms\Components\TextInput::make('address')
                     ->nullable()
                     ->label('Адреса ФОП'),
@@ -59,6 +63,10 @@ class FopResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ipn')
+                    ->label('Ідитифікаційний код ФОП')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone')
