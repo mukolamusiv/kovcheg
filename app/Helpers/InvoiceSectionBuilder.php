@@ -366,7 +366,7 @@ class InvoiceSectionBuilder
                         TextEntry::make('invoice.notes')
                             ->label('Примітки'),
                         TextEntry::make('invoice.fop.name')
-                            ->default($invoice->fop->name)
+                            ->default($invoice->fop->name ?? 'Не вказано')
                             ->label('ФОП'),
                         ]),
                 Fieldset::make('Фінанси')
