@@ -294,7 +294,8 @@ class ProductionViewBuilder
                                 self::actionEditProduction($record),
                                 self::addInvoiceOn($record),
                             ])->alignment(Alignment::Center),
-                            self::buildOrderSection($record),
+                                self::buildOrderSection($record),
+
                         ]),
                     Tabs\Tab::make('Розміри')
                         ->schema([
@@ -909,6 +910,47 @@ class ProductionViewBuilder
             ->icon('heroicon-o-calculator')
             ->color('success')
             ->visible(fn () => $record->status === 'виготовлено')
+            ->form([
+                Select::make('type_price')
+                    ->label('Спосіб націнки')
+                    ->options([
+                        'у відсотках' => 'у відсотках',
+                        'у гривнях' => 'у гривнях',
+                    ])
+                    ->default('у відсотках')
+                    ->reactive()
+                    ->required(),
+                TextInput::make('addprice')
+                    ->label('Сума націнки')
+                    ->required()
+                    ->numeric()
+                    ->prefix('₴')
+                    ->visible(fn (Get $get) => $get('type_price') === 'у гривнях'),
+                TextInput::make('addprice_percent')
+                    ->label('Сума націнки у відсотках')
+                    ->required()
+                    ->numeric()
+                    ->prefix('%')
+                    ->visible(fn (Get $get) => $get('type_price') === 'у відсотках'),
+                Select::make('warehouse_id')
+                    ->label('Перемістити на склад')
+                    ->options(Warehouse::pluck('name', 'id'))
+                    ->required(),
+            ])
+            ->action(function (array $data, Production $record): void {
+                ProductionService::createInvoice($record, $data);
+            });
+    }
+
+
+
+    public static function addInvoiceSales($record){
+
+        return Action::make('addInvoiceOn')
+            ->label('Продати виріб замовнику')
+            ->icon('heroicon-o-shopping-cart')
+            ->color('success')
+            //->visible(fn () => $record->status === 'виготовлено')
             ->form([
                 Select::make('type_price')
                     ->label('Спосіб націнки')
