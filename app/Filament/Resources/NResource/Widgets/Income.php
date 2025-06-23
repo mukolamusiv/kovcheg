@@ -42,7 +42,7 @@ class Income extends ChartWidget
     protected function getData(): array
     {
 
-        return $this->calculateTotalIncome();
+        //return $this->calculateTotalIncome();
 
         return [
             'datasets' => [
