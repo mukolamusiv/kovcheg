@@ -14,6 +14,7 @@ class Fop extends Model
         'iban',
         'bank_name',
         'bank_code',
+        'ipn',
     ];
 
     protected $casts = [

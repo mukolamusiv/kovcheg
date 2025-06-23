@@ -157,13 +157,13 @@
 
     <div class="signature">
         <div class="text-right">
-            <strong>Відвантажив(ла):</strong> _______________________
+            <strong>Відвантажив(ла): _______________________</strong>
         </div>
         <br>
         <br>
         <br>
         <div class="text-right">
-            <strong>Отримав(ла):</strong> _______________________
+            <strong>Отримав(ла): _______________________</strong>
         </div>
     </div>
 </body>
