@@ -44,7 +44,7 @@ class Income extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Blog posts created',
-                    'data' => $this->calculateTotalIncome(),
+                    'data' => $this->calculateTotalIncome()[$month] ?? 0,
                     'backgroundColor' => '#36A2EB',
                     'borderColor' => '#9BD0F5',
                 ],
