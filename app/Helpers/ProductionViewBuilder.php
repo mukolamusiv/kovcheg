@@ -978,6 +978,11 @@ class ProductionViewBuilder
                     ->label('Перемістити на склад')
                     ->options(Warehouse::pluck('name', 'id'))
                     ->required(),
+                Select::make('customer_id')
+                    ->label('Кілєнт')
+                    ->options(Customer::pluck('name', 'id'))
+                    ->default($record->customer_id) // якщо користувач має клієнта, то встановлюємо його
+                    ->required(),
             ])
             ->action(function (array $data, Production $record): void {
                 ProductionService::createInvoice($record, $data);
