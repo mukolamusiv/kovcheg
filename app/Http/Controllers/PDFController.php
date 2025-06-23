@@ -14,9 +14,10 @@ class PDFController extends Controller
     {
         $invoice = Invoice::find($invoice_id);
         $total_in_words = self::numToWords($invoice->total);
+        $fop = $invoice->fop;
         //dd($order);
         //$pdf = Pdf::loadView('demopdf', compact('order'));
-        $pdf = FacadePdf::loadView('PDF.new_invoice', compact('invoice','total_in_words'));
+        $pdf = FacadePdf::loadView('PDF.new_invoice', compact('invoice','total_in_words', 'fop'));
         return $pdf->download($invoice->invoice_number.'.pdf');
        // return $pdf->download('order.pdf');
     }

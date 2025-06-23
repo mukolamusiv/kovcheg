@@ -142,7 +142,7 @@ class InvoiceSectionBuilder
                             ->label('Призначити ФОП')
                             ->visible(true)
                             ->icon('heroicon-o-truck')
-                            ->color('success')
+                            ->color('info')
                             ->form([
                                 Select::make('fop_id')
                                     ->label('ФОП')

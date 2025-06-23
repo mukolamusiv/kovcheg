@@ -62,13 +62,14 @@
     <table class="no-border">
         <tr class="no-border">
             <td class="no-border">
-                <div><strong>Організація:</strong> ________________________________________</div>
-                <div><strong>Постачальник:</strong> {{ $invoice->supplier->name ?? '—' }}</div>
-                <div><strong>ІПН:</strong> {{ $invoice->supplier->ipn ?? '—' }}</div>
-                <div><strong>Адреса:</strong> {{ $invoice->supplier->address ?? 'м. Львів, вул. Грінченка 12В' }}</div>
-                <div><strong>Р/рахунок:</strong> {{ $invoice->supplier->bank_account ?? 'UA243052990000026008011027721' }}</div>
-                <div><strong>в АТ КБ «ПРИВАТБАНК»</strong></div>
-                <div><strong>Тел.:</strong> {{ $invoice->supplier->phone ?? '+380964668317' }}</div>
+                {{-- <div><strong>Організація:</strong> ________________________________________</div> --}}
+                <div><strong>Постачальник:</strong> {{ $fop->name ?? '—' }}</div>
+                <div><strong>ІПН:</strong> {{ $fop->ipn ?? '—' }}</div>
+                <div><strong>Адреса:</strong> {{ $fop->address ?? 'м. Львів, вул. Грінченка 12В' }}</div>
+                <div><strong>Р/рахунок:</strong> {{ $fop->iban ?? 'UA243052990000026008011027721' }}</div>
+                <div><strong>в {{ $fop->bank_name ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
+                <div><strong>в {{ $fop->bank_code ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
+                <div><strong>Тел.:</strong> {{ $fop->phone ?? '+380964668317' }}</div>
             </td>
             <td class="no-border text-right">
                 <h2>НАКЛАДНА</h2>
