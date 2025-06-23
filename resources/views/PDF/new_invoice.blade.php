@@ -65,11 +65,11 @@
                 {{-- <div><strong>Організація:</strong> ________________________________________</div> --}}
                 <div><strong>Постачальник:</strong> {{ $fop->name ?? '—' }}</div>
                 <div><strong>ІПН:</strong> {{ $fop->ipn ?? '—' }}</div>
-                <div><strong>Адреса:</strong> {{ $fop->address ?? 'м. Львів, вул. Грінченка 12В' }}</div>
-                <div><strong>Р/рахунок:</strong> {{ $fop->iban ?? 'UA243052990000026008011027721' }}</div>
-                <div><strong>в {{ $fop->bank_name ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
-                <div><strong>МФО {{ $fop->bank_code ?? 'АТ КБ «ПРИВАТБАНК»' }}</strong></div>
-                <div><strong>Тел.:</strong> {{ $fop->phone ?? '+380964668317' }}</div>
+                <div><strong>Адреса:</strong> {{ $fop->address ?? '—' }}</div>
+                <div><strong>Р/рахунок:</strong> {{ $fop->iban ?? '—' }}</div>
+                <div><strong>в {{ $fop->bank_name ?? '—' }}</strong></div>
+                <div><strong>МФО {{ $fop->bank_code ?? '—' }}</strong></div>
+                <div><strong>Тел.:</strong> {{ $fop->phone ?? '—' }}</div>
             </td>
             <td class="no-border text-right">
                 <h2>НАКЛАДНА</h2>
@@ -155,14 +155,14 @@
         </tr>
     </table>
 
-    <div class="signature">
-        <div class="text-right">
+    <div>
+        <div>
             <strong>Відвантажив(ла): _______________________</strong>
         </div>
         <br>
         <br>
         <br>
-        <div class="text-right">
+        <div>
             <strong>Отримав(ла): _______________________</strong>
         </div>
     </div>
