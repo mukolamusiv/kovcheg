@@ -31,6 +31,7 @@ class Income extends ChartWidget
             $totalIncome[$month] = $sales - $purchases;
         }
 
+        dd($totalIncome);
         return $totalIncome;
     }
 
