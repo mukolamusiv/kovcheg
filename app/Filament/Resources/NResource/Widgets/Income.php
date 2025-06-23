@@ -10,6 +10,13 @@ class Income extends ChartWidget
 {
     protected static ?string $heading = 'Чистий дохід';
 
+
+    public static function canView(): bool
+    {
+        return auth()->user()->role === 'admin'; // обмеження на працівника
+    }
+
+
     protected static ?int $sort = 2;
     protected static ?string $maxHeight = '900px';
     protected static ?string $pollingInterval = '2230s';
