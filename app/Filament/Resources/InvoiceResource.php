@@ -483,10 +483,10 @@ class InvoiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('invoice_number')
-                    ->label('Номер накладної')
-                    ->searchable()
+                Tables\Columns\TextColumn::make('customer.name')
+                    ->label('Клієнт')
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('type')
                     ->label('Тип')
                     ->colors([
@@ -520,8 +520,9 @@ class InvoiceResource extends Resource
                 Tables\Columns\TextColumn::make('supplier.name')
                     ->label('Постачальник')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('customer.name')
-                    ->label('Клієнт')
+                Tables\Columns\TextColumn::make('invoice_number')
+                    ->label('Номер накладної')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Користувач')
