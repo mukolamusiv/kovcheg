@@ -32,7 +32,8 @@ class Invoice extends Model
         'status', // Загальний статус накладної
         'notes', // Примітки
         'warehouse_id',//склад
-        'warehouse_to_id'//склад
+        'warehouse_to_id',//склад
+        'fop_id', // Ідентифікатор ФОП
     ];
 
     // Відношення до моделі Production (виробництво)
