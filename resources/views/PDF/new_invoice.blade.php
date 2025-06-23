@@ -156,7 +156,7 @@
     </table>
 
     <div class="signature">
-        <div>
+        <div class="text-right">
             <strong>Відвантажив(ла):</strong> _______________________
         </div>
         <br>
