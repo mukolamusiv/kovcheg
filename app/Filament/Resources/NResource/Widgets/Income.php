@@ -31,8 +31,12 @@ class Income extends ChartWidget
             $totalIncome[$month] = $sales - $purchases;
         }
 
-        //dd($totalIncome);
-        return $totalIncome;
+        $formattedIncome = [];
+        foreach (range(1, 12) as $month) {
+            $formattedIncome[] = $totalIncome[$month] ?? 0;
+        }
+        return $formattedIncome;
+        //return $totalIncome;
     }
 
     protected function getData(): array
@@ -44,7 +48,7 @@ class Income extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Blog posts created',
-                    'data' => $this->calculateTotalIncome()[$month] ?? 0,
+                    'data' => $this->calculateTotalIncome() ?? 0,
                     'backgroundColor' => '#36A2EB',
                     'borderColor' => '#9BD0F5',
                 ],
