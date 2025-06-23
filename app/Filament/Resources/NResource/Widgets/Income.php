@@ -10,6 +10,9 @@ class Income extends ChartWidget
 {
     protected static ?string $heading = 'Чистий дохід';
 
+    protected static ?int $sort = 2;
+    protected static ?string $maxHeight = '900px';
+    protected static ?string $pollingInterval = '2230s';
 
     public function calculateTotalIncome()
     {
@@ -47,13 +50,13 @@ class Income extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Blog posts created',
+                    'label' => 'Фінансовий результат',
                     'data' => $this->calculateTotalIncome() ?? 0,
                     'backgroundColor' => '#36A2EB',
                     'borderColor' => '#9BD0F5',
                 ],
             ],
-                    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    'labels' => ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
         ];
     }
 
