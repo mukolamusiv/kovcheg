@@ -122,7 +122,7 @@
         <tr>
             <td class="no-border" colspan="6">
                 <strong>Загальна сума, що підлягає сплаті:</strong>
-                {{ \App\Helpers\NumberHelper::numToWords($total) }}
+                {{ $total_in_words ?? '—' }}
             </td>
         </tr>
         <tr>
