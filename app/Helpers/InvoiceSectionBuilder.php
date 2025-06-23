@@ -140,7 +140,7 @@ class InvoiceSectionBuilder
 
                         Action::make('add_fop' . $invoice->id)
                             ->label('Призначити ФОП')
-                            //->visible(fn () => $invoice->status === 'створено')
+                            ->visible(true)
                             ->icon('heroicon-o-truck')
                             ->color('success')
                             ->form([
@@ -152,6 +152,7 @@ class InvoiceSectionBuilder
                             ->action(function (array $data) use ($invoice): void {
                                // InvoiceService::addInvoiceDelivery($invoice, $data['shipping']);
                             }),
+
 
 
 
