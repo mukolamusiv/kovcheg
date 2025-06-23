@@ -365,6 +365,8 @@ class InvoiceSectionBuilder
                             ->badge(),
                         TextEntry::make('invoice.notes')
                             ->label('Примітки'),
+                        TextEntry::make('invoice.fop.name')
+                            ->label('ФОП'),
                         ]),
                 Fieldset::make('Фінанси')
                         //->description('Базова інформація про накладну')
