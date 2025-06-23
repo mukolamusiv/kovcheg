@@ -115,6 +115,17 @@
                 </tr>
                 @php $total += $item->total; @endphp
             @endforeach
+            @foreach($invoice->invoiceProductionItems as $data => $item)
+                <tr>
+                    <td class="text-center">{{ $data + 1 }}</td>
+                    <td>{{ $item->production->name ?? '—' }}</td>
+                    <td class="text-center">шт.</td>
+                    <td class="text-center">{{ $item->quantity }}</td>
+                    <td class="text-right">{{ number_format($item->price, 2) }}</td>
+                    <td class="text-right">{{ number_format($item->total, 2) }}</td>
+                </tr>
+                @php $total += $item->total; @endphp
+            @endforeach
         </tbody>
     </table>
 
