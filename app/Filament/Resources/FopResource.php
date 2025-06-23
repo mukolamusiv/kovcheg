@@ -23,7 +23,29 @@ class FopResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->label('Назва ФОП'),
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->nullable()
+                    ->label('Email ФОП'),
+                Forms\Components\TextInput::make('phone')
+                    ->tel()
+                    ->nullable()
+                    ->label('Телефон ФОП'),
+                Forms\Components\TextInput::make('address')
+                    ->nullable()
+                    ->label('Адреса ФОП'),
+                Forms\Components\TextInput::make('iban')
+                    ->nullable()
+                    ->label('Рахунок IBAN ФОП'),
+                Forms\Components\TextInput::make('bank_name')
+                    ->nullable()
+                    ->label('Назва банку ФОП'),
+                Forms\Components\TextInput::make('bank_code')
+                    ->nullable()
+                    ->label('Код банку ФОП'),
             ]);
     }
 
@@ -31,8 +53,36 @@ class FopResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Назва ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->label('Email ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->label('Телефон ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('address')
+                    ->label('Адреса ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('iban')
+                    ->label('Рахунок IBAN ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('bank_name')
+                    ->label('Назва банку ФОП')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('bank_code')
+                    ->label('Код банку ФОП')
+                    ->searchable()
+                    ->sortable(),
             ])
+
             ->filters([
                 //
             ])
