@@ -293,6 +293,7 @@ class ProductionViewBuilder
                                 self::actionPauseProduction($record),
                                 self::actionEditProduction($record),
                                 self::addInvoiceOn($record),
+                                self::addInvoiceSales($record),
                             ])->alignment(Alignment::Center),
                                 self::buildOrderSection($record),
 
