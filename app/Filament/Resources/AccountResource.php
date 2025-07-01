@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AccountResource\Pages;
 use App\Filament\Resources\AccountResource\RelationManagers;
+use App\Filament\Resources\AccountResource\RelationManagers\TransactionEntriesRelationManager;
 use App\Models\Account;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -135,6 +136,7 @@ class AccountResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
+            ->defaultSort('updated_at', 'desc')
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -147,7 +149,7 @@ class AccountResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TransactionEntriesRelationManager::class,
         ];
     }
 
