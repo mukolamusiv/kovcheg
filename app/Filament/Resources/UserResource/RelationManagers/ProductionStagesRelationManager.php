@@ -14,6 +14,10 @@ class ProductionStagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'production_stages';
 
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?string $title = 'Етапи виробництва';
+
     public function form(Form $form): Form
     {
         return $form
@@ -29,7 +33,13 @@ class ProductionStagesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')->label('Name'),
+                Tables\Columns\TextColumn::make('description')->label('Description'),
+                Tables\Columns\TextColumn::make('status')->label('Status'),
+                Tables\Columns\TextColumn::make('production_id')->label('Production ID'),
+                Tables\Columns\TextColumn::make('user_id')->label('User ID'),
+                Tables\Columns\TextColumn::make('date')->label('Date')->date(),
+                Tables\Columns\BooleanColumn::make('paid_worker')->label('Paid Worker'),
             ])
             ->filters([
                 //
