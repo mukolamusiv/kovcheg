@@ -17,6 +17,13 @@ class Transaction extends Model
         'user_id', 'customer_id', 'supplier_id', 'invoice_id'
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            $model->entries()->delete();
+        });
+    }
+
     public function amount(){
         //dd($this->debet);
         return $this->debet->last();

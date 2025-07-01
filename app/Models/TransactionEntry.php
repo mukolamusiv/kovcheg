@@ -13,6 +13,14 @@ class TransactionEntry extends Model
 
     protected $fillable = ['transaction_id', 'account_id', 'entry_type', 'amount'];
 
+
+    protected static function booted()
+    {
+        static::deleting(function ($model) {
+            $model->transaction()->delete();
+        });
+    }
+
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);
