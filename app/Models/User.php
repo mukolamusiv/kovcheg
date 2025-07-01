@@ -92,8 +92,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function transactionsPaid()
     {
-        //$account = Account::find(->id);
-        return $this->account->transactionEntries();
+        $account = Account::find($this->account->id);
+        return $account->transactionEntries;
     }
 
 
