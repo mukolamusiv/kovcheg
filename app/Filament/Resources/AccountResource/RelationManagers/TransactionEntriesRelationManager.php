@@ -33,7 +33,7 @@ class TransactionEntriesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('transaction_id')
                     ->label('Transaction ID')
-                    ->url(fn ($record) => route('filament.resources.transactions.view', ['record' => $record->transaction_id])),
+                    ->url(fn ($record) => route('filament.administrator.resources.transactions.view', ['record' => $record->transaction_id])),
                 Tables\Columns\TextColumn::make('transaction.reference_number')->label('Reference Number'),
                 Tables\Columns\TextColumn::make('transaction.description')->label('Опис')->limit(50),
                 Tables\Columns\TextColumn::make('transaction.transaction_date')->label('Transaction Date')->date(),
