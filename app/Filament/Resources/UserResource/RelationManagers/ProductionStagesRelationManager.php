@@ -38,7 +38,7 @@ class ProductionStagesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('status')->label('Статус'),
                 Tables\Columns\TextColumn::make('production.name')->label('Виробництво'),
                 Tables\Columns\TextColumn::make('updated_at')->label('Дата')->date(),
-                Tables\Columns\TextColumn::make('paid_worker')->numeric()->label('Оплачений працівник'),
+                Tables\Columns\TextColumn::make('paid_worker')->numeric()->label('Оплата працівника'),
             ])
             ->filters([
                 //

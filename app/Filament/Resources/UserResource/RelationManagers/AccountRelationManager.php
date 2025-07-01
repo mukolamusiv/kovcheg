@@ -14,6 +14,8 @@ class AccountRelationManager extends RelationManager
 {
     protected static string $relationship = 'account';
 
+    protected static ?string $title = 'Рахунки';
+
     public function form(Form $form): Form
     {
         return $form

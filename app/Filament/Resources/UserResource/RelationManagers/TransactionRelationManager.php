@@ -14,6 +14,8 @@ class TransactionRelationManager extends RelationManager
 {
     protected static string $relationship = 'transactions';
 
+    protected static ?string $title = 'Транзакції які створив користувач';
+
     public function form(Form $form): Form
     {
         return $form
