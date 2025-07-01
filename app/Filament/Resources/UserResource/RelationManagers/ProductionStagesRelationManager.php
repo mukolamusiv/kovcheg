@@ -33,13 +33,13 @@ class ProductionStagesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')->label('Name'),
-                Tables\Columns\TextColumn::make('description')->label('Description'),
-                Tables\Columns\TextColumn::make('status')->label('Status'),
-                Tables\Columns\TextColumn::make('production_id')->label('Production ID'),
-                Tables\Columns\TextColumn::make('user_id')->label('User ID'),
-                Tables\Columns\TextColumn::make('date')->label('Date')->date(),
-                Tables\Columns\BooleanColumn::make('paid_worker')->label('Paid Worker'),
+                Tables\Columns\TextColumn::make('name')->label('Назва'),
+                Tables\Columns\TextColumn::make('description')->label('Опис'),
+                Tables\Columns\TextColumn::make('status')->label('Статус'),
+                Tables\Columns\TextColumn::make('production_id')->label('ID виробництва'),
+                Tables\Columns\TextColumn::make('user_id')->label('ID користувача'),
+                Tables\Columns\TextColumn::make('date')->label('Дата')->date(),
+                Tables\Columns\BooleanColumn::make('paid_worker')->label('Оплачений працівник'),
             ])
             ->filters([
                 //
@@ -51,6 +51,7 @@ class ProductionStagesRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
+            ->defaultSort('updated_at', 'desc')
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
