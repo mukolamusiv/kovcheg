@@ -121,6 +121,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             ->sum('paid_worker');
      */
 
+    //зарплата працівника
     public function paid()
     {
         $account = Account::find($this->account->id);

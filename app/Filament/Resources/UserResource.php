@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Filament\Resources\UserResource\RelationManagers\AccountRelationManager;
+use App\Filament\Resources\UserResource\RelationManagers\ProductionStagesRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\TransactionRelationManager;
 use App\Filament\Resources\UserResource\Widgets\UserAccaunt;
 use App\Models\User;
@@ -142,6 +143,7 @@ class UserResource extends Resource
         return [
             AccountRelationManager::class,
             TransactionRelationManager::class,
+            ProductionStagesRelationManager::class,
         ];
     }
 
