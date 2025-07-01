@@ -90,6 +90,13 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     }
 
 
+    public function transactionsPaid()
+    {
+        //$account = Account::find(->id);
+        return $this->account->transactionEntries();
+    }
+
+
     //етапи що виконував працівник
     public function production_stages()
     {
@@ -125,7 +132,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function paid()
     {
         $account = Account::find($this->account->id);
-        $account->syncBalance();
+        //$account->syncBalance();
     }
 
     //накладні що проводив працівник
