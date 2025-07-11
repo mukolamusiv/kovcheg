@@ -15,9 +15,11 @@
                         <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <div class="font-medium">Етап - {{ $task->name }}</div>
-                                    <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div>
-                                    <div class="text-sm text-color-info">Виконавець: {{ $task->user->name }}</div>
+
+                                    <div class="font-medium">Виробництво: {{ $task->production->name }}</div>
+                                    <hr>
+                                    <div class="text-sm text-color-info">Етап - {{ $task->name }}</div>
+                                    {{-- <div class="text-sm text-color-info">Виконавець: {{ $task->user->name }}</div> --}}
                                 </div>
                                 <form wire:submit.prevent="startTask({{ $task->id }})">
                                     <x-filament::button type="submit" color="primary" size="sm">
