@@ -30,10 +30,13 @@
                     <h3 class="font-semibold mb-2">В роботі</h3>
                     @foreach ($inProgressTasks as $task)
                         <x-filament::card class="mb-2">
+                            @if(!$task->production)
+                            @continue
+                            @endif
                             <div class="flex justify-between items-center">
                                 <div>
                                     <div class="font-medium">Етап - {{ $task->name }}</div>
-                                    {{-- <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div> --}}
+                                    <div class="text-sm text-color-info">Виробництво: {{ $task->production->name }}</div>
                                     <div class="text-sm text-color-info">Виконавець: {{ $task->user->name }}</div>
                                 </div>
                                 <form wire:submit.prevent="completeTask({{ $task->id }})">
@@ -43,6 +46,7 @@
                                 </form>
                             </div>
                         </x-filament::card>
+                        <br>
                     @endforeach
                 </div>
 
