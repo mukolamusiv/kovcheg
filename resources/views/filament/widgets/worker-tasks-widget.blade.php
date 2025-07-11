@@ -8,6 +8,9 @@
                 <div class="mb-6">
                     <h3 class="font-semibold mb-2">Очікує на початок</h3>
                     @foreach ($pendingTasks as $task)
+                    @if(!$task->production)
+                        @continue
+                    @endif
                     @dd($task->production)
                         <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
@@ -33,7 +36,6 @@
                     @if(!$task->production)
                                 @continue
                             @endif
-
                         <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
                                 <div>
