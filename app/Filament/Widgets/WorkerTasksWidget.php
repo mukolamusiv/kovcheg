@@ -53,6 +53,6 @@ class WorkerTasksWidget extends Widget
     public function completeTask($taskId)
     {
         $task = ProductionStage::findOrFail($taskId);
-        ProductionService::stopStage($task);
+        ProductionService::endStage($task);
     }
 }
