@@ -215,8 +215,9 @@ class ProductionResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->label('Опис')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('invoice.number')
-                    ->label('Номер накладної')
+                Tables\Columns\TextColumn::make('invoice.total')
+                    ->label('Сума накладної')
+                    ->money('UAN')
                     ->searchable(),
 
                 // Tables\Columns\TextColumn::make('user_id')
