@@ -62,7 +62,7 @@ class CustomerResource extends Resource
                     ->columnSpanFull(),
 
                 Forms\Components\Repeater::make('customer_robe_sizes')
-                        ->relationship('customerRobeSizes')
+                        ->relationship('robeSize')
                         ->schema([
                             Forms\Components\TextInput::make('throat')
                                 ->label('Горловина')
