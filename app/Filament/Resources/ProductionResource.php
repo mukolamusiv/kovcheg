@@ -223,7 +223,7 @@ class ProductionResource extends Resource
                         };
                     })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('invoice.number_invoice')
+                Tables\Columns\TextColumn::make('invoice.invoice_number')
                     ->label('Номер')
 
                     ->searchable(),
