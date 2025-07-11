@@ -212,11 +212,19 @@ class ProductionResource extends Resource
                     ->label('Оплата')
                     ->hidden(true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->label('Опис')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('description')
+                //     ->label('Опис')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('invoice.total')
                     ->label('Сума накладної')
+                    ->color(function ($state, $record) {
+                        return match ($record->invoice->payment_status ?? null) {
+                            'оплачено' => 'success',
+                            'частково оплачено' => 'warning',
+                            'не оплачено' => 'danger',
+                            default => 'gray',
+                        };
+                    })
                     ->money('UAN')
                     ->searchable(),
 
