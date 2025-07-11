@@ -32,6 +32,7 @@
                     @if(!$task->production)
                                 @continue
                             @endif
+                            @dd($task->production)
                         <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
                                 <div>
