@@ -18,6 +18,25 @@ class Customer extends Model
         return $this->morphOne(Account::class, 'owner');
     }
 
+
+    public function robeSize()
+    {
+        return $this->hasOne(CustomerRobeSize::class);
+    }
+
+    public function dalmaticSize()
+    {
+        return $this->hasOne(CustomerDalmaticSizes::class);
+    }
+
+    public function underwearSize()
+    {
+        return $this->hasOne(CustomerUnderwearSizes::class);
+    }
+
+
+
+
     protected static function booted()
     {
         static::created(function ($customer) {

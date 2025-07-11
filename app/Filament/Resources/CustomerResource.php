@@ -60,43 +60,43 @@ class CustomerResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
-                Forms\Components\Repeater::make('size')
-                        ->relationship('size')
+
+                Forms\Components\Repeater::make('customer_robe_sizes')
+                        ->relationship('customerRobeSizes')
                         ->schema([
                             Forms\Components\TextInput::make('throat')
-                                ->label('Горло')
+                                ->label('Горловина')
                                 ->numeric()
-                                ->required(),
-                            Forms\Components\TextInput::make('redistribution')
-                                ->label('Розподіл')
-                                ->numeric()
-                                ->required(),
-                            Forms\Components\TextInput::make('behind')
-                                ->label('Позаду')
-                                ->numeric()
-                                ->required(),
-                            Forms\Components\TextInput::make('hips')
-                                ->label('Стегна')
-                                ->numeric()
-                                ->required(),
-                            Forms\Components\TextInput::make('length')
-                                ->label('Довжина')
-                                ->numeric()
-                                ->required(),
-                            Forms\Components\TextInput::make('sleeve')
-                                ->label('Рукав')
-                                ->numeric()
-                                ->required(),
-                            Forms\Components\TextInput::make('shoulder')
-                                ->label('Плече')
-                                ->numeric()
-                                ->required(),
-                            Forms\Components\Textarea::make('comment')
-                                ->label('Коментар')
-                                ->maxLength(255),
+                                ->nullable(),
+                            Forms\Components\TextInput::make('front')
+                                ->label('Перед')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('front_type')
+                                ->label('Тип переду')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('back')
+                                ->label('Зад')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('epitrachelion_length')
+                                ->label('Єпитрахиль – довжина')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('epitrachelion_type')
+                                ->label('Тип єпитрахилі')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('cuff_type')
+                                ->label('Тип нарукавника')
+                                ->nullable(),
+                            Forms\Components\Toggle::make('awards')
+                                ->label('Нагороди')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('tape')
+                                ->label('Тасьма')
+                                ->nullable(),
+                            Forms\Components\Toggle::make('clasp')
+                                ->label('Застібка')
+                                ->nullable(),
                         ])
-                        ->label('Розміри клієнта')
-                        ->createItemButtonLabel('Додати розмір')
+                        ->label('Розміри ризи клієнта')
                         ->columns(2),
 
             ]);
