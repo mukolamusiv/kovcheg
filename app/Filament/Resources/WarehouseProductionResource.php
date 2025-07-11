@@ -18,6 +18,12 @@ class WarehouseProductionResource extends Resource
     protected static ?string $model = WarehouseProduction::class;
 
 
+     //обмеження доступу
+     public static function canViewAny(): bool
+     {
+         return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
+     }
+
               //назва ресурсу
    protected static ?string $label = 'Готова продукція';
    protected static ?string $pluralLabel = 'Готова продукція';
