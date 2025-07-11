@@ -21,10 +21,12 @@ class WorkerTasksWidget extends Widget
         return [
             'pendingTasks' => ProductionStage::where('user_id', $userId)
                 ->where('status', 'очікує')
+                ->with('production') // Завантаження пов'язаного виробництва
                 ->get(),
 
             'inProgressTasks' => ProductionStage::where('user_id', $userId)
                 ->where('status', 'в роботі')
+                ->with('production') // Завантаження пов'язаного виробництва
                 ->get(),
 
             'doneTasks' => ProductionStage::where('user_id', $userId)
