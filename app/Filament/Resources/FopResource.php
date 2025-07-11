@@ -18,6 +18,11 @@ class FopResource extends Resource
     protected static ?string $model = Fop::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    //обмеження доступу
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
+    }
 
     public static function form(Form $form): Form
     {

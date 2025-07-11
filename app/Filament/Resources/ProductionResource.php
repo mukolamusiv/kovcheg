@@ -22,6 +22,12 @@ class ProductionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-fire';
 
+    //обмеження доступу
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'admin' || auth()->user()?->role === 'manager';
+    }
+
           //назва ресурсу
    protected static ?string $label = 'Виробництво';
    //protected static ?string $pluralLabel = 'Накладні';
