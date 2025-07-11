@@ -223,6 +223,10 @@ class ProductionResource extends Resource
                         };
                     })
                     ->searchable(),
+                Tables\Columns\TextColumn::make('invoice.number_invoice')
+                    ->label('Номер')
+
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('invoice.total')
                     ->label('Сума накладної')
                     // ->color(function ($state, $record) {
