@@ -29,10 +29,10 @@
                 <div class="mb-6">
                     <h3 class="font-semibold mb-2">В роботі</h3>
                     @foreach ($inProgressTasks as $task)
-                        <x-filament::card class="mb-2">
-                            @if(!$task->production)
-                            @continue
+                    @if(!$task->production)
+                                @continue
                             @endif
+                        <x-filament::card class="mb-2">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <div class="font-medium">Етап - {{ $task->name }}</div>
@@ -51,7 +51,7 @@
                 </div>
 
                 {{-- Завершені --}}
-                <div>
+                {{-- <div>
                     <h3 class="font-semibold mb-2">Завершені</h3>
                     @foreach ($doneTasks as $task)
                         <x-filament::card class="mb-2 opacity-80">
@@ -61,7 +61,7 @@
                             </div>
                         </x-filament::card>
                     @endforeach
-                </div>
+                </div> --}}
             </x-filament::card>
         </x-filament::widget>
     </x-filament::section>
