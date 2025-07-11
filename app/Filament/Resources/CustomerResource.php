@@ -180,6 +180,25 @@ class CustomerResource extends Resource
                         ->maxItems(1)
                         ->columns(2),
 
+
+
+                        Forms\Components\Repeater::make('size')
+                        ->relationship('size')
+                        ->schema([
+                            Forms\Components\TextInput::make('length')
+                                ->label('Ріст людини')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('throat')
+                                ->label('Шия ')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('comment')
+                                ->label('Примітка')
+                                ->nullable(),
+                        ])
+                        ->label('Розміри клієнта')
+                        ->maxItems(1)
+                        ->columns(2),
+
             ]);
     }
 
