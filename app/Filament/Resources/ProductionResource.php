@@ -218,6 +218,7 @@ class ProductionResource extends Resource
                 Tables\Columns\TextColumn::make('invoice.total')
                     ->label('Сума накладної')
                     ->color(function ($state, $record) {
+                        dd($record->invoice->payment_status);
                         return match ($record->invoice->payment_status ?? null) {
                             'оплачено' => 'success',
                             'частково оплачено' => 'warning',
