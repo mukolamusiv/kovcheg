@@ -97,6 +97,87 @@ class CustomerResource extends Resource
                                 ->nullable(),
                         ])
                         ->label('Розміри ризи клієнта')
+                        ->maxItems(1)
+                        ->columns(2),
+
+
+
+                        Forms\Components\Repeater::make('customer_dalmatic_sizes')
+                        ->relationship('dalmaticSize')
+                        ->schema([
+                            Forms\Components\TextInput::make('throat')
+                                ->label('Горловина')
+                                ->numeric()
+                                ->nullable(),
+                            Forms\Components\TextInput::make('length')
+                                ->label('Довжина')
+                                ->numeric()
+                                ->nullable(),
+                            Forms\Components\TextInput::make('width')
+                                ->label('Ширина')
+                                ->numeric()
+                                ->nullable(),
+                            Forms\Components\TextInput::make('sleeve_type')
+                                ->label('Тип рукава')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('sleeve_length')
+                                ->label('Довжина рукава')
+                                ->numeric()
+                                ->nullable(),
+                            Forms\Components\TextInput::make('shoulder')
+                                ->label('Плече')
+                                ->numeric()
+                                ->nullable(),
+                            Forms\Components\Toggle::make('stand_collar_zip')
+                                ->label('Комір-стійка з блискавкою')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('fabric')
+                                ->label('Тканина')
+                                ->nullable(),
+                        ])
+                        ->label('Розміри дальматика клієнта')
+                        ->maxItems(1)
+                        ->columns(2),
+
+
+
+
+                        Forms\Components\Repeater::make('customer_underwear_sizes')
+                        ->relationship('underwearSize')
+                        ->schema([
+                            Forms\Components\TextInput::make('throat')
+                                ->label('Горловина')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('length')
+                                ->label('Довжина виробу')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('chest_volume')
+                                ->label('Об’єм грудей')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('belly_volume')
+                                ->label('Об’єм живота')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('shoulder')
+                                ->label('Плече')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('sleeve_length')
+                                ->label('Довжина рукава')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('back_width')
+                                ->label('Ширина спинки')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('cuff')
+                                ->label('Зап’ястя')
+                                ->nullable(),
+                            Forms\Components\TextInput::make('fabric')
+                                ->label('Тканина')
+                                ->nullable(),
+                            Forms\Components\Toggle::make('embroidery')
+                                ->label('Вишивка')
+                                ->nullable(),
+                        ])
+                        ->label('Розміри стихаря клієнта')
+                        ->maxItems(1)
                         ->columns(2),
 
             ]);
