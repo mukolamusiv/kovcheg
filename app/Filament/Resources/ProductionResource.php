@@ -210,8 +210,7 @@ class ProductionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pay')
                     ->label('Оплата')
-                    ->hidden(true)
-                    ->sortable(),
+                    ->hidden(true),
                 Tables\Columns\TextColumn::make('invoice.payment_status')
                     ->label('Стутус оплати')
                     ->color(function ($state) {
@@ -221,12 +220,9 @@ class ProductionResource extends Resource
                             'не оплачено' => 'danger',
                             default => 'gray',
                         };
-                    })
-                    ->searchable(),
+                    }),
                 Tables\Columns\TextColumn::make('invoice.invoice_number')
-                    ->label('Номер')
-
-                    ->searchable(),
+                    ->label('Номер'),
                 Tables\Columns\TextColumn::make('invoice.total')
                     ->label('Сума накладної')
                     // ->color(function ($state, $record) {
@@ -238,8 +234,7 @@ class ProductionResource extends Resource
                     //         default => 'gray',
                     //     };
                     // })
-                    ->money('UAN')
-                    ->searchable(),
+                    ->money('UAN'),
 
                 // Tables\Columns\TextColumn::make('user_id')
                 //     ->numeric()
@@ -250,8 +245,7 @@ class ProductionResource extends Resource
                 Tables\Columns\TextColumn::make('price')
                     ->label('Варітсть')
                     ->money('UAN')
-                    ->visible(fn () => auth()->user()->role == 'admin' || auth()->user()->role== 'manager')
-                    ->sortable(),
+                    ->visible(fn () => auth()->user()->role == 'admin' || auth()->user()->role== 'manager'),
                 // Tables\Columns\TextColumn::make('production_date')
                 //     ->date()
                 //     ->sortable(),
