@@ -485,6 +485,7 @@ class InvoiceResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Клієнт')
+                    ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('type')
