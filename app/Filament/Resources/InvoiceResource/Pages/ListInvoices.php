@@ -23,7 +23,6 @@ class ListInvoices extends ListRecords
     public function getTabs(): array
     {
         $array = [
-            'Вся продукція' => Tab::make(),
             'Продажі' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'продаж')),
             'Постачання' => Tab::make()
@@ -34,6 +33,7 @@ class ListInvoices extends ListRecords
             ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'повернення')),
             'Списання' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('type', '=', 'списання')),
+            'Вся продукція' => Tab::make(),
         ];
         return $array;
     }
