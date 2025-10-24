@@ -171,14 +171,14 @@ class InvoiceResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->required(),
-                                // Select::make('warehouse_id_to')
-                                //     ->label('Пермістити на склад')
-                                //     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
-                                //     ->relationship('warehouse', 'name')
-                                //     ->searchable()
-                                //     ->visible(fn (callable $get) => $get('type') === 'переміщення')
-                                //     ->preload()
-                                //     ->required(),
+                                Select::make('warehouse_id_to')
+                                    ->label('Пермістити на склад')
+                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                    ->relationship('warehouse', 'name')
+                                    ->searchable()
+                                    ->visible(fn (callable $get) => $get('type') === 'переміщення')
+                                    ->preload()
+                                    ->required(),
                                 TextInput::make('shipping')
                                     ->label('Доставка')
                                     ->numeric()
@@ -356,14 +356,14 @@ class InvoiceResource extends Resource
                                 Forms\Components\Repeater::make('productions')
                                     ->label('Замовлення на виробництво')
                                     ->schema([
-                                        Select::make('product_id')
-                                            ->label('Готова продукція на скаладі')
-                                             ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
-                                            ->options(\App\Models\WarehouseProduction::with('production')->get()->pluck('production.name', 'id'))
-                                            ->searchable()
-                                            ->preload()
-                                            ->columnSpan(6)
-                                            ->required(),
+                                        // Select::make('product_id')
+                                        //     ->label('Готова продукція на скаладі')
+                                        //      ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
+                                        //     ->options(\App\Models\WarehouseProduction::with('production')->get()->pluck('production.name', 'id'))
+                                        //     ->searchable()
+                                        //     ->preload()
+                                        //     ->columnSpan(6)
+                                        //     ->required(),
                                         TextInput::make('quantity')
                                             ->label('Кількість виробів')
                                             ->numeric()
