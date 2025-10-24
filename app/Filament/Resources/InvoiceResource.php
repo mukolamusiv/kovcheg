@@ -356,14 +356,20 @@ class InvoiceResource extends Resource
                                 Forms\Components\Repeater::make('productions')
                                     ->label('Замовлення на виробництво')
                                     ->schema([
-                                        // Select::make('product_id')
-                                        //     ->label('Готова продукція на скаладі')
-                                        //      ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
-                                        //     ->options(\App\Models\WarehouseProduction::with('production')->get()->pluck('production.name', 'id'))
-                                        //     ->searchable()
-                                        //     ->preload()
-                                        //     ->columnSpan(6)
-                                        //     ->required(),
+                                        Select::make('product_id')
+                                            ->label('Готова продукція на скаладі')
+                                            //->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
+                                            ->options(
+                                                    \App\Models\WarehouseProduction::with('production')
+                                                        ->get()
+                                                        ->mapWithKeys(fn ($wp) => [$wp->id => $wp->production?->name ?? '—'])
+                                                        ->toArray()
+                                                )
+                                            //->options(\App\Models\WarehouseProduction::with('production')->get()->pluck('production.name', 'id'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpan(6)
+                                            ->required(),
                                         TextInput::make('quantity')
                                             ->label('Кількість виробів')
                                             ->numeric()
