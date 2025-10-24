@@ -75,7 +75,7 @@ class InvoiceResource extends Resource
                                 Select::make('supplier_id')
                                     ->label('Постачальник')
                                     ->relationship('supplier', 'name')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
                                     ->searchable()
                                     ->preload()
                                     ->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
@@ -358,6 +358,7 @@ class InvoiceResource extends Resource
                                     ->schema([
                                         Select::make('product_id')
                                             ->label('Готова продукція на скаладі')
+                                             ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
                                             ->options(\App\Models\WarehouseProduction::with('production')->get()->pluck('production.name', 'id'))
                                             ->searchable()
                                             ->preload()
