@@ -164,21 +164,21 @@ class InvoiceResource extends Resource
                            ])
                            ->columnSpan(8),
                         Section::make([
-                                // Select::make('warehouse_id')
-                                //     ->label('Склад')
-                                //     ->relationship('warehouse', 'name')
-                                //     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
-                                //     ->searchable()
-                                //     ->preload()
-                                //     ->required(),
-                                Select::make('warehouse_id_to')
-                                    ->label('Пермістити на склад')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                Select::make('warehouse_id')
+                                    ->label('Склад')
                                     ->relationship('warehouse', 'name')
+                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
                                     ->searchable()
-                                    ->visible(fn (callable $get) => $get('type') === 'переміщення')
                                     ->preload()
                                     ->required(),
+                                // Select::make('warehouse_id_to')
+                                //     ->label('Пермістити на склад')
+                                //     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                //     ->relationship('warehouse', 'name')
+                                //     ->searchable()
+                                //     ->visible(fn (callable $get) => $get('type') === 'переміщення')
+                                //     ->preload()
+                                //     ->required(),
                                 TextInput::make('shipping')
                                     ->label('Доставка')
                                     ->numeric()
