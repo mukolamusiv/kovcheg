@@ -72,13 +72,13 @@ class InvoiceResource extends Resource
                                     ])
                                     ->required()
                                     ->reactive(),
-                                // Select::make('supplier_id')
-                                //     ->label('Постачальник')
-                                //     ->relationship('supplier', 'name')
-                                //     ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
-                                //     ->searchable()
-                                //     ->preload()
-                                //     ->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
+                                Select::make('supplier_id')
+                                    ->label('Постачальник')
+                                    ->relationship('supplier', 'name')
+                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record?->name ?? '—') // <- note ?-operator
+                                    ->searchable()
+                                    ->preload()
+                                    ->visible(fn (callable $get) => $get('type') === 'постачання' || $get('type') === 'повернення'),
                                 Select::make('customer_id')
                                     ->label('Клієнт')
                                     ->relationship('customer', 'name')
@@ -108,14 +108,14 @@ class InvoiceResource extends Resource
                                     ->visible(fn (callable $get) => $get('type') === 'постачання')
                                     ->relationship('invoiceItems')
                                     ->schema([
-                                        Select::make('material_id')
-                                            ->label('Матеріал')
-                                            ->relationship('material', 'name')
-                                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
-                                            ->searchable()
-                                            ->preload()
-                                            ->columnSpan(6)
-                                            ->required(),
+                                        // Select::make('material_id')
+                                        //     ->label('Матеріал')
+                                        //     ->relationship('material', 'name')
+                                        //     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                        //     ->searchable()
+                                        //     ->preload()
+                                        //     ->columnSpan(6)
+                                        //     ->required(),
                                         TextInput::make('quantity')
                                             ->label('Кількість')
                                             ->numeric()
