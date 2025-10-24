@@ -139,14 +139,14 @@ class InvoiceResource extends Resource
                                     ->visible(fn (callable $get) => $get('type') !== 'постачання')
                                     ->relationship('invoiceItems')
                                     ->schema([
-                                        // Select::make('material_id')
-                                        //     ->label('Матеріал')
-                                        //     ->relationship('material', 'name')
-                                        //     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
-                                        //     ->searchable()
-                                        //     ->preload()
-                                        //     ->columnSpan(6)
-                                        //     ->required(),
+                                        Select::make('material_id')
+                                            ->label('Матеріал')
+                                            ->relationship('material', 'name')
+                                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                            ->searchable()
+                                            ->preload()
+                                            ->columnSpan(6)
+                                            ->required(),
                                         TextInput::make('quantity')
                                             ->label('Кількість')
                                             ->numeric()
@@ -164,13 +164,13 @@ class InvoiceResource extends Resource
                            ])
                            ->columnSpan(8),
                         Section::make([
-                                Select::make('warehouse_id')
-                                    ->label('Склад')
-                                    ->relationship('warehouse', 'name')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
+                                // Select::make('warehouse_id')
+                                //     ->label('Склад')
+                                //     ->relationship('warehouse', 'name')
+                                //     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
+                                //     ->searchable()
+                                //     ->preload()
+                                //     ->required(),
                                 Select::make('warehouse_id_to')
                                     ->label('Пермістити на склад')
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?? '—')
